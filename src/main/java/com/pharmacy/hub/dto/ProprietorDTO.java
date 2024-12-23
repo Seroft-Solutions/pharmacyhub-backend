@@ -1,0 +1,23 @@
+package com.pharmacy.hub.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProprietorDTO implements PHUserDTO
+{
+  private Long id;
+  private String categoryRequired;
+  private String licenseDuration;
+  private String experienced;
+  private String pharmacyName;
+  private String city;
+  private String location;
+  private String contactNumber;
+  private String categoryProvince;
+}
