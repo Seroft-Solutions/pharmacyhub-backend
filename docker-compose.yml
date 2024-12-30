@@ -1,32 +1,97 @@
-version: '3'
+
 services:
-  spring-boot-app:
-    build: ./pharmacyhub-springboot
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_DB=pharmacyhub
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass myredispassword
+    healthcheck:
+      test: [ "PharmacyHub", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: pharmacyhub
+      DB_USER: postgres
+      DB_PASSWORD: postgres
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql-db
-    # Optional: Use an entrypoint script that waits for MySQL to be ready before starting the Spring Boot app.
-    # entrypoint: ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "your-app.jar"]
-  react-app:
-    build: ./pharmacyhub-react
-    ports:
-      - "80:80"
-  mysql-db:
-    image: mysql:8.0.23
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: pharmacyhub
-      MYSQL_USER: pharmacyhub
-      MYSQL_PASSWORD: PharmacyHub#1
-    ports:
-      - "3306:3306"
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "8081:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./pharmacyhub-realm/pharmacyhub_realm_local.json:/opt/keycloak/data/import/realm.json
+      - keycloak-data:/opt/keycloak/data
+    command:
+      - "start-dev"
+      - "--import-realm"
+      - "--spi-theme-static-max-age=-1"
+      - "--spi-theme-cache-themes=false"
+      - "--spi-theme-cache-templates=false"
     depends_on:
-      - spring-boo
-        this is me usman
+      - postgres
+      - redis
+
+#  calcom:
+#    image: calcom/cal.com:latest
+#    restart: always
+#    env_file: .env
+#    environment:
+#      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/calendso
+#      - DATABASE_DIRECT_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/calendso
+#      - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3011
+#      - NEXT_PUBLIC_WEBSITE_URL=http://localhost:3011
+#      - NEXT_PUBLIC_URL=http://localhost:3011
+#      - BASE_URL=http://localhost:3011
+#      - NEXT_PUBLIC_BASE_URL=http://localhost:3011
+#      - NEXT_PUBLIC_API_V2_URL=http://localhost:3011/api/v2
+#      - NEXTAUTH_URL=http://localhost:3011
+#      - PORT=3011
+#      - NEXT_PUBLIC_APP_URL=http://localhost:3011
+#      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3011
+#      - APP_URL=http://localhost:3011
+#      - NEXT_PUBLIC_WEBAPP_PORT=3011
+#      - NEXT_PUBLIC_WEBSITE_PORT=3011
+#      - CALCOM_PORT=3011
+#      - HOSTING_URL=http://localhost:3011
+#      - NEXT_PUBLIC_TEAM_URL=http://localhost:3011
+#      - DEFAULT_HOSTNAME=localhost:3011
+#      - NEXT_PUBLIC_IS_E2E=1
+#      # Redis configuration
+#      - REDIS_HOST=redis
+#      - REDIS_PORT=6379
+#      - REDIS_PASSWORD=myredispassword
+#    command: >
+#      sh -c "find /calcom -type f -exec sed -i 's/:3000/:3011/g' {} + &&
+#             yarn prisma migrate deploy &&
+#             yarn workspace @calcom/web start"
+#    ports:
+#      - "3011:3011"
+#    depends_on:
+#      - postgres
+#      - redis
+
+volumes:
+  postgres-data:
+  redis-data:
+  keycloak-data:
