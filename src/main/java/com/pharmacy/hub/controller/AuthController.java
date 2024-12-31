@@ -43,8 +43,8 @@ public class AuthController
             UserDTO userDTO = UserDTO.builder().id(userId)
                                      .emailAddress(oidcUser.getEmail())
                                      // .role(keycloakUserService.getUserRoles(oidcUser))
-                                     .firstName(oidcUser.getClaims().get("family_name").toString())
-                                     .lastName(oidcUser.getClaims().get("given_name").toString())
+                                     .firstName(oidcUser.getClaims().get("given_name").toString())
+                                     .lastName(oidcUser.getClaims().get("family_name").toString())
                                      .build();
 
             Map<String, Object> tokenResponse = new HashMap<>();
