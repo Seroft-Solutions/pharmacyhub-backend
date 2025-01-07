@@ -35,7 +35,7 @@ spring:
         registration:
           keycloak:
             client-id: pharmacyhub-client
-            client-secret: oe96iYNG9C7BPAfaToyFxv02FylVzxTX
+            client-secret: gH5vlF79Wm5jOaKawkPzjB4tA0jfaLAJ
             authorization-grant-type: authorization_code
             scope:
               - openid

@@ -84,9 +84,7 @@ public class ProprietorService extends PHEngine implements PHUserService
       UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(proprietor.getUser());
       userDisplayDTO.setProprietor(phMapper.getProprietorDTO(proprietor));
 
-      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
-       return userDisplayDTO1.getProprietor().getId().equals(proprietor.getId());
-      }));
+      //userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getProprietor().getId().equals(proprietor.getId())));
 
       return userDisplayDTO;
     }).collect(Collectors.toList());

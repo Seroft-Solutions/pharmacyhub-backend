@@ -80,9 +80,7 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
     return pharmacyManagerRepository.findAll().stream().map(pharmacyManager -> {
       UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacyManager.getUser());
       userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(pharmacyManager));
-      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
-        return userDisplayDTO1.getPharmacyManager().getId().equals(pharmacyManager.getId());
-      }));
+      //userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getPharmacyManager().getId().equals(pharmacyManager.getId())));
 
       return userDisplayDTO;
     }).collect(Collectors.toList());

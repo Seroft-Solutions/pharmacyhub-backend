@@ -81,9 +81,7 @@ public class PharmacistService extends PHEngine implements PHUserService
       UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacist.getUser());
       userDisplayDTO.setPharmacist(phMapper.getPharmacistDTO(pharmacist));
 
-      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
-        return userDisplayDTO1.getPharmacist().getId().equals(pharmacist.getId());
-      }));
+//      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getPharmacist().getId().equals(pharmacist.getId())));
 
       return userDisplayDTO;
     }).collect(Collectors.toList());

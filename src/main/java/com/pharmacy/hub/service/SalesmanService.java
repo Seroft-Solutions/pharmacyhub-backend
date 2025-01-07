@@ -83,9 +83,7 @@ public class SalesmanService extends PHEngine implements PHUserService
       UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(salesman.getUser());
       userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(salesman));
 
-      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
-        return userDisplayDTO1.getSalesman().getId().equals(salesman.getId());
-      }));
+     // userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getSalesman().getId().equals(salesman.getId())));
 
       return userDisplayDTO;
     }).collect(Collectors.toList());
