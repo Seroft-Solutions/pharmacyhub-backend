@@ -22,6 +22,5 @@ public class PharmacyManagerDTO implements PHUserDTO
   private String currentJobStatus;
   private String timePrefernce;
   private String saleryExpectation;
-private String userId;
 }
 

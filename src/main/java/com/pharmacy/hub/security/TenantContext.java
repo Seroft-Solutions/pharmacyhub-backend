@@ -51,11 +51,11 @@ public class TenantContext
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth instanceof OAuth2AuthenticationToken oauthToken)
         {
-            userName = oauthToken.getPrincipal().getAttribute("preferred_username");
+            userName = oauthToken.getPrincipal().getAttribute("sub");
         }
         else if (auth instanceof JwtAuthenticationToken jwtToken)
         {
-            userName = ((Jwt) (jwtToken.getPrincipal())).getClaims().get("preferred_username").toString();
+            userName = ((Jwt) (jwtToken.getPrincipal())).getClaims().get("sub").toString();
         }
 
 

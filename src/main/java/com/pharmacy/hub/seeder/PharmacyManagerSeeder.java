@@ -46,6 +46,7 @@ public class PharmacyManagerSeeder
                 if (userRepository.findByEmailAddress(email).isEmpty())
                 {
                   User user = new User();
+                  user.setId(i+"@pharmacitManager");
                   user.setFirstName("User " + i);
                   user.setLastName("Pharmacy Manager");
                   user.setEmailAddress("user" + i + "@pharmacyhub.pk");
@@ -57,12 +58,15 @@ public class PharmacyManagerSeeder
                   
                   PharmacyManager pharmacyManager = PharmacyManager.builder()
                           .contactNumber("03456142607")
+                          .experienceAsManager("3 years")
+                          .education("Matric")
                           .area("NFC")
                           .city("Lahore")
                           .experience("1 year")
                           .previousPharmacyName("Madina pharmacy")
                           .currentJobStatus("resigned")
-                          .shiftTime("morning")
+                          .timePrefernce("morning")
+                          .saleryExpectation("10000")
                           .user(user)
                           .build();
 

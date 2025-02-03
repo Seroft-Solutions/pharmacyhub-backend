@@ -11,13 +11,13 @@ import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.PharmacyManager;
+import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.entity.connections.SalesmenConnections;
-import com.pharmacy.hub.repository.PharmacistRepository;
-import com.pharmacy.hub.repository.PharmacyManagerRepository;
-import com.pharmacy.hub.repository.ProprietorRepository;
-import com.pharmacy.hub.repository.SalesmanRepository;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.PharmacyManagerConnectionsRepository;
+import com.pharmacy.hub.security.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +45,27 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   private PharmacyManagerConnectionsRepository pharmacyManagerConnectionsRepository;
   @Autowired
   private PHMapper phMapper;
-
+  @Autowired
+  private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
+  @Autowired
+  private UserRepository userRepository;
 
   @Override
   public PHUserDTO saveUser(PHUserDTO pharmacyManagerDTO)
   {
+    User user= new User();
+    String groupName="ADMIN";
+    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
+    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(), groupId);
     PharmacyManager PharmacyManager = phMapper.getPharmacyManager((PharmacyManagerDTO) pharmacyManagerDTO);
-    getLoggedInUser().setRegistered(true);
-    getLoggedInUser().setUserType(UserEnum.PHARMACY_MANAGER.getUserEnum());
-    PharmacyManager.setUser(getLoggedInUser());
+    user.setId(TenantContext.getCurrentTenant());
+    user.setRegistered(true);
+    user.setOpenToConnect(true);
+    userRepository.save(user);
+    PharmacyManager.setUser(user);
+//    getLoggedInUser().setRegistered(true);
+//    getLoggedInUser().setUserType(UserEnum.PHARMACY_MANAGER.getUserEnum());
+//    PharmacyManager.setUser(getLoggedInUser());
     PharmacyManager savedPharmacyManager = pharmacyManagerRepository.save(PharmacyManager);
     return phMapper.getPharmacyManagerDTO(savedPharmacyManager);
   }
