@@ -11,15 +11,22 @@ import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
+import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.PharmacistsConnections;
-import com.pharmacy.hub.repository.PharmacistRepository;
-import com.pharmacy.hub.repository.PharmacyManagerRepository;
-import com.pharmacy.hub.repository.ProprietorRepository;
-import com.pharmacy.hub.repository.SalesmanRepository;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.keycloak.services.KeycloakAuthService;
+import com.pharmacy.hub.keycloak.utils.KeycloakGroupUtils;
+import com.pharmacy.hub.keycloak.utils.KeycloakUtils;
+import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.PharmacistsConnectionsRepository;
+import com.pharmacy.hub.security.TenantContext;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.GroupRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,14 +53,30 @@ public class PharmacistService extends PHEngine implements PHUserService
   private PharmacistsConnectionsRepository pharmacistsConnectionsRepository;
   @Autowired
   private PHMapper phMapper;
+    @Autowired
+    private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
+    @Autowired
+    private UserRepository userRepository;
+
 
   @Override
   public PHUserDTO saveUser(PHUserDTO pharmacistDTO)
   {
-    Pharmacist pharmacist = phMapper.getPharmacist((PharmacistDTO) pharmacistDTO);
-    getLoggedInUser().setRegistered(true);
-    getLoggedInUser().setUserType(UserEnum.PHARMACIST.getUserEnum());
-    pharmacist.setUser(getLoggedInUser());
+    User user= new User();
+    String groupName="PHARMACIST";
+    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
+    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(),groupId);
+   Pharmacist pharmacist = phMapper.getPharmacist((PharmacistDTO) pharmacistDTO);
+user.setId(TenantContext.getCurrentTenant());
+user.setRegistered(true);
+user.setOpenToConnect(true);
+userRepository.save(user);
+pharmacist.setUser(user);
+
+//pharmacist.setUser(userId);
+//    getLoggedInUser().setRegistered(true);
+//    getLoggedInUser().setUserType(UserEnum.PHARMACIST.getUserEnum());
+//    pharmacist.setUser(getLoggedInUser());
     Pharmacist savedPharmacist = pharmacistRepository.save(pharmacist);
     return phMapper.getPharmacistDTO(savedPharmacist);
   }

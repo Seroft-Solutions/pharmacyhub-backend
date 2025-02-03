@@ -21,7 +21,6 @@ public class PharmacistDTO implements PHUserDTO
   private String batch;
   private String contactNumber;
   private String timePreference;
- private String userId;
  private String previousPharmacyName;
  private String currentJobStatus;
 }
