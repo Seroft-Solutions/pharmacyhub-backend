@@ -11,13 +11,13 @@ import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.Salesman;
+import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.ProprietorsConnections;
 import com.pharmacy.hub.entity.connections.SalesmenConnections;
-import com.pharmacy.hub.repository.PharmacistRepository;
-import com.pharmacy.hub.repository.PharmacyManagerRepository;
-import com.pharmacy.hub.repository.ProprietorRepository;
-import com.pharmacy.hub.repository.SalesmanRepository;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.SalesmenConnectionsRepository;
+import com.pharmacy.hub.security.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,15 +47,29 @@ public class SalesmanService extends PHEngine implements PHUserService
   private SalesmenConnectionsRepository salesmenConnectionsRepository;
 
   @Autowired
+  private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
+  @Autowired
+  private UserRepository userRepository;
+
+  @Autowired
   private PHMapper phMapper;
 
   @Override
   public PHUserDTO saveUser(PHUserDTO salesmanDTO)
   {
+    User user= new User();
+    String groupName="SALESMAN";
+    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
+    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(), groupId);
     Salesman salesman = phMapper.getSalesman((SalesmanDTO) salesmanDTO);
-    getLoggedInUser().setRegistered(true);
-    salesman.setUser(getLoggedInUser());
-    getLoggedInUser().setUserType(UserEnum.SALESMAN.getUserEnum());
+    user.setId(TenantContext.getCurrentTenant());
+    user.setRegistered(true);
+    user.setOpenToConnect(true);
+    userRepository.save(user);
+    salesman.setUser(user);
+    //    getLoggedInUser().setRegistered(true);
+//    salesman.setUser(getLoggedInUser());
+//    getLoggedInUser().setUserType(UserEnum.SALESMAN.getUserEnum());
     Salesman savedSalesman = salesmanRepository.save(salesman);
     return phMapper.getSalesmanDTO(savedSalesman);
   }

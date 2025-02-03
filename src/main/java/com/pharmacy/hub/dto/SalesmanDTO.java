@@ -21,5 +21,4 @@ public class SalesmanDTO implements PHUserDTO
   private String currentJobStatus;
   private String timePrefernce;
   private String saleryExpectation;
-  private String userId;
 }
