@@ -16,9 +16,12 @@ public class PharmacistDTO implements PHUserDTO
   private String licenseDuration;
   private String experience;
   private String city;
-  private String location;
+  private String area;
   private String universityName;
   private String batch;
   private String contactNumber;
-  private String categoryProvince;
+  private String timePreference;
+ private String userId;
+ private String previousPharmacyName;
+ private String currentJobStatus;
 }
