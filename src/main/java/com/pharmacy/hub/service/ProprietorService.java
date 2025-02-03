@@ -11,13 +11,13 @@ import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.Proprietor;
+import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.entity.connections.ProprietorsConnections;
-import com.pharmacy.hub.repository.PharmacistRepository;
-import com.pharmacy.hub.repository.PharmacyManagerRepository;
-import com.pharmacy.hub.repository.ProprietorRepository;
-import com.pharmacy.hub.repository.SalesmanRepository;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.ProprietorsConnectionsRepository;
+import com.pharmacy.hub.security.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +49,26 @@ public class ProprietorService extends PHEngine implements PHUserService
   @Autowired
   private PHMapper phMapper;
 
-
+  @Autowired
+  private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
+  @Autowired
+  private UserRepository userRepository;
   @Override
   public PHUserDTO saveUser(PHUserDTO proprietorDTO)
   {
+    User user= new User();
+    String groupName="PROPRIETOR";
+    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
+    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(), groupId);
     Proprietor proprietor = phMapper.getProprietor((ProprietorDTO) proprietorDTO);
-    getLoggedInUser().setRegistered(true);
-    proprietor.setUser(getLoggedInUser());
-    getLoggedInUser().setUserType(UserEnum.PROPRIETOR.getUserEnum());
+    user.setId(TenantContext.getCurrentTenant());
+    user.setRegistered(true);
+    user.setOpenToConnect(true);
+    userRepository.save(user);
+    proprietor.setUser(user);
+//    getLoggedInUser().setRegistered(true);
+//    proprietor.setUser(getLoggedInUser());
+//    getLoggedInUser().setUserType(UserEnum.PROPRIETOR.getUserEnum());
     Proprietor savedProprietor = proprietorRepository.save(proprietor);
     return phMapper.getProprietorDTO(savedProprietor);
   }
