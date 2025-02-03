@@ -35,8 +35,7 @@ import java.util.Date;
 public class User implements UserDetails
 {
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private String id;
   private String firstName;
   @Column(columnDefinition = "boolean default true")
   private boolean openToConnect = true;
