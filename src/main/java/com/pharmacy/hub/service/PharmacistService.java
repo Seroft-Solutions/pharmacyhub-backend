@@ -13,7 +13,9 @@ import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.PharmacistsConnections;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
 import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakUserServiceImpl;
 import com.pharmacy.hub.keycloak.services.KeycloakAuthService;
 import com.pharmacy.hub.keycloak.utils.KeycloakGroupUtils;
 import com.pharmacy.hub.keycloak.utils.KeycloakUtils;
@@ -23,6 +25,7 @@ import com.pharmacy.hub.security.TenantContext;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,7 +62,14 @@ public class PharmacistService extends PHEngine implements PHUserService
     @Autowired
     private UserRepository userRepository;
 
-
+    @Autowired
+    private KeycloakUserServiceImpl keycloakUserServiceImpl;
+    @Autowired
+    private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
+  private final String realm;
+  PharmacistService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
+    this.realm=realm;
+  }
   @Override
   public PHUserDTO saveUser(PHUserDTO pharmacistDTO)
   {
@@ -97,17 +108,39 @@ pharmacist.setUser(user);
     return phMapper.getPharmacistDTO(pharmacist.get());
   }
 
+
+
+
   @Override
-  public List<UserDisplayDTO> findAllUsers()
-  {
-    return pharmacistRepository.findAll().stream().map(pharmacist -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacist.getUser());
-      userDisplayDTO.setPharmacist(phMapper.getPharmacistDTO(pharmacist));
+  public List<UserDisplayDTO> findAllUsers() {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
 
-//      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getPharmacist().getId().equals(pharmacist.getId())));
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> pharmacistGroup = realmResource.groups().groups().stream()
+                                                                 .filter(group -> "PHARMACIST".equalsIgnoreCase(group.getName()))
+                                                                 .findFirst();
 
-      return userDisplayDTO;
-    }).collect(Collectors.toList());
+    if (pharmacistGroup.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> pharmacistUserIds = realmResource.groups().group(pharmacistGroup.get().getId()).members().stream()
+                                                  .map(UserRepresentation::getId)
+                                                  .collect(Collectors.toList());
+
+    return pharmacistRepository.findAll().stream()
+                               .filter(pharmacist -> pharmacistUserIds.contains(pharmacist.getUser().getId()))
+                               .map(pharmacist -> {
+                                 UserRepresentation keycloakUser = realmResource.users().get(pharmacist.getUser().getId()).toRepresentation();
+                                 UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacist.getUser());
+                                 userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+                                 userDisplayDTO.setLastName(keycloakUser.getLastName());
+                                 userDisplayDTO.setPharmacist(phMapper.getPharmacistDTO(pharmacist));
+
+                                 return userDisplayDTO;
+                               }).collect(Collectors.toList());
   }
 
   @Override

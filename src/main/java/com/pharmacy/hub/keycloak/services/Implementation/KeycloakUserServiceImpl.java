@@ -90,6 +90,11 @@ public class KeycloakUserServiceImpl implements KeycloakUserService
     {
 
     }
+    public UserRepresentation getUserById(String userId) {
+        Keycloak keycloak = keycloakAuthService.getKeycloakInstance();
+        RealmResource realmResource = keycloak.realm(realm);
+        return realmResource.users().get(userId).toRepresentation();
+    }
 
     @Override
     public UserDTO getUserInfo(String userId)

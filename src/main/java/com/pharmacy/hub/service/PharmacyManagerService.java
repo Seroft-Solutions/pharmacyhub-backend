@@ -14,15 +14,21 @@ import com.pharmacy.hub.entity.PharmacyManager;
 import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.entity.connections.SalesmenConnections;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
 import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
 import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.PharmacyManagerConnectionsRepository;
 import com.pharmacy.hub.security.TenantContext;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,6 +55,15 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
   @Autowired
   private UserRepository userRepository;
+
+
+  @Autowired
+  private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
+  private final String realm;
+  PharmacyManagerService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
+    this.realm=realm;
+  }
+
 
   @Override
   public PHUserDTO saveUser(PHUserDTO pharmacyManagerDTO)
@@ -87,16 +102,37 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   }
 
   @Override
-  public List<UserDisplayDTO> findAllUsers()
-  {
-    return pharmacyManagerRepository.findAll().stream().map(pharmacyManager -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacyManager.getUser());
-      userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(pharmacyManager));
-      //userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getPharmacyManager().getId().equals(pharmacyManager.getId())));
+  public List<UserDisplayDTO> findAllUsers() {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
 
-      return userDisplayDTO;
-    }).collect(Collectors.toList());
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> pharmacyManagerGroup = realmResource.groups().groups().stream()
+                                                                 .filter(group -> "ADMIN".equalsIgnoreCase(group.getName()))
+                                                                 .findFirst();
+
+    if (pharmacyManagerGroup.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> pharmacyManagerUserIds = realmResource.groups().group(pharmacyManagerGroup.get().getId()).members().stream()
+                                                  .map(UserRepresentation::getId)
+                                                  .collect(Collectors.toList());
+
+    return pharmacyManagerRepository.findAll().stream()
+                               .filter(pharmacyManager -> pharmacyManagerUserIds.contains(pharmacyManager.getUser().getId()))
+                               .map(pharmacyManager -> {
+                                 UserRepresentation keycloakUser = realmResource.users().get(pharmacyManager.getUser().getId()).toRepresentation();
+                                 UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacyManager.getUser());
+                                 userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+                                 userDisplayDTO.setLastName(keycloakUser.getLastName());
+                                 userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(pharmacyManager));
+
+                                 return userDisplayDTO;
+                               }).collect(Collectors.toList());
   }
+
 
   @Override
   public void connectWith(PHUserConnectionDTO phUserConnectionDTO)

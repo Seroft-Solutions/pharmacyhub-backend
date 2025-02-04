@@ -14,15 +14,21 @@ import com.pharmacy.hub.entity.Proprietor;
 import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.entity.connections.ProprietorsConnections;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
 import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
 import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.ProprietorsConnectionsRepository;
 import com.pharmacy.hub.security.TenantContext;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,6 +59,14 @@ public class ProprietorService extends PHEngine implements PHUserService
   private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
   @Autowired
   private UserRepository userRepository;
+
+
+  @Autowired
+  private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
+  private final String realm;
+  ProprietorService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
+    this.realm=realm;
+  }
   @Override
   public PHUserDTO saveUser(PHUserDTO proprietorDTO)
   {
@@ -90,16 +104,35 @@ public class ProprietorService extends PHEngine implements PHUserService
   }
 
   @Override
-  public List<UserDisplayDTO> findAllUsers()
-  {
-    return proprietorRepository.findAll().stream().map(proprietor -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(proprietor.getUser());
-      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(proprietor));
+  public List<UserDisplayDTO> findAllUsers() {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
 
-      //userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getProprietor().getId().equals(proprietor.getId())));
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> proprietorGroup = realmResource.groups().groups().stream()
+                                                                      .filter(group -> "PROPRIETOR".equalsIgnoreCase(group.getName()))
+                                                                      .findFirst();
 
-      return userDisplayDTO;
-    }).collect(Collectors.toList());
+    if (proprietorGroup.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> proprietorUserIds = realmResource.groups().group(proprietorGroup.get().getId()).members().stream()
+                                                       .map(UserRepresentation::getId)
+                                                       .collect(Collectors.toList());
+
+    return proprietorRepository.findAll().stream()
+                                    .filter(proprietor -> proprietorUserIds.contains(proprietor.getUser().getId()))
+                                    .map(proprietor -> {
+                                      UserRepresentation keycloakUser = realmResource.users().get(proprietor.getUser().getId()).toRepresentation();
+                                      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(proprietor.getUser());
+                                      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+                                      userDisplayDTO.setLastName(keycloakUser.getLastName());
+                                      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(proprietor));
+
+                                      return userDisplayDTO;
+                                    }).collect(Collectors.toList());
   }
 
   @Override

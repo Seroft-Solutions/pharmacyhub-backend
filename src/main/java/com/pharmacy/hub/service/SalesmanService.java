@@ -14,16 +14,22 @@ import com.pharmacy.hub.entity.Salesman;
 import com.pharmacy.hub.entity.User;
 import com.pharmacy.hub.entity.connections.ProprietorsConnections;
 import com.pharmacy.hub.entity.connections.SalesmenConnections;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
 import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
 import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.SalesmenConnectionsRepository;
 import com.pharmacy.hub.security.TenantContext;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,6 +59,13 @@ public class SalesmanService extends PHEngine implements PHUserService
 
   @Autowired
   private PHMapper phMapper;
+
+  @Autowired
+  private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
+  private final String realm;
+  SalesmanService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
+    this.realm=realm;
+  }
 
   @Override
   public PHUserDTO saveUser(PHUserDTO salesmanDTO)
@@ -91,16 +104,35 @@ public class SalesmanService extends PHEngine implements PHUserService
   }
 
   @Override
-  public List<UserDisplayDTO> findAllUsers()
-  {
-    return salesmanRepository.findAll().stream().map(salesman -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(salesman.getUser());
-      userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(salesman));
+  public List<UserDisplayDTO> findAllUsers() {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
 
-     // userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> userDisplayDTO1.getSalesman().getId().equals(salesman.getId())));
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> salesmanGroup = realmResource.groups().groups().stream()
+                                                                 .filter(group -> "SALESMAN".equalsIgnoreCase(group.getName()))
+                                                                 .findFirst();
 
-      return userDisplayDTO;
-    }).collect(Collectors.toList());
+    if (salesmanGroup.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> salesmanUserIds = realmResource.groups().group(salesmanGroup.get().getId()).members().stream()
+                                                  .map(UserRepresentation::getId)
+                                                  .collect(Collectors.toList());
+
+    return salesmanRepository.findAll().stream()
+                               .filter(salesman -> salesmanUserIds.contains(salesman.getUser().getId()))
+                               .map(salesman -> {
+                                 UserRepresentation keycloakUser = realmResource.users().get(salesman.getUser().getId()).toRepresentation();
+                                 UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(salesman.getUser());
+                                 userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+                                 userDisplayDTO.setLastName(keycloakUser.getLastName());
+                                 userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(salesman));
+
+                                 return userDisplayDTO;
+                               }).collect(Collectors.toList());
   }
 
   @Override
