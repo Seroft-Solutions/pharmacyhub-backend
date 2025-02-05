@@ -2,6 +2,7 @@ package com.pharmacy.hub.controller;
 
 import com.pharmacy.hub.dto.UserDTO;
 import com.pharmacy.hub.keycloak.services.KeycloakUserService;
+import com.pharmacy.hub.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class AuthController
 
     @Autowired
     private KeycloakUserService keycloakUserService;
+    @Autowired
+    private UserService userService;
 
 
     @GetMapping("/token")
@@ -45,6 +48,7 @@ public class AuthController
                                      // .role(keycloakUserService.getUserRoles(oidcUser))
                                      .firstName(oidcUser.getClaims().get("given_name").toString())
                                      .lastName(oidcUser.getClaims().get("family_name").toString())
+                    .registered(userService.isRegisteredUser(userId))
                                      .build();
 
             Map<String, Object> tokenResponse = new HashMap<>();

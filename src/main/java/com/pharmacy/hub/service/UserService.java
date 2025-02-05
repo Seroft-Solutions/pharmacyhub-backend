@@ -165,6 +165,13 @@ public class UserService extends PHEngine implements PHUserService {
 
         return savedUser != null;
     }
+    public boolean isRegisteredUser(String userId) {
+        User user = userRepository.findById(userId);
+        if (user != null) {
+            return user.isRegistered();
+        }
+        return false;
+    }
 
     public boolean isUserRole() {
         return getLoggedInUser().getRole().getName().equals(RoleEnum.USER);
