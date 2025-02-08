@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface ProprietorRepository extends JpaRepository<Proprietor, Long>
 {
   Proprietor findByUser(User loggedInUser);
+
+    Proprietor findByUser_Id(String id);
 }

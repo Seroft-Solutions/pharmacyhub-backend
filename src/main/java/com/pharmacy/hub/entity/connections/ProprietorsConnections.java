@@ -1,5 +1,6 @@
 package com.pharmacy.hub.entity.connections;
 
+import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.entity.Proprietor;
 import com.pharmacy.hub.entity.User;
@@ -35,7 +36,7 @@ public class ProprietorsConnections
   private Long id;
 
   @Enumerated(EnumType.STRING)
-  private StateEnum state = StateEnum.READY_TO_CONNECT;
+  private ConnectionStatusEnum connectionStatus ;
 
   private String notes;
 
@@ -49,10 +50,10 @@ public class ProprietorsConnections
 
   @ManyToOne
   @JoinColumn(name = "user_id")
-  private User user;
+  private User userId;
 
   @ManyToOne
   @JoinColumn(name = "proprietor_id")
-  private Proprietor proprietor;
+  private Proprietor proprietorId;
 
 }

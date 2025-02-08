@@ -4,6 +4,7 @@ import com.pharmacy.hub.constants.APIConstants;
 import com.pharmacy.hub.dto.PHUserConnectionDTO;
 import com.pharmacy.hub.dto.PHUserDTO;
 import com.pharmacy.hub.dto.ProprietorDTO;
+import com.pharmacy.hub.dto.ProprietorsConnectionsDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.service.ProprietorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +45,48 @@ public class ProprietorController
     return new ResponseEntity<>(proprietorService.findAllUsers(), HttpStatus.OK);
   }
 
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-pending-requests", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDisplayDTO>> getAllPendingRequests()
+  {
+    return new ResponseEntity<>(proprietorService.findPendingUsers(), HttpStatus.OK);
+  }
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-connections", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDisplayDTO>> getAllConnections()
+  {
+    return new ResponseEntity<>(proprietorService.getAllUserConnections(), HttpStatus.OK);
+  }
+
   @PreAuthorize("isAuthenticated()")
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/connect",
           method = RequestMethod.POST
   )
-  public ResponseEntity connectProprietor(@RequestBody PHUserConnectionDTO PHUserConnectionDTO)
+  public ResponseEntity connectProprietor(@RequestBody ProprietorsConnectionsDTO proprietorsConnectionsDTO)
   {
-    proprietorService.connectWith(PHUserConnectionDTO);
+    proprietorService.connectWith(proprietorsConnectionsDTO);
     return new ResponseEntity<>(HttpStatus.OK);
   }
+
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/approveStatus/{id}", method = RequestMethod.POST)
+  public ResponseEntity approveStatus(@PathVariable Long id) {
+    proprietorService.approveStatus(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/rejectStatus/{id}", method = RequestMethod.POST)
+  public ResponseEntity rejectStatus(@PathVariable Long id)
+  {
+
+    proprietorService.rejectStatus(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
 
   @PreAuthorize("isAuthenticated()")
   @RequestMapping(
@@ -92,15 +125,15 @@ public class ProprietorController
     return new ResponseEntity<>(HttpStatus.CONFLICT);
   }
 
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-  @RequestMapping(
-          value = APIConstants.API_VERSION_V1 + "/get-all-connections",
-          method = RequestMethod.GET
-  )
-  public ResponseEntity getAllConnections()
-  {
-    return new ResponseEntity<>(proprietorService.getAllConnections(), HttpStatus.OK);
-  }
+//  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+//  @RequestMapping(
+//          value = APIConstants.API_VERSION_V1 + "/get-all-connections",
+//          method = RequestMethod.GET
+//  )
+//  public ResponseEntity getAllConnections()
+//  {
+//    return new ResponseEntity<>(proprietorService.getAllConnections(), HttpStatus.OK);
+//  }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
   @RequestMapping(
