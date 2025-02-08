@@ -4,6 +4,7 @@ import com.pharmacy.hub.constants.APIConstants;
 import com.pharmacy.hub.dto.PHUserConnectionDTO;
 import com.pharmacy.hub.dto.PHUserDTO;
 import com.pharmacy.hub.dto.PharmacistDTO;
+import com.pharmacy.hub.dto.PharmacistsConnectionsDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
 import com.pharmacy.hub.service.PharmacistService;
@@ -52,20 +53,48 @@ public ResponseEntity<List<GroupRepresentation>> checkUserGroup(@PathVariable Lo
     }
     return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Not found response
 }
+    @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-pending-requests", method = RequestMethod.GET)
+    public ResponseEntity<List<UserDisplayDTO>> getAllPendingRequests()
+    {
+        return new ResponseEntity<>(pharmacistService.findPendingUsers(), HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-connections", method = RequestMethod.GET)
+    public ResponseEntity<List<UserDisplayDTO>> getAllConnections()
+    {
+        return new ResponseEntity<>(pharmacistService.getAllUserConnections(), HttpStatus.OK);
+    }
 
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = APIConstants.API_VERSION_V1 + "/connect", method = RequestMethod.POST)
-    public ResponseEntity connectPharmacist(@RequestBody PHUserConnectionDTO phUserConnectionDTO)
+    public ResponseEntity connectPharmacist(@RequestBody PharmacistsConnectionsDTO pharmacistsConnectionsDTO)
     {
-            ResponseEntity responseEntity = isEligibleToConnect();
-            if (responseEntity.getStatusCode() == HttpStatus.OK)
-            {
-                pharmacistService.connectWith(phUserConnectionDTO);
+            //ResponseEntity responseEntity = isEligibleToConnect();
+//            if (responseEntity.getStatusCode() == HttpStatus.OK)
+//            {
+                pharmacistService.connectWith2(pharmacistsConnectionsDTO);
                 return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return responseEntity;
+//            }
+           // return responseEntity;
     }
+
+
+    @RequestMapping(value = APIConstants.API_VERSION_V1 + "/approveStatus/{id}", method = RequestMethod.POST)
+    public ResponseEntity approveStatus(@PathVariable Long id) {
+        pharmacistService.approveStatus(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = APIConstants.API_VERSION_V1 + "/rejectStatus/{id}", method = RequestMethod.POST)
+    public ResponseEntity rejectStatus(@PathVariable Long id)
+    {
+
+        pharmacistService.rejectStatus(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-user-connections", method = RequestMethod.GET)
@@ -95,12 +124,12 @@ public ResponseEntity<List<GroupRepresentation>> checkUserGroup(@PathVariable Lo
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-    @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-connections", method = RequestMethod.GET)
-    public ResponseEntity getAllConnections()
-    {
-        return new ResponseEntity<>(pharmacistService.getAllConnections(), HttpStatus.OK);
-    }
+//    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+//    @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-connections", method = RequestMethod.GET)
+//    public ResponseEntity getAllConnections()
+//    {
+//        return new ResponseEntity<>(pharmacistService.getAllConnections(), HttpStatus.OK);
+//    }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @RequestMapping(value = APIConstants.API_VERSION_V1 + "/update-connection-state", method = RequestMethod.PUT)

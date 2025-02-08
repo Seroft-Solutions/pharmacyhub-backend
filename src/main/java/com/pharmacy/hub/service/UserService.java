@@ -105,7 +105,7 @@ public class UserService extends PHEngine implements PHUserService {
         return null;
     }
 
-    @Override
+
     public void connectWith(PHUserConnectionDTO phUserConnectionDTO) {
 
     }
