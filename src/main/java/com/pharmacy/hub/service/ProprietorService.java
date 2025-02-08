@@ -67,6 +67,9 @@ public class ProprietorService extends PHEngine implements PHUserService
   @Autowired
   private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
   private final String realm;
+    @Autowired
+    private UserService userService;
+
   ProprietorService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
     this.realm=realm;
   }
@@ -163,13 +166,9 @@ public class ProprietorService extends PHEngine implements PHUserService
     proprietorsConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
     proprietorsConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
     proprietorsConnectionsDTO.setNotes("User Want to connect");
-    proprietorsConnectionsDTO.setUserGroup(getUserGroup(TenantContext.getCurrentTenant()));
+    proprietorsConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
     ProprietorsConnections proprietorsConnections = phMapper.getProprietorConnections(proprietorsConnectionsDTO);
     proprietorsConnectionsRepository.save(proprietorsConnections);
-  }
-  public String getUserGroup(String userId)
-  {
-    return keycloakGroupServiceImpl.getAllUserGroups(userId).get(0).getName();
   }
 
 

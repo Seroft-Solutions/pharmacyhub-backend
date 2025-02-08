@@ -66,6 +66,8 @@ public class PharmacistService extends PHEngine implements PHUserService
     @Autowired
     private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
     private final String realm;
+    @Autowired
+    private UserService userService;
 
     PharmacistService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm)
     {
@@ -217,7 +219,7 @@ public class PharmacistService extends PHEngine implements PHUserService
         pharmacistsConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
         pharmacistsConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
         pharmacistsConnectionsDTO.setNotes("User Want to connect");
-        pharmacistsConnectionsDTO.setUserGroup(getUserGroup(TenantContext.getCurrentTenant()));
+        pharmacistsConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
         PharmacistsConnections pharmacistsConnections = phMapper.getPharmacistsConnections(pharmacistsConnectionsDTO);
         pharmacistsConnectionsRepository.save(pharmacistsConnections);
     }
@@ -228,10 +230,6 @@ public class PharmacistService extends PHEngine implements PHUserService
 
     }
 
-    public String getUserGroup(String userId)
-    {
-        return keycloakGroupServiceImpl.getAllUserGroups(userId).get(0).getName();
-    }
 
     @Override
     public List<UserDisplayDTO> getAllUserConnections()
@@ -349,10 +347,6 @@ public class PharmacistService extends PHEngine implements PHUserService
 
     }
 
-    public Pharmacist getPharmacist()
-    {
-        return pharmacistRepository.findByUser(getLoggedInUser());
-    }
 }
 
 

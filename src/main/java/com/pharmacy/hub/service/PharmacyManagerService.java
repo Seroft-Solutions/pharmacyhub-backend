@@ -56,7 +56,8 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
   @Autowired
   private UserRepository userRepository;
-
+@Autowired
+private UserService userService;
 
   @Autowired
   private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
@@ -151,17 +152,14 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
                                }).collect(Collectors.toList());
   }
 
-  public String getUserGroup(String userId)
-  {
-    return keycloakGroupServiceImpl.getAllUserGroups(userId).get(0).getName();
-  }
+
 
   public void connectWith(PharmacyManagerConnectionsDTO pharmacyManagerConnectionsDTO)
   {
     pharmacyManagerConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
     pharmacyManagerConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
     pharmacyManagerConnectionsDTO.setNotes("User Want to connect");
-    pharmacyManagerConnectionsDTO.setUserGroup(getUserGroup(TenantContext.getCurrentTenant()));
+    pharmacyManagerConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
     PharmacyManagerConnections pharmacyManagerConnections = phMapper.getPharmacyManagerConnections(pharmacyManagerConnectionsDTO);
     pharmacyManagerConnectionsRepository.save(pharmacyManagerConnections);
   }
@@ -300,9 +298,6 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   {
     }
 
-  public PharmacyManager getPharmacyManager() {
-    return pharmacyManagerRepository.findByUser(getLoggedInUser());
-  }
 }
 
 

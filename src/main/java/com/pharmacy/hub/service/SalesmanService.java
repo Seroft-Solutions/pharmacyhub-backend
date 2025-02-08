@@ -64,6 +64,9 @@ public class SalesmanService extends PHEngine implements PHUserService
   @Autowired
   private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
   private final String realm;
+    @Autowired
+    private UserService userService;
+
   SalesmanService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
     this.realm=realm;
   }
@@ -130,15 +133,11 @@ public class SalesmanService extends PHEngine implements PHUserService
     salesmanConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
     salesmanConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
     salesmanConnectionsDTO.setNotes("User Want to connect");
-    salesmanConnectionsDTO.setUserGroup(getUserGroup(TenantContext.getCurrentTenant()));
+    salesmanConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
     SalesmenConnections salesmanConnections = phMapper.getSalesmenConnections(salesmanConnectionsDTO);
     salesmenConnectionsRepository.save(salesmanConnections);
   }
 
-  public String getUserGroup(String userId)
-  {
-    return keycloakGroupServiceImpl.getAllUserGroups(userId).get(0).getName();
-  }
   @Override
   public List<UserDisplayDTO> findAllUsers() {
     Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
