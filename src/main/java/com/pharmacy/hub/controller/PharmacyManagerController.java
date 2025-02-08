@@ -3,8 +3,10 @@ package com.pharmacy.hub.controller;
 import com.pharmacy.hub.constants.APIConstants;
 import com.pharmacy.hub.dto.PHUserConnectionDTO;
 import com.pharmacy.hub.dto.PHUserDTO;
+import com.pharmacy.hub.dto.PharmacyManagerConnectionsDTO;
 import com.pharmacy.hub.dto.PharmacyManagerDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
+import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.service.PharmacyManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,22 @@ public class PharmacyManagerController
     return new ResponseEntity<PHUserDTO>(pharmacyManagerService.saveUser(pharmacyManagerDTO), HttpStatus.OK);
   }
 
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-pending-requests", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDisplayDTO>> getAllPendingRequests()
+  {
+    return new ResponseEntity<>(pharmacyManagerService.findPendingUsers(), HttpStatus.OK);
+  }
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-connections", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDisplayDTO>> getAllConnections()
+  {
+    return new ResponseEntity<>(pharmacyManagerService.getAllUserConnections(), HttpStatus.OK);
+  }
+
+
+
   @PreAuthorize("isAuthenticated()")
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/get-all",
@@ -50,9 +68,24 @@ public class PharmacyManagerController
           value = APIConstants.API_VERSION_V1 + "/connect",
           method = RequestMethod.POST
   )
-  public ResponseEntity connectPharmacyManager(@RequestBody PHUserConnectionDTO phUserConnectionDTO)
+  public ResponseEntity connectPharmacyManager(@RequestBody PharmacyManagerConnectionsDTO pharmacyManagerConnectionsDTO)
   {
-    pharmacyManagerService.connectWith(phUserConnectionDTO);
+    pharmacyManagerService.connectWith(pharmacyManagerConnectionsDTO);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/approveStatus/{id}", method = RequestMethod.POST)
+  public ResponseEntity approveStatus(@PathVariable Long id) {
+    pharmacyManagerService.approveStatus(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/rejectStatus/{id}", method = RequestMethod.POST)
+  public ResponseEntity rejectStatus(@PathVariable Long id)
+  {
+
+    pharmacyManagerService.rejectStatus(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -93,15 +126,6 @@ public class PharmacyManagerController
     return new ResponseEntity<>(HttpStatus.CONFLICT);
   }
 
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-  @RequestMapping(
-          value = APIConstants.API_VERSION_V1 + "/get-all-connections",
-          method = RequestMethod.GET
-  )
-  public ResponseEntity getAllConnections()
-  {
-    return new ResponseEntity<>(pharmacyManagerService.getAllConnections(), HttpStatus.OK);
-  }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
   @RequestMapping(
