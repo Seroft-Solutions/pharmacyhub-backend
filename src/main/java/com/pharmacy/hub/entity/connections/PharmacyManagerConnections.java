@@ -34,6 +34,7 @@ public class PharmacyManagerConnections
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private String userGroup;
 
   @Enumerated(EnumType.STRING)
   private ConnectionStatusEnum connectionStatus ;
