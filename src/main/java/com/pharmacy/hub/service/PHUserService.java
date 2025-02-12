@@ -16,7 +16,7 @@ public interface PHUserService
 
   List<UserDisplayDTO> findAllUsers();
 
-  void connectWith(PHUserConnectionDTO phUserConnectionDTO);
+//  void connectWith(PHUserConnectionDTO phUserConnectionDTO);
 
   void disconnectWith(PHUserConnectionDTO phUserConnectionDTO);
 

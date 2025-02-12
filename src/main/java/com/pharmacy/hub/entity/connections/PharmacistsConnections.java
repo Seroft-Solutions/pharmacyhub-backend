@@ -1,5 +1,6 @@
 package com.pharmacy.hub.entity.connections;
 
+import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.User;
@@ -35,10 +36,11 @@ public class PharmacistsConnections
   private Long id;
 
   @Enumerated(EnumType.STRING)
-  private StateEnum state = StateEnum.READY_TO_CONNECT;
+  private ConnectionStatusEnum connectionStatus ;
 
   private String notes;
 
+  private String userGroup;
   @CreationTimestamp
   @Column(updatable = false, name = "created_at")
   private Date createdAt;
@@ -49,10 +51,10 @@ public class PharmacistsConnections
 
   @ManyToOne
   @JoinColumn(name = "user_id")
-  private User user;
+  private User userId;
 
   @ManyToOne
   @JoinColumn(name = "pharmacist_id")
-  private Pharmacist pharmacist;
+  private Pharmacist pharmacistId;
 
 }

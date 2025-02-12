@@ -19,6 +19,7 @@ import com.pharmacy.hub.entity.Proprietor;
 import com.pharmacy.hub.entity.Role;
 import com.pharmacy.hub.entity.Salesman;
 import com.pharmacy.hub.entity.User;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
 import com.pharmacy.hub.repository.RoleRepository;
 import com.pharmacy.hub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,8 @@ public class UserService extends PHEngine implements PHUserService {
     private PHMapper phMapper;
     @Autowired
     private EmailService emailService;
-
+    @Autowired
+    private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
     @Autowired
     private PharmacistService pharmacistService;
     @Autowired
@@ -105,7 +107,7 @@ public class UserService extends PHEngine implements PHUserService {
         return null;
     }
 
-    @Override
+
     public void connectWith(PHUserConnectionDTO phUserConnectionDTO) {
 
     }
@@ -165,6 +167,13 @@ public class UserService extends PHEngine implements PHUserService {
 
         return savedUser != null;
     }
+    public boolean isRegisteredUser(String userId) {
+        User user = userRepository.findById(userId);
+        if (user != null) {
+            return user.isRegistered();
+        }
+        return false;
+    }
 
     public boolean isUserRole() {
         return getLoggedInUser().getRole().getName().equals(RoleEnum.USER);
@@ -183,9 +192,6 @@ public class UserService extends PHEngine implements PHUserService {
         UserDTO userDTO = phMapper.getUserDTO(user);
 
         if (user.getUserType().equals(UserEnum.PHARMACIST.getUserEnum())) {
-            Pharmacist pharmacist = pharmacistService.getPharmacist();
-            PharmacistDTO pharmacistDTO = phMapper.getPharmacistDTO(pharmacist);
-            userDTO.setPharmacist(pharmacistDTO);
             return userDTO;
 
         } else if (user.getUserType().equals(UserEnum.PROPRIETOR.getUserEnum())) {
@@ -195,9 +201,6 @@ public class UserService extends PHEngine implements PHUserService {
             return userDTO;
 
         } else if (user.getUserType().equals(UserEnum.PHARMACY_MANAGER.getUserEnum())) {
-            PharmacyManager pharmacyManager = pharmacyManagerService.getPharmacyManager();
-            PharmacyManagerDTO pharmacyManagerDTO = phMapper.getPharmacyManagerDTO(pharmacyManager);
-            userDTO.setPharmacyManager(pharmacyManagerDTO);
             return userDTO;
 
         } else if (user.getUserType().equals(UserEnum.SALESMAN.getUserEnum())) {
@@ -248,6 +251,11 @@ public class UserService extends PHEngine implements PHUserService {
         }
         return false;
     }
+    public String getUserGroup(String userId)
+    {
+        return keycloakGroupServiceImpl.getAllUserGroups(userId).get(0).getName();
+    }
+
 
     public boolean verifyUser(String token)
     {

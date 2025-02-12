@@ -9,5 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface PharmacyManagerRepository extends JpaRepository<PharmacyManager, Long>
 {
   PharmacyManager findByUser(User loggedInUser);
+
+    PharmacyManager findByUser_Id(String currentUserId);
 }
 

@@ -33,16 +33,16 @@ public class Pharmacist
   private String licenseDuration;
   private String experience;
   private String city;
-  private String location;
+  private String area;
   private String universityName;
   private String batch;
   private String contactNumber;
-  private String categoryProvince;
-
+  private String timePreference;
+  private String previousPharmacyName;
+  private String currentJobStatus;
   @CreationTimestamp
   @Column(updatable = false, name = "created_at")
   private Date createdAt;
-
   @UpdateTimestamp
   @Column(name = "updated_at")
   private Date updatedAt;

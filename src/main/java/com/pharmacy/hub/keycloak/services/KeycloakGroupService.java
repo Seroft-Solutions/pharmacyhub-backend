@@ -34,9 +34,6 @@ public interface KeycloakGroupService
     //    @Cacheable(key = "'groups-with-subgroup-' + #subgroupName")
     List<GroupRepresentation> getGroupsContainingSubgroup(String subgroupName);
 
-    //@Cacheable(key = "'users-in-subgroup-' + #groupName + '-' + #subGroupName")
-    List<UserRepresentation> getUsersInSubGroup(String groupName, String subGroupName);
-
     //@Cacheable(key = "'group-hierarchy'")
     void printGroupHierarchy();
 

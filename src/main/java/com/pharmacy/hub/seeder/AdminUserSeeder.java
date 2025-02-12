@@ -31,6 +31,7 @@ public class AdminUserSeeder
     try
     {
       User user = new User();
+      user.setId("1");
       user.setFirstName("Admin");
       user.setEmailAddress("admin@pharmacyhub.pk");
       user.setPassword(passwordEncoder.encode("Pharmacy@Hub#1234"));

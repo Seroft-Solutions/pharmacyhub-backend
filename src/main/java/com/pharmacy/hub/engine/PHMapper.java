@@ -1,11 +1,6 @@
 package com.pharmacy.hub.engine;
 
-import com.pharmacy.hub.dto.PharmacistDTO;
-import com.pharmacy.hub.dto.PharmacyManagerDTO;
-import com.pharmacy.hub.dto.ProprietorDTO;
-import com.pharmacy.hub.dto.ReportingUserDTO;
-import com.pharmacy.hub.dto.SalesmanDTO;
-import com.pharmacy.hub.dto.UserDTO;
+import com.pharmacy.hub.dto.*;
 import com.pharmacy.hub.dto.display.ConnectionDisplayDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.entity.Pharmacist;
@@ -23,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PHMapper
 {
-    private ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper = new ModelMapper();
 
     public Proprietor getProprietor(ProprietorDTO proprietorDTO)
     {
@@ -39,7 +34,6 @@ public class PHMapper
     {
         return modelMapper.map(pharmacistDTO, Pharmacist.class);
     }
-
     public PharmacistDTO getPharmacistDTO(Pharmacist pharmacist)
     {
         return modelMapper.map(pharmacist, PharmacistDTO.class);
@@ -105,4 +99,21 @@ public class PHMapper
         return modelMapper.map(pharmacistsConnections, ConnectionDisplayDTO.class);
     }
 
+    public PharmacistsConnections getPharmacistsConnections(PharmacistsConnectionsDTO pharmacistsConnectionsDTO)
+    {
+        return modelMapper.map(pharmacistsConnectionsDTO, PharmacistsConnections.class);
+    }
+    public PharmacyManagerConnections getPharmacyManagerConnections(PharmacyManagerConnectionsDTO pharmacyManagerConnectionsDTO)
+    {
+        return modelMapper.map(pharmacyManagerConnectionsDTO, PharmacyManagerConnections.class);
+    }
+    public ProprietorsConnections getProprietorConnections(ProprietorsConnectionsDTO proprietorConnectionsDTO)
+    {
+        return modelMapper.map(proprietorConnectionsDTO, ProprietorsConnections.class);
+    }
+
+    public SalesmenConnections getSalesmenConnections(SalesmenConnectionsDTO salesmanConnectionsDTO)
+    {
+        return modelMapper.map(salesmanConnectionsDTO, SalesmenConnections.class);
+    }
 }

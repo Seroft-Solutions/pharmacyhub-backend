@@ -29,13 +29,16 @@ public class PharmacyManager
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+  private String experienceAsManager;
+  private String education;
   private String contactNumber;
   private String area;
   private String city;
   private String experience;
   private String previousPharmacyName;
   private String currentJobStatus;
-  private String shiftTime;
+  private String timePrefernce;
+  private String saleryExpectation;
 
   @CreationTimestamp
   @Column(updatable = false, name = "created_at")

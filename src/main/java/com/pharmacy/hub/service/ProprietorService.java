@@ -1,29 +1,38 @@
 package com.pharmacy.hub.service;
 
+import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.constants.UserEnum;
-import com.pharmacy.hub.dto.PHUserConnectionDTO;
-import com.pharmacy.hub.dto.PHUserDTO;
-import com.pharmacy.hub.dto.ProprietorDTO;
+import com.pharmacy.hub.dto.*;
 import com.pharmacy.hub.dto.display.ConnectionDisplayDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.Proprietor;
+import com.pharmacy.hub.entity.Salesman;
+import com.pharmacy.hub.entity.User;
+import com.pharmacy.hub.entity.connections.PharmacistsConnections;
 import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.entity.connections.ProprietorsConnections;
-import com.pharmacy.hub.repository.PharmacistRepository;
-import com.pharmacy.hub.repository.PharmacyManagerRepository;
-import com.pharmacy.hub.repository.ProprietorRepository;
-import com.pharmacy.hub.repository.SalesmanRepository;
+import com.pharmacy.hub.entity.connections.SalesmenConnections;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.ProprietorsConnectionsRepository;
+import com.pharmacy.hub.security.TenantContext;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,14 +58,37 @@ public class ProprietorService extends PHEngine implements PHUserService
   @Autowired
   private PHMapper phMapper;
 
+  @Autowired
+  private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
+  @Autowired
+  private UserRepository userRepository;
 
+
+  @Autowired
+  private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
+  private final String realm;
+    @Autowired
+    private UserService userService;
+
+  ProprietorService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
+    this.realm=realm;
+  }
   @Override
   public PHUserDTO saveUser(PHUserDTO proprietorDTO)
   {
+    User user= new User();
+    String groupName="PROPRIETOR";
+    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
+    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(), groupId);
     Proprietor proprietor = phMapper.getProprietor((ProprietorDTO) proprietorDTO);
-    getLoggedInUser().setRegistered(true);
-    proprietor.setUser(getLoggedInUser());
-    getLoggedInUser().setUserType(UserEnum.PROPRIETOR.getUserEnum());
+    user.setId(TenantContext.getCurrentTenant());
+    user.setRegistered(true);
+    user.setOpenToConnect(true);
+    userRepository.save(user);
+    proprietor.setUser(user);
+//    getLoggedInUser().setRegistered(true);
+//    proprietor.setUser(getLoggedInUser());
+//    getLoggedInUser().setUserType(UserEnum.PROPRIETOR.getUserEnum());
     Proprietor savedProprietor = proprietorRepository.save(proprietor);
     return phMapper.getProprietorDTO(savedProprietor);
   }
@@ -70,6 +102,27 @@ public class ProprietorService extends PHEngine implements PHUserService
     return phMapper.getProprietorDTO(savedProprietor);
   }
 
+
+  public void approveStatus(Long id)
+  {
+    Proprietor proprietor = proprietorRepository.findById(id).orElseThrow(() -> new RuntimeException("Proprietor not found"));
+    User requesterId = proprietor.getUser();
+    ProprietorsConnections proprietorConnections = proprietorsConnectionsRepository.findByUserId(requesterId);
+    proprietorConnections.setConnectionStatus(ConnectionStatusEnum.APPROVED);
+    proprietorsConnectionsRepository.save(proprietorConnections);
+  }
+
+  public void rejectStatus(Long id)
+  {
+    Proprietor proprietor = proprietorRepository.findById(id).orElseThrow(() -> new RuntimeException("Proprietor not found"));
+    User requesterId = proprietor.getUser();
+    ProprietorsConnections proprietorConnections = proprietorsConnectionsRepository.findByUserId(requesterId);
+    proprietorConnections.setConnectionStatus(ConnectionStatusEnum.REJECTED);
+    proprietorsConnectionsRepository.save(proprietorConnections);
+  }
+
+
+
   @Override
   public PHUserDTO findUser(long id)
   {
@@ -78,45 +131,147 @@ public class ProprietorService extends PHEngine implements PHUserService
   }
 
   @Override
-  public List<UserDisplayDTO> findAllUsers()
-  {
-    return proprietorRepository.findAll().stream().map(proprietor -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(proprietor.getUser());
-      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(proprietor));
+  public List<UserDisplayDTO> findAllUsers() {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
 
-      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
-       return userDisplayDTO1.getProprietor().getId().equals(proprietor.getId());
-      }));
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> proprietorGroup = realmResource.groups().groups().stream()
+                                                                      .filter(group -> "PROPRIETOR".equalsIgnoreCase(group.getName()))
+                                                                      .findFirst();
+
+    if (proprietorGroup.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> proprietorUserIds = realmResource.groups().group(proprietorGroup.get().getId()).members().stream()
+                                                       .map(UserRepresentation::getId)
+                                                       .collect(Collectors.toList());
+
+    return proprietorRepository.findAll().stream()
+                                    .filter(proprietor -> proprietorUserIds.contains(proprietor.getUser().getId()))
+                                    .map(proprietor -> {
+                                      UserRepresentation keycloakUser = realmResource.users().get(proprietor.getUser().getId()).toRepresentation();
+                                      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(proprietor.getUser());
+                                      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+                                      userDisplayDTO.setLastName(keycloakUser.getLastName());
+                                      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(proprietor));
+
+                                      return userDisplayDTO;
+                                    }).collect(Collectors.toList());
+  }
+  public void connectWith(ProprietorsConnectionsDTO proprietorsConnectionsDTO)
+  {
+    proprietorsConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
+    proprietorsConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
+    proprietorsConnectionsDTO.setNotes("User Want to connect");
+    proprietorsConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
+    ProprietorsConnections proprietorsConnections = phMapper.getProprietorConnections(proprietorsConnectionsDTO);
+    proprietorsConnectionsRepository.save(proprietorsConnections);
+  }
+
+
+  public List<UserDisplayDTO> findPendingUsers()
+  {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
+    String currentUserId = TenantContext.getCurrentTenant();
+
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> proprietorGroup = realmResource.groups().groups().stream().filter(group -> "PROPRIETOR".equalsIgnoreCase(group.getName())).findFirst();
+
+    if (proprietorGroup.isEmpty())
+    {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> proprietorUserIds = realmResource.groups().group(proprietorGroup.get().getId()).members().stream().map(UserRepresentation::getId).collect(Collectors.toList());
+
+    // Get current user's proprietor record
+    Proprietor currentUserProprietor = proprietorRepository.findByUser_Id(currentUserId);
+    if (currentUserProprietor == null)
+    {
+      return Collections.emptyList();
+    }
+
+    // Find all pending connections for the current user's proprietor ID
+    List<ProprietorsConnections> pendingConnections = proprietorsConnectionsRepository.findByProprietorIdAndConnectionStatus(currentUserProprietor, ConnectionStatusEnum.PENDING);
+
+    // Map the connections to UserDisplayDTO
+    return pendingConnections.stream().map(connection -> {
+      // Get the requesting user's information
+      User requestingUser = connection.getUserId();
+      if (!proprietorUserIds.contains(requestingUser.getId()))
+      {
+        return null;
+      }
+
+      UserRepresentation keycloakUser = realmResource.users().get(requestingUser.getId()).toRepresentation();
+      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(requestingUser);
+      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+      userDisplayDTO.setLastName(keycloakUser.getLastName());
+
+      // Get the proprietor details for the requesting user
+      Proprietor requestingProprietor = proprietorRepository.findByUser_Id(requestingUser.getId());
+      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(requestingProprietor));
+      userDisplayDTO.setConnected(true); // Since we found a connection
 
       return userDisplayDTO;
-    }).collect(Collectors.toList());
+    }).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
-  @Override
-  public void connectWith(PHUserConnectionDTO phUserConnectionDTO)
-  {
-    Proprietor proprietor = phMapper.getProprietor((ProprietorDTO) findUser(phUserConnectionDTO.getConnectWith()));
-    List<ProprietorsConnections> proprietorConnectionsList = proprietorsConnectionsRepository.findByUserAndProprietorAndState(getLoggedInUser(), proprietor, StateEnum.READY_TO_CONNECT);
-
-    if (proprietorConnectionsList.isEmpty())
-    {
-      ProprietorsConnections proprietorConnections = new ProprietorsConnections();
-      proprietorConnections.setProprietor(proprietor);
-      proprietorConnections.setUser(getLoggedInUser());
-      proprietorsConnectionsRepository.save(proprietorConnections);
-    }
-  }
 
   @Override
   public List<UserDisplayDTO> getAllUserConnections()
   {
-    List<ProprietorsConnections> proprietorConnectionsList = proprietorsConnectionsRepository.findByUserAndState(getLoggedInUser(), StateEnum.READY_TO_CONNECT);
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
+    String currentUserId = TenantContext.getCurrentTenant();
 
-    return proprietorConnectionsList.stream().map(proprietorConnection -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(proprietorConnection.getProprietor().getUser());
-      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(proprietorConnection.getProprietor()));
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> proprietorGroup = realmResource.groups().groups().stream().filter(group -> "PROPRIETOR".equalsIgnoreCase(group.getName())).findFirst();
+
+    if (proprietorGroup.isEmpty())
+    {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> proprietorUserIds = realmResource.groups().group(proprietorGroup.get().getId()).members().stream().map(UserRepresentation::getId).collect(Collectors.toList());
+
+    // Get current user's proprietor record
+    Proprietor currentUserProprietor = proprietorRepository.findByUser_Id(currentUserId);
+    if (currentUserProprietor == null)
+    {
+      return Collections.emptyList();
+    }
+
+    // Find all pending connections for the current user's proprietor ID
+    List<ProprietorsConnections> pendingConnections = proprietorsConnectionsRepository.findByProprietorIdAndConnectionStatus(currentUserProprietor, ConnectionStatusEnum.APPROVED);
+
+    // Map the connections to UserDisplayDTO
+    return pendingConnections.stream().map(connection -> {
+      // Get the requesting user's information
+      User requestingUser = connection.getUserId();
+      if (!proprietorUserIds.contains(requestingUser.getId()))
+      {
+        return null;
+      }
+
+      UserRepresentation keycloakUser = realmResource.users().get(requestingUser.getId()).toRepresentation();
+      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(requestingUser);
+      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+      userDisplayDTO.setLastName(keycloakUser.getLastName());
+
+      // Get the proprietor details for the requesting user
+      Proprietor requestingProprietor = proprietorRepository.findByUser_Id(requestingUser.getId());
+      userDisplayDTO.setProprietor(phMapper.getProprietorDTO(requestingProprietor));
+      userDisplayDTO.setConnected(true); // Since we found a connection
+
       return userDisplayDTO;
-    }).collect(Collectors.toList());
+    }).filter(Objects::nonNull).collect(Collectors.toList());
 
   }
 
@@ -124,7 +279,7 @@ public class ProprietorService extends PHEngine implements PHUserService
   public void updateState(PHUserConnectionDTO userConnectionDTO)
   {
     ProprietorsConnections proprietorsConnections = proprietorsConnectionsRepository.findById(userConnectionDTO.getId()).get();
-    proprietorsConnections.setState(userConnectionDTO.getState());
+//    proprietorsConnections.setState(userConnectionDTO.getState());
     proprietorsConnectionsRepository.save(proprietorsConnections);
   }
 
@@ -198,12 +353,12 @@ public class ProprietorService extends PHEngine implements PHUserService
   @Override
   public void disconnectWith(PHUserConnectionDTO phUserConnectionDTO)
   {
-    Proprietor proprietor = phMapper.getProprietor((ProprietorDTO) findUser(phUserConnectionDTO.getConnectWith()));
-    List<ProprietorsConnections> proprietorConnectionsList = proprietorsConnectionsRepository.findByUserAndProprietorAndState(getLoggedInUser(), proprietor, StateEnum.READY_TO_CONNECT);
-
-    ProprietorsConnections proprietorConnection = proprietorConnectionsList.stream().findFirst().get();
-    proprietorConnection.setState(StateEnum.CLIENT_DISCONNECT);
-    proprietorsConnectionsRepository.save(proprietorConnection);
+//    Proprietor proprietor = phMapper.getProprietor((ProprietorDTO) findUser(phUserConnectionDTO.getConnectWith()));
+//    List<ProprietorsConnections> proprietorConnectionsList = proprietorsConnectionsRepository.findByUserAndProprietorAndState(getLoggedInUser(), proprietor, StateEnum.READY_TO_CONNECT);
+//
+//    ProprietorsConnections proprietorConnection = proprietorConnectionsList.stream().findFirst().get();
+////    proprietorConnection.setState(StateEnum.CLIENT_DISCONNECT);
+//    proprietorsConnectionsRepository.save(proprietorConnection);
   }
 
   public Proprietor getProprietor() {

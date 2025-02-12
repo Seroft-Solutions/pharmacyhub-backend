@@ -30,14 +30,12 @@ public class Proprietor
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String categoryRequired;
-  private String licenseDuration;
-  private String experienced;
+  private String licenseRequired;
+  private String requiredLicenseDuration;
   private String pharmacyName;
   private String city;
-  private String location;
+  private String area;
   private String contactNumber;
-  private String categoryProvince;
 
   @CreationTimestamp
   @Column(updatable = false, name = "created_at")

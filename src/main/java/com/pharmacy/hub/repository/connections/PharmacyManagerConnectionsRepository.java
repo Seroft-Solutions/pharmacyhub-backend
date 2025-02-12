@@ -1,5 +1,6 @@
 package com.pharmacy.hub.repository.connections;
 
+import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.entity.PharmacyManager;
 import com.pharmacy.hub.entity.User;
@@ -15,7 +16,11 @@ import java.util.List;
 @Repository
 public interface PharmacyManagerConnectionsRepository extends JpaRepository<PharmacyManagerConnections, Long>
 {
-  List<PharmacyManagerConnections> findByUserAndPharmacyManagerAndState(User user, PharmacyManager pharmacyManager, StateEnum stateEnum);
+//  List<PharmacyManagerConnections> findByUserAndPharmacyManagerAndState(User user, PharmacyManager pharmacyManager, StateEnum stateEnum);
 
-  List<PharmacyManagerConnections> findByUserAndState(User user, StateEnum stateEnum);
+//  List<PharmacyManagerConnections> findByUserAndState(User user, StateEnum stateEnum);
+
+    PharmacyManagerConnections findByUserId(User requesterId);
+
+  List<PharmacyManagerConnections> findByPharmacyManagerIdAndConnectionStatus(PharmacyManager currentUserPharmacyManager, ConnectionStatusEnum connectionStatusEnum);
 }

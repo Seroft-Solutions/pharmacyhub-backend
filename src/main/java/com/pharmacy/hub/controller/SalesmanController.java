@@ -4,16 +4,15 @@ import com.pharmacy.hub.constants.APIConstants;
 import com.pharmacy.hub.dto.PHUserConnectionDTO;
 import com.pharmacy.hub.dto.PHUserDTO;
 import com.pharmacy.hub.dto.SalesmanDTO;
+import com.pharmacy.hub.dto.SalesmenConnectionsDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
+import com.pharmacy.hub.service.PharmacyManagerService;
 import com.pharmacy.hub.service.SalesmanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,6 +23,8 @@ public class SalesmanController
   final private int connectCount = 3;
 
   @Autowired private SalesmanService salesmanService;
+    @Autowired
+    private PharmacyManagerService pharmacyManagerService;
 
   @PreAuthorize("isAuthenticated()")
   @RequestMapping(
@@ -34,6 +35,22 @@ public class SalesmanController
   {
     return new ResponseEntity<PHUserDTO>(salesmanService.saveUser(salesmanDTO), HttpStatus.OK);
   }
+
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-pending-requests", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDisplayDTO>> getAllPendingRequests()
+  {
+    return new ResponseEntity<>(salesmanService.findPendingUsers(), HttpStatus.OK);
+  }
+
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/get-all-connections", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDisplayDTO>> getAllConnections()
+  {
+    return new ResponseEntity<>(salesmanService.getAllUserConnections(), HttpStatus.OK);
+  }
+
 
   @PreAuthorize("isAuthenticated()")
   @RequestMapping(
@@ -50,9 +67,23 @@ public class SalesmanController
           value = APIConstants.API_VERSION_V1 + "/connect",
           method = RequestMethod.POST
   )
-  public ResponseEntity connectSalesman(@RequestBody PHUserConnectionDTO phUserConnectionDTO)
+  public ResponseEntity connectSalesman(@RequestBody SalesmenConnectionsDTO salesmenConnectionsDTO)
   {
-    salesmanService.connectWith(phUserConnectionDTO);
+    salesmanService.connectWith(salesmenConnectionsDTO);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/approveStatus/{id}", method = RequestMethod.POST)
+  public ResponseEntity approveStatus(@PathVariable Long id) {
+    pharmacyManagerService.approveStatus(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @RequestMapping(value = APIConstants.API_VERSION_V1 + "/rejectStatus/{id}", method = RequestMethod.POST)
+  public ResponseEntity rejectStatus(@PathVariable Long id)
+  {
+
+    pharmacyManagerService.rejectStatus(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
@@ -93,16 +124,6 @@ public class SalesmanController
     return new ResponseEntity<>(HttpStatus.CONFLICT);
   }
 
-
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
-  @RequestMapping(
-          value = APIConstants.API_VERSION_V1 + "/get-all-connections",
-          method = RequestMethod.GET
-  )
-  public ResponseEntity getAllConnections()
-  {
-    return new ResponseEntity<>(salesmanService.getAllConnections(), HttpStatus.OK);
-  }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
   @RequestMapping(

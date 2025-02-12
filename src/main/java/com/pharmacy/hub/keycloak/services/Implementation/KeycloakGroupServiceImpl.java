@@ -2,6 +2,7 @@ package com.pharmacy.hub.keycloak.services.Implementation;
 
 import com.pharmacy.hub.keycloak.services.KeycloakAuthService;
 import com.pharmacy.hub.keycloak.services.KeycloakGroupService;
+import com.pharmacy.hub.keycloak.utils.KeycloakGroupUtils;
 import com.pharmacy.hub.keycloak.utils.KeycloakUtils;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
@@ -12,6 +13,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,14 +27,16 @@ public class KeycloakGroupServiceImpl implements KeycloakGroupService
     private final KeycloakAuthService keycloakAuthService;
     private final KeycloakUtils keycloakUtils;
     private final String realm;
+    private final KeycloakGroupUtils keycloakGroupUtils;
 
     public KeycloakGroupServiceImpl(KeycloakAuthService keycloakAuthService,
                                     KeycloakUtils keycloakUtils,
-                                    @Value("${keycloak.realm}") String realm)
+                                    @Value("${keycloak.realm}") String realm, KeycloakGroupUtils keycloakGroupUtils)
     {
         this.keycloakAuthService = keycloakAuthService;
         this.keycloakUtils = keycloakUtils;
         this.realm = realm;
+        this.keycloakGroupUtils = keycloakGroupUtils;
     }
 
     @Override
@@ -243,61 +247,11 @@ public class KeycloakGroupServiceImpl implements KeycloakGroupService
     @Override
     public void addUserToSubGroup(String userId, String groupName, String subGroupName)
     {
-        logger.info("Adding user {} to subgroup: {} under group: {}", userId, subGroupName, groupName);
-        Keycloak keycloak = keycloakAuthService.getKeycloakInstance();
-        RealmResource realmResource = keycloak.realm(realm);
-        UserResource userResource = realmResource.users().get(userId);
-
-        GroupRepresentation group = keycloakUtils.findGroupByName(realmResource, groupName);
-        if (group != null)
-        {
-            GroupRepresentation subGroup = keycloakUtils.findSubGroupByName(realmResource, group.getId(), subGroupName);
-            if (subGroup != null)
-            {
-                userResource.joinGroup(subGroup.getId());
-                logger.info("Added user to subgroup: {} (ID: {})", subGroup.getName(), subGroup.getId());
-            }
-            else
-            {
-                logger.error("Subgroup not found: {} under group: {}", subGroupName, groupName);
-                throw new RuntimeException("Subgroup not found: " + subGroupName + " under group: " + groupName);
-            }
-        }
-        else
-        {
-            logger.error("Group not found: {}", groupName);
-            throw new RuntimeException("Group not found: " + groupName);
-        }
     }
 
     @Override
     public void removeUserFromSubGroup(String userId, String groupName, String subGroupName)
     {
-        logger.info("Removing user {} from subgroup: {} under group: {}", userId, subGroupName, groupName);
-        Keycloak keycloak = keycloakAuthService.getKeycloakInstance();
-        RealmResource realmResource = keycloak.realm(realm);
-        UserResource userResource = realmResource.users().get(userId);
-
-        GroupRepresentation group = keycloakUtils.findGroupByName(realmResource, groupName);
-        if (group != null)
-        {
-            GroupRepresentation subGroup = keycloakUtils.findSubGroupByName(realmResource, group.getId(), subGroupName);
-            if (subGroup != null)
-            {
-                userResource.leaveGroup(subGroup.getId());
-                logger.info("Removed user from subgroup: {} (ID: {})", subGroup.getName(), subGroup.getId());
-            }
-            else
-            {
-                logger.error("Subgroup not found: {} under group: {}", subGroupName, groupName);
-                throw new RuntimeException("Subgroup not found: " + subGroupName + " under group: " + groupName);
-            }
-        }
-        else
-        {
-            logger.error("Group not found: {}", groupName);
-            throw new RuntimeException("Group not found: " + groupName);
-        }
     }
 
     @Override
@@ -320,33 +274,6 @@ public class KeycloakGroupServiceImpl implements KeycloakGroupService
                 subGroups.stream().anyMatch(subGroup -> hasSubgroup(realmResource, subGroup, subgroupName));
     }
 
-    @Override
-    public List<UserRepresentation> getUsersInSubGroup(String groupName, String subGroupName)
-    {
-        logger.info("Retrieving users in subgroup: {} under group: {}", subGroupName, groupName);
-        Keycloak keycloak = keycloakAuthService.getKeycloakInstance();
-        RealmResource realmResource = keycloak.realm(realm);
-
-        GroupRepresentation group = keycloakUtils.findGroupByName(realmResource, groupName);
-        if (group != null)
-        {
-            GroupRepresentation subGroup = keycloakUtils.findSubGroupByName(realmResource, group.getId(), subGroupName);
-            if (subGroup != null)
-            {
-                return realmResource.groups().group(subGroup.getId()).members();
-            }
-            else
-            {
-                logger.error("Subgroup not found: {} under group: {}", subGroupName, groupName);
-                throw new RuntimeException("Subgroup not found: " + subGroupName + " under group: " + groupName);
-            }
-        }
-        else
-        {
-            logger.error("Group not found: {}", groupName);
-            throw new RuntimeException("Group not found: " + groupName);
-        }
-    }
 
     @Override
     public void printGroupHierarchy()
@@ -422,7 +349,7 @@ public class KeycloakGroupServiceImpl implements KeycloakGroupService
             {
                 currentPath.append("/").append(part);
                 realmResource.groups().groups().stream()
-                             .filter(g -> g.getPath().equals(currentPath.toString()))
+                             .filter(g -> g.getPath().contentEquals(currentPath))
                              .findFirst()
                              .ifPresent(parents::add);
             }
@@ -509,5 +436,19 @@ public class KeycloakGroupServiceImpl implements KeycloakGroupService
         {
             printGroup(subGroup, level + 1);
         }
+    }
+
+    public String findGroupIdByName(String groupName)
+    {
+        Keycloak keycloak = keycloakAuthService.getKeycloakInstance();
+        List<GroupRepresentation> groups = keycloak.realm(realm).groups().groups();
+
+
+        for (GroupRepresentation group : groups) {
+            if (group.getName().equals(groupName)) {
+                return group.getId();
+            }
+        }
+        return null;
     }
 }

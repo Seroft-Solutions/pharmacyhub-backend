@@ -1,29 +1,36 @@
 package com.pharmacy.hub.service;
 
+import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.constants.UserEnum;
-import com.pharmacy.hub.dto.PHUserConnectionDTO;
-import com.pharmacy.hub.dto.PHUserDTO;
-import com.pharmacy.hub.dto.PharmacyManagerDTO;
+import com.pharmacy.hub.dto.*;
 import com.pharmacy.hub.dto.display.ConnectionDisplayDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.PharmacyManager;
+import com.pharmacy.hub.entity.User;
+import com.pharmacy.hub.entity.connections.PharmacistsConnections;
 import com.pharmacy.hub.entity.connections.PharmacyManagerConnections;
 import com.pharmacy.hub.entity.connections.SalesmenConnections;
-import com.pharmacy.hub.repository.PharmacistRepository;
-import com.pharmacy.hub.repository.PharmacyManagerRepository;
-import com.pharmacy.hub.repository.ProprietorRepository;
-import com.pharmacy.hub.repository.SalesmanRepository;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
+import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
+import com.pharmacy.hub.repository.*;
 import com.pharmacy.hub.repository.connections.PharmacyManagerConnectionsRepository;
+import com.pharmacy.hub.security.TenantContext;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,17 +52,56 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   private PharmacyManagerConnectionsRepository pharmacyManagerConnectionsRepository;
   @Autowired
   private PHMapper phMapper;
+  @Autowired
+  private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
+  @Autowired
+  private UserRepository userRepository;
+@Autowired
+private UserService userService;
+
+  @Autowired
+  private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
+  private final String realm;
+  PharmacyManagerService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
+    this.realm=realm;
+  }
 
 
   @Override
   public PHUserDTO saveUser(PHUserDTO pharmacyManagerDTO)
   {
+    User user= new User();
+    String groupName="ADMIN";
+    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
+    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(), groupId);
     PharmacyManager PharmacyManager = phMapper.getPharmacyManager((PharmacyManagerDTO) pharmacyManagerDTO);
-    getLoggedInUser().setRegistered(true);
-    getLoggedInUser().setUserType(UserEnum.PHARMACY_MANAGER.getUserEnum());
-    PharmacyManager.setUser(getLoggedInUser());
+    user.setId(TenantContext.getCurrentTenant());
+    user.setRegistered(true);
+    user.setOpenToConnect(true);
+    userRepository.save(user);
+    PharmacyManager.setUser(user);
+//    getLoggedInUser().setRegistered(true);
+//    getLoggedInUser().setUserType(UserEnum.PHARMACY_MANAGER.getUserEnum());
+//    PharmacyManager.setUser(getLoggedInUser());
     PharmacyManager savedPharmacyManager = pharmacyManagerRepository.save(PharmacyManager);
     return phMapper.getPharmacyManagerDTO(savedPharmacyManager);
+  }
+  public void approveStatus(Long id)
+  {
+    PharmacyManager pharmacyManager = pharmacyManagerRepository.findById(id).orElseThrow(() -> new RuntimeException("PharmacyManager not found"));
+    User requesterId = pharmacyManager.getUser();
+    PharmacyManagerConnections pharmacyManagerConnection = pharmacyManagerConnectionsRepository.findByUserId(requesterId);
+    pharmacyManagerConnection.setConnectionStatus(ConnectionStatusEnum.APPROVED);
+    pharmacyManagerConnectionsRepository.save(pharmacyManagerConnection);
+  }
+
+  public void rejectStatus(Long id)
+  {
+    PharmacyManager pharmacyManager = pharmacyManagerRepository.findById(id).orElseThrow(() -> new RuntimeException("PharmacyManager not found"));
+    User requesterId = pharmacyManager.getUser();
+    PharmacyManagerConnections pharmacyManagerConnection = pharmacyManagerConnectionsRepository.findByUserId(requesterId);
+    pharmacyManagerConnection.setConnectionStatus(ConnectionStatusEnum.REJECTED);
+    pharmacyManagerConnectionsRepository.save(pharmacyManagerConnection);
   }
 
   @Override
@@ -75,53 +121,161 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   }
 
   @Override
-  public List<UserDisplayDTO> findAllUsers()
-  {
-    return pharmacyManagerRepository.findAll().stream().map(pharmacyManager -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacyManager.getUser());
-      userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(pharmacyManager));
-      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
-        return userDisplayDTO1.getPharmacyManager().getId().equals(pharmacyManager.getId());
-      }));
+  public List<UserDisplayDTO> findAllUsers() {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
 
-      return userDisplayDTO;
-    }).collect(Collectors.toList());
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> pharmacyManagerGroup = realmResource.groups().groups().stream()
+                                                                 .filter(group -> "ADMIN".equalsIgnoreCase(group.getName()))
+                                                                 .findFirst();
+
+    if (pharmacyManagerGroup.isEmpty()) {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> pharmacyManagerUserIds = realmResource.groups().group(pharmacyManagerGroup.get().getId()).members().stream()
+                                                  .map(UserRepresentation::getId)
+                                                  .collect(Collectors.toList());
+
+    return pharmacyManagerRepository.findAll().stream()
+                               .filter(pharmacyManager -> pharmacyManagerUserIds.contains(pharmacyManager.getUser().getId()))
+                               .map(pharmacyManager -> {
+                                 UserRepresentation keycloakUser = realmResource.users().get(pharmacyManager.getUser().getId()).toRepresentation();
+                                 UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacyManager.getUser());
+                                 userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+                                 userDisplayDTO.setLastName(keycloakUser.getLastName());
+                                 userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(pharmacyManager));
+
+                                 return userDisplayDTO;
+                               }).collect(Collectors.toList());
   }
 
-  @Override
-  public void connectWith(PHUserConnectionDTO phUserConnectionDTO)
-  {
-    PharmacyManager pharmacyManager = phMapper.getPharmacyManager((PharmacyManagerDTO) findUser(phUserConnectionDTO.getConnectWith()));
-    List<PharmacyManagerConnections> pharmacyManagerConnectionsList = pharmacyManagerConnectionsRepository.findByUserAndPharmacyManagerAndState(getLoggedInUser(), pharmacyManager, StateEnum.READY_TO_CONNECT);
 
-    if (pharmacyManagerConnectionsList.isEmpty())
-    {
-      PharmacyManagerConnections pharmacyManagerConnections = new PharmacyManagerConnections();
-      pharmacyManagerConnections.setPharmacyManager(pharmacyManager);
-      pharmacyManagerConnections.setUser(getLoggedInUser());
-      pharmacyManagerConnectionsRepository.save(pharmacyManagerConnections);
-    }
+
+  public void connectWith(PharmacyManagerConnectionsDTO pharmacyManagerConnectionsDTO)
+  {
+    pharmacyManagerConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
+    pharmacyManagerConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
+    pharmacyManagerConnectionsDTO.setNotes("User Want to connect");
+    pharmacyManagerConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
+    PharmacyManagerConnections pharmacyManagerConnections = phMapper.getPharmacyManagerConnections(pharmacyManagerConnectionsDTO);
+    pharmacyManagerConnectionsRepository.save(pharmacyManagerConnections);
   }
 
   @Override
   public List<UserDisplayDTO> getAllUserConnections()
   {
-    List<PharmacyManagerConnections> pharmacyManagerConnectionsList = pharmacyManagerConnectionsRepository.findByUserAndState(getLoggedInUser(), StateEnum.READY_TO_CONNECT);
+//
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
+    String currentUserId = TenantContext.getCurrentTenant();
 
-    return pharmacyManagerConnectionsList.stream().map(pharmacyManagerConnection -> {
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(pharmacyManagerConnection.getPharmacyManager().getUser());
-      userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(pharmacyManagerConnection.getPharmacyManager()));
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> pharmacyManagerGroup = realmResource.groups().groups().stream().filter(group -> "ADMIN".equalsIgnoreCase(group.getName())).findFirst();
+
+    if (pharmacyManagerGroup.isEmpty())
+    {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> pharmacyManagerUserIds = realmResource.groups().group(pharmacyManagerGroup.get().getId()).members().stream().map(UserRepresentation::getId).collect(Collectors.toList());
+
+    // Get current user's pharmacyManager record
+    PharmacyManager currentUserPharmacyManager = pharmacyManagerRepository.findByUser_Id(currentUserId);
+    if (currentUserPharmacyManager == null)
+    {
+      return Collections.emptyList();
+    }
+
+    // Find all pending connections for the current user's pharmacyManager ID
+    List<PharmacyManagerConnections> pendingConnections = pharmacyManagerConnectionsRepository.findByPharmacyManagerIdAndConnectionStatus(currentUserPharmacyManager, ConnectionStatusEnum.APPROVED);
+
+    // Map the connections to UserDisplayDTO
+    return pendingConnections.stream().map(connection -> {
+      // Get the requesting user's information
+      User requestingUser = connection.getUserId();
+      if (!pharmacyManagerUserIds.contains(requestingUser.getId()))
+      {
+        return null;
+      }
+
+      UserRepresentation keycloakUser = realmResource.users().get(requestingUser.getId()).toRepresentation();
+      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(requestingUser);
+      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+      userDisplayDTO.setLastName(keycloakUser.getLastName());
+
+      // Get the pharmacyManager details for the requesting user
+      PharmacyManager requestingPharmacyManager = pharmacyManagerRepository.findByUser_Id(requestingUser.getId());
+      userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(requestingPharmacyManager));
+      userDisplayDTO.setConnected(true); // Since we found a connection
+
       return userDisplayDTO;
-    }).collect(Collectors.toList());
-
+    }).filter(Objects::nonNull).collect(Collectors.toList());
   }
+
+
+  public List<UserDisplayDTO> findPendingUsers()
+  {
+    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
+    RealmResource realmResource = keycloak.realm(realm);
+    String currentUserId = TenantContext.getCurrentTenant();
+
+    // Find the PHARMACIST group
+    Optional<GroupRepresentation> pharmacyManagerGroup = realmResource.groups().groups().stream().filter(group -> "ADMIN".equalsIgnoreCase(group.getName())).findFirst();
+
+    if (pharmacyManagerGroup.isEmpty())
+    {
+      return Collections.emptyList();
+    }
+
+    // Get user IDs in the PHARMACIST group
+    List<String> pharmacyManagerUserIds = realmResource.groups().group(pharmacyManagerGroup.get().getId()).members().stream().map(UserRepresentation::getId).collect(Collectors.toList());
+
+    // Get current user's pharmacyManager record
+    PharmacyManager currentUserPharmacyManager = pharmacyManagerRepository.findByUser_Id(currentUserId);
+    if (currentUserPharmacyManager == null)
+    {
+      return Collections.emptyList();
+    }
+
+    // Find all pending connections for the current user's pharmacyManager ID
+    List<PharmacyManagerConnections> pendingConnections = pharmacyManagerConnectionsRepository.findByPharmacyManagerIdAndConnectionStatus(currentUserPharmacyManager, ConnectionStatusEnum.PENDING);
+
+    // Map the connections to UserDisplayDTO
+    return pendingConnections.stream().map(connection -> {
+      // Get the requesting user's information
+      User requestingUser = connection.getUserId();
+      if (!pharmacyManagerUserIds.contains(requestingUser.getId()))
+      {
+        return null;
+      }
+
+      UserRepresentation keycloakUser = realmResource.users().get(requestingUser.getId()).toRepresentation();
+      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(requestingUser);
+      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
+      userDisplayDTO.setLastName(keycloakUser.getLastName());
+
+      // Get the pharmacyManager details for the requesting user
+      PharmacyManager requestingPharmacyManager = pharmacyManagerRepository.findByUser_Id(requestingUser.getId());
+      userDisplayDTO.setPharmacyManager(phMapper.getPharmacyManagerDTO(requestingPharmacyManager));
+      userDisplayDTO.setConnected(true); // Since we found a connection
+
+      return userDisplayDTO;
+    }).filter(Objects::nonNull).collect(Collectors.toList());
+  }
+
+
+
 
   @Override
   public void updateState(PHUserConnectionDTO userConnectionDTO)
   {
-    PharmacyManagerConnections pharmacyManagerConnections = pharmacyManagerConnectionsRepository.findById(userConnectionDTO.getId()).get();
-    pharmacyManagerConnections.setState(userConnectionDTO.getState());
-    pharmacyManagerConnectionsRepository.save(pharmacyManagerConnections);
+//    PharmacyManagerConnections pharmacyManagerConnections = pharmacyManagerConnectionsRepository.findById(userConnectionDTO.getId()).get();
+//    pharmacyManagerConnections.setState(userConnectionDTO.getState());
+//    pharmacyManagerConnectionsRepository.save(pharmacyManagerConnections);
   }
 
   @Override
@@ -135,76 +289,15 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   @Override
   public List getAllConnections()
   {
-    List<PharmacyManagerConnections> pharmacyManagerConnections = pharmacyManagerConnectionsRepository.findAll();
-
-    return pharmacyManagerConnections.stream().map(pharmacistsConnection -> {
-      ConnectionDisplayDTO connectionDisplayDTO = phMapper.getConnectionDisplayDTO(pharmacistsConnection);
-
-      connectionDisplayDTO.getUser().setPharmacist(null);
-      connectionDisplayDTO.getUser().setSalesman(null);
-      connectionDisplayDTO.getUser().setPharmacyManager(null);
-      connectionDisplayDTO.getUser().setProprietor(null);
-      
-      if(connectionDisplayDTO.getUser().getUserType().equals(UserEnum.PHARMACIST.getUserEnum())){
-        connectionDisplayDTO.getUser().setPharmacist(
-                phMapper.getPharmacistDTO(
-                        pharmacistRepository.findByUser(
-                                phMapper.getUser(connectionDisplayDTO.getUser())
-                        )
-                )
-        );
-      }
-
-      else if(connectionDisplayDTO.getUser().getUserType().equals(UserEnum.PROPRIETOR.getUserEnum())){
-        connectionDisplayDTO.getUser().setProprietor(
-                phMapper.getProprietorDTO(
-                        proprietorRepository.findByUser(
-                                phMapper.getUser(connectionDisplayDTO.getUser())
-                        )
-                )
-        );
-      }
-
-      else if(connectionDisplayDTO.getUser().getUserType().equals(UserEnum.SALESMAN.getUserEnum())){
-        connectionDisplayDTO.getUser().setSalesman(
-                phMapper.getSalesmanDTO(
-                        salesmanRepository.findByUser(
-                                phMapper.getUser(connectionDisplayDTO.getUser())
-                        )
-                )
-        );
-      }
-
-      else if(connectionDisplayDTO.getUser().getUserType().equals(UserEnum.PHARMACY_MANAGER.getUserEnum())){
-        connectionDisplayDTO.getUser().setPharmacyManager(
-                phMapper.getPharmacyManagerDTO(
-                        pharmacyManagerRepository.findByUser(
-                                phMapper.getUser(connectionDisplayDTO.getUser())
-                        )
-                )
-        );
-      }
-
-      return connectionDisplayDTO;
-    }).collect(Collectors.toList());
-
+    return pharmacyManagerConnectionsRepository.findAll();
 
   }
 
   @Override
   public void disconnectWith(PHUserConnectionDTO phUserConnectionDTO)
   {
-    PharmacyManager pharmacyManager = phMapper.getPharmacyManager((PharmacyManagerDTO) findUser(phUserConnectionDTO.getConnectWith()));
-    List<PharmacyManagerConnections> pharmacyManagerConnectionsList = pharmacyManagerConnectionsRepository.findByUserAndPharmacyManagerAndState(getLoggedInUser(), pharmacyManager, StateEnum.READY_TO_CONNECT);
+    }
 
-    PharmacyManagerConnections pharmacyManagerConnection = pharmacyManagerConnectionsList.stream().findFirst().get();
-    pharmacyManagerConnection.setState(StateEnum.CLIENT_DISCONNECT);
-    pharmacyManagerConnectionsRepository.save(pharmacyManagerConnection);
-  }
-
-  public PharmacyManager getPharmacyManager() {
-    return pharmacyManagerRepository.findByUser(getLoggedInUser());
-  }
 }
 
 

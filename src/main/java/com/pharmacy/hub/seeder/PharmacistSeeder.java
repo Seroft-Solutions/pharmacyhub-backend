@@ -47,6 +47,7 @@ public class PharmacistSeeder
                 if (userRepository.findByEmailAddress(email).isEmpty())
                 {
                   User user = new User();
+                  user.setId(i+"@pharmacit");
                   user.setFirstName("User " + i);
                   user.setLastName("Pharmacist");
                   user.setEmailAddress(email);
@@ -61,11 +62,13 @@ public class PharmacistSeeder
                           .licenseDuration("1 year")
                           .experience("Yes")
                           .city("Lahore")
-                          .location("NFC")
+                          .area("NFC")
                           .universityName("UCP")
                           .batch("F16")
+                          .timePreference("Morning")
+                          .previousPharmacyName("Pharmacy")
+                          .currentJobStatus("Employed")
                           .contactNumber("03456142607")
-                          .categoryProvince("")
                           .user(user)
                           .build();
 
