@@ -52,45 +52,6 @@ services:
       - postgres
       - redis
 
-#  calcom:
-#    image: calcom/cal.com:latest
-#    restart: always
-#    env_file: .env
-#    environment:
-#      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/calendso
-#      - DATABASE_DIRECT_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/calendso
-#      - NEXT_PUBLIC_WEBAPP_URL=http://localhost:3011
-#      - NEXT_PUBLIC_WEBSITE_URL=http://localhost:3011
-#      - NEXT_PUBLIC_URL=http://localhost:3011
-#      - BASE_URL=http://localhost:3011
-#      - NEXT_PUBLIC_BASE_URL=http://localhost:3011
-#      - NEXT_PUBLIC_API_V2_URL=http://localhost:3011/api/v2
-#      - NEXTAUTH_URL=http://localhost:3011
-#      - PORT=3011
-#      - NEXT_PUBLIC_APP_URL=http://localhost:3011
-#      - NEXT_PUBLIC_BACKEND_URL=http://localhost:3011
-#      - APP_URL=http://localhost:3011
-#      - NEXT_PUBLIC_WEBAPP_PORT=3011
-#      - NEXT_PUBLIC_WEBSITE_PORT=3011
-#      - CALCOM_PORT=3011
-#      - HOSTING_URL=http://localhost:3011
-#      - NEXT_PUBLIC_TEAM_URL=http://localhost:3011
-#      - DEFAULT_HOSTNAME=localhost:3011
-#      - NEXT_PUBLIC_IS_E2E=1
-#      # Redis configuration
-#      - REDIS_HOST=redis
-#      - REDIS_PORT=6379
-#      - REDIS_PASSWORD=myredispassword
-#    command: >
-#      sh -c "find /calcom -type f -exec sed -i 's/:3000/:3011/g' {} + &&
-#             yarn prisma migrate deploy &&
-#             yarn workspace @calcom/web start"
-#    ports:
-#      - "3011:3011"
-#    depends_on:
-#      - postgres
-#      - redis
-
 volumes:
   postgres-data:
   redis-data:
