@@ -14,6 +14,7 @@ import com.pharmacyhub.security.dto.RoleDTO;
 import com.pharmacyhub.security.infrastructure.AuditLogRepository;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +31,7 @@ import java.util.Set;
 public class RBACService extends PHEngine
 {
     private final UserRepository userRepository;
-    private final com.pharmacyhub.security.infrastructure.RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
     private final AuditLogRepository auditLogRepository;
@@ -39,14 +39,14 @@ public class RBACService extends PHEngine
 
     public RBACService(
             UserRepository userRepository,
-            com.pharmacyhub.security.infrastructure.RoleRepository roleRepository,
+            RolesRepository rolesRepository,
             PermissionRepository permissionRepository,
             GroupRepository groupRepository,
             AuditLogRepository auditLogRepository,
             PHMapper phMapper)
     {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.rolesRepository = rolesRepository;
         this.permissionRepository = permissionRepository;
         this.groupRepository = groupRepository;
         this.auditLogRepository = auditLogRepository;
@@ -111,7 +111,7 @@ public class RBACService extends PHEngine
     {
         validateRoleHierarchy(roleDTO);
         Role role = phMapper.getRole(roleDTO);
-        role = roleRepository.save(role);
+        role = rolesRepository.save(role);
         auditLogRepository.save(createAuditLog("CREATE_ROLE", role.getId()));
         return role;
     }
@@ -139,8 +139,8 @@ public class RBACService extends PHEngine
     {
         User user = userRepository.findById(userId)
                                   .orElseThrow(() -> new RuntimeException("User not found"));
-        Role role = roleRepository.findById(roleId)
-                                  .orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = rolesRepository.findById(roleId)
+                                   .orElseThrow(() -> new RuntimeException("Role not found"));
 
         user.getRoles().add(role);
         userRepository.save(user);
@@ -190,8 +190,8 @@ public class RBACService extends PHEngine
             throw new RuntimeException("Circular dependency detected in role hierarchy");
         }
 
-        Role role = roleRepository.findById(roleId)
-                                  .orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = rolesRepository.findById(roleId)
+                                   .orElseThrow(() -> new RuntimeException("Role not found"));
 
         role.getChildRoles().forEach(childRole ->
                                              checkCircularDependency(childRole.getId(), new HashSet<>(visited)));

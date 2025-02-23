@@ -2,7 +2,7 @@ package com.pharmacyhub.security.service;
 
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.exception.RBACException;
-import com.pharmacyhub.security.infrastructure.RoleRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -15,16 +15,16 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class RoleHierarchyService {
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final AuditService auditService;
 
     @Transactional
     @CacheEvict(value = {"roleHierarchy", "userPermissions"}, allEntries = true)
     public void addChildRole(Long parentRoleId, Long childRoleId) {
-        Role parentRole = roleRepository.findById(parentRoleId)
-            .orElseThrow(() -> RBACException.entityNotFound("Parent role"));
-        Role childRole = roleRepository.findById(childRoleId)
-            .orElseThrow(() -> RBACException.entityNotFound("Child role"));
+        Role parentRole = rolesRepository.findById(parentRoleId)
+                                         .orElseThrow(() -> RBACException.entityNotFound("Parent role"));
+        Role childRole = rolesRepository.findById(childRoleId)
+                                        .orElseThrow(() -> RBACException.entityNotFound("Child role"));
 
         // Check for circular dependency
         if (isCircularDependency(childRole, parentRoleId, new HashSet<>())) {
@@ -37,7 +37,7 @@ public class RoleHierarchyService {
         }
 
         parentRole.getChildRoles().add(childRole);
-        roleRepository.save(parentRole);
+        rolesRepository.save(parentRole);
 
         auditService.logSecurityEvent(
             "ADD_CHILD_ROLE",
@@ -49,13 +49,13 @@ public class RoleHierarchyService {
     @Transactional
     @CacheEvict(value = {"roleHierarchy", "userPermissions"}, allEntries = true)
     public void removeChildRole(Long parentRoleId, Long childRoleId) {
-        Role parentRole = roleRepository.findById(parentRoleId)
-            .orElseThrow(() -> RBACException.entityNotFound("Parent role"));
-        Role childRole = roleRepository.findById(childRoleId)
-            .orElseThrow(() -> RBACException.entityNotFound("Child role"));
+        Role parentRole = rolesRepository.findById(parentRoleId)
+                                         .orElseThrow(() -> RBACException.entityNotFound("Parent role"));
+        Role childRole = rolesRepository.findById(childRoleId)
+                                        .orElseThrow(() -> RBACException.entityNotFound("Child role"));
 
         if (parentRole.getChildRoles().remove(childRole)) {
-            roleRepository.save(parentRole);
+            rolesRepository.save(parentRole);
             
             auditService.logSecurityEvent(
                 "REMOVE_CHILD_ROLE",
@@ -68,8 +68,8 @@ public class RoleHierarchyService {
     @Transactional(readOnly = true)
     @Cacheable(value = "roleHierarchy", key = "#roleId")
     public Set<Role> getAllChildRoles(Long roleId) {
-        Role role = roleRepository.findById(roleId)
-            .orElseThrow(() -> RBACException.entityNotFound("Role"));
+        Role role = rolesRepository.findById(roleId)
+                                   .orElseThrow(() -> RBACException.entityNotFound("Role"));
 
         Set<Role> allChildRoles = new HashSet<>();
         collectChildRoles(role, allChildRoles);
@@ -78,7 +78,7 @@ public class RoleHierarchyService {
 
     @Transactional(readOnly = true)
     public List<Role> getRolesByPrecedence() {
-        return roleRepository.findAll(Sort.by(Sort.Direction.ASC, "precedence"));
+        return rolesRepository.findAll(Sort.by(Sort.Direction.ASC, "precedence"));
     }
 
     private boolean isCircularDependency(Role role, Long targetParentId, Set<Long> visited) {

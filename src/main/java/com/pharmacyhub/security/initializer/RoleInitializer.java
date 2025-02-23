@@ -3,7 +3,7 @@ package com.pharmacyhub.security.initializer;
 import com.pharmacyhub.security.domain.*;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
-import com.pharmacyhub.security.infrastructure.RoleRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +16,14 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class RoleInitializer {
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
 
     @PostConstruct
     @Transactional
     public void init() {
-        if (roleRepository.count() > 0) {
+        if (rolesRepository.count() > 0) {
             log.info("Roles already initialized");
             return;
         }
@@ -106,7 +106,7 @@ public class RoleInitializer {
         proprietorRole.setChildRoles(Set.of(managerRole));
         adminRole.setChildRoles(Set.of(proprietorRole));
 
-        roleRepository.saveAll(Arrays.asList(pharmacistRole, managerRole, proprietorRole, salesmanRole, adminRole));
+        rolesRepository.saveAll(Arrays.asList(pharmacistRole, managerRole, proprietorRole, salesmanRole, adminRole));
     }
 
     private void initializeGroups() {
@@ -155,13 +155,13 @@ public class RoleInitializer {
             .childRoles(new HashSet<>())
             .build();
 
-        return roleRepository.save(role);
+        return rolesRepository.save(role);
     }
 
     private Group createGroup(String name, String description, String... roleNames) {
         Set<Role> roles = Arrays.stream(roleNames)
-            .map(roleName -> roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
+            .map(roleName -> rolesRepository.findByName(roleName)
+                                            .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
             .collect(java.util.stream.Collectors.toSet());
 
         Group group = Group.builder()

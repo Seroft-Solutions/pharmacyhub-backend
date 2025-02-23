@@ -20,7 +20,7 @@ import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.security.domain.Role;
-import com.pharmacyhub.security.infrastructure.RoleRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ public class UserService extends PHEngine implements PHUserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private RoleRepository roleRepository;
+    private RolesRepository rolesRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -60,7 +60,7 @@ public class UserService extends PHEngine implements PHUserService {
         if (getUserByEmailAddress(userDTO)==null) {
             User user = phMapper.getUser(userDTO);
 
-            Role role = roleRepository.findByName(RoleEnum.USER).orElseThrow(() ->
+            Role role = rolesRepository.findByName(RoleEnum.USER).orElseThrow(() ->
                 new RuntimeException("Default user role not found"));
             String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
             user.setPassword(encodedPassword);

@@ -3,27 +3,25 @@ package com.pharmacyhub.security.service;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.domain.Group;
 import com.pharmacyhub.security.domain.Role;
-import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.exception.RBACException;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
-import com.pharmacyhub.security.infrastructure.RoleRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserRoleService {
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final GroupRepository groupRepository;
 
     @Transactional(readOnly = true)
     public boolean hasRole(Long userId, String roleName) {
-        Role role = roleRepository.findByName(roleName)
-            .orElseThrow(() -> RBACException.entityNotFound("Role"));
+        Role role = rolesRepository.findByName(roleName)
+                                   .orElseThrow(() -> RBACException.entityNotFound("Role"));
         return hasRole(userId, role);
     }
 

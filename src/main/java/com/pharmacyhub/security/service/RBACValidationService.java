@@ -8,7 +8,7 @@ import com.pharmacyhub.security.dto.RoleDTO;
 import com.pharmacyhub.security.exception.RBACException;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
-import com.pharmacyhub.security.infrastructure.RoleRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +19,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RBACValidationService
 {
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
 
     public void validateRoleCreation(RoleDTO roleDTO)
     {
         // Check for name uniqueness
-        if (roleRepository.findByName(roleDTO.getName()).isPresent())
+        if (rolesRepository.findByName(roleDTO.getName()).isPresent())
         {
             throw RBACException.invalidOperation("Role name already exists");
         }
@@ -73,7 +73,7 @@ public class RBACValidationService
         if (groupDTO.getRoleIds() != null)
         {
             groupDTO.getRoleIds().forEach(roleId -> {
-                if (!roleRepository.existsById(roleId))
+                if (!rolesRepository.existsById(roleId))
                 {
                     throw RBACException.entityNotFound("Role");
                 }
@@ -90,8 +90,8 @@ public class RBACValidationService
                 throw RBACException.invalidRoleHierarchy();
             }
 
-            Role role = roleRepository.findByIdWithChildRoles(roleId)
-                                      .orElseThrow(() -> RBACException.entityNotFound("Role"));
+            Role role = rolesRepository.findByIdWithChildRoles(roleId)
+                                       .orElseThrow(() -> RBACException.entityNotFound("Role"));
 
             if (!role.getChildRoles().isEmpty())
             {

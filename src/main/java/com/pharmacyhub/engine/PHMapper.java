@@ -13,25 +13,24 @@ import com.pharmacyhub.security.dto.PermissionDTO;
 import com.pharmacyhub.security.dto.RoleDTO;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
-import com.pharmacyhub.security.infrastructure.RoleRepository;
+import com.pharmacyhub.security.infrastructure.RolesRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class PHMapper {
     private final ModelMapper modelMapper = new ModelMapper();
-    private final RoleRepository roleRepository;
+    private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
 
-    public PHMapper(RoleRepository roleRepository, 
-                   PermissionRepository permissionRepository, 
-                   GroupRepository groupRepository) {
-        this.roleRepository = roleRepository;
+    public PHMapper(RolesRepository rolesRepository,
+                    PermissionRepository permissionRepository,
+                    GroupRepository groupRepository) {
+        this.rolesRepository = rolesRepository;
         this.permissionRepository = permissionRepository;
         this.groupRepository = groupRepository;
     }
@@ -115,8 +114,8 @@ public class PHMapper {
 
         if (roleDTO.getChildRoleIds() != null) {
             Set<Role> childRoles = roleDTO.getChildRoleIds().stream()
-                .map(id -> roleRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Role not found")))
+                .map(id -> rolesRepository.findById(id)
+                                          .orElseThrow(() -> new RuntimeException("Role not found")))
                 .collect(Collectors.toSet());
             role.setChildRoles(childRoles);
         }
@@ -155,8 +154,8 @@ public class PHMapper {
         
         if (groupDTO.getRoleIds() != null) {
             Set<Role> roles = groupDTO.getRoleIds().stream()
-                .map(id -> roleRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Role not found")))
+                .map(id -> rolesRepository.findById(id)
+                                          .orElseThrow(() -> new RuntimeException("Role not found")))
                 .collect(Collectors.toSet());
             group.setRoles(roles);
         }
