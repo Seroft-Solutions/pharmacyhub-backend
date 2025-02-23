@@ -30,9 +30,6 @@ public class SecurityConfig
     private String frontendUrl;
 
 
-
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
     {
