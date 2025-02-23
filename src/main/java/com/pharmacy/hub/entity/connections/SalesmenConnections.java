@@ -1,6 +1,5 @@
 package com.pharmacy.hub.entity.connections;
 
-import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.entity.Salesman;
 import com.pharmacy.hub.entity.User;
@@ -18,7 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.poi.ss.formula.functions.T;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -37,7 +35,7 @@ public class SalesmenConnections
   private Long id;
 
   @Enumerated(EnumType.STRING)
-  private ConnectionStatusEnum connectionStatus;
+  private StateEnum state = StateEnum.READY_TO_CONNECT;
   
   private String notes;
 
@@ -51,10 +49,10 @@ public class SalesmenConnections
 
   @ManyToOne
   @JoinColumn(name = "user_id")
-  private User userId;
+  private User user;
 
   @ManyToOne
   @JoinColumn(name = "salesman_id")
-  private Salesman salesmanId;
+  private Salesman salesman;
 
 }

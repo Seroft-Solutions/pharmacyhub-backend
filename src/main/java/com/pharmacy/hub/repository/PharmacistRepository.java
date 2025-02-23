@@ -12,6 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface PharmacistRepository extends JpaRepository<Pharmacist, Long>
 {
     Pharmacist findByUser(User user);
-
-    Pharmacist findByUser_Id(String currentUserId);
 }

@@ -1,6 +1,5 @@
 package com.pharmacy.hub.repository.connections;
 
-import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.entity.Salesman;
 import com.pharmacy.hub.entity.User;
@@ -16,11 +15,7 @@ import java.util.List;
 @Repository
 public interface SalesmenConnectionsRepository extends JpaRepository<SalesmenConnections, Long>
 {
-//  List<SalesmenConnections> findByUserAndSalesmanAndState(User user, Salesman salesman, StateEnum stateEnum);
-//
-//  List<SalesmenConnections> findByUserAndState(User user, StateEnum stateEnum);
+  List<SalesmenConnections> findByUserAndSalesmanAndState(User user, Salesman salesman, StateEnum stateEnum);
 
-  SalesmenConnections findByUserId(User requesterId);
-
-  List<SalesmenConnections> findBySalesmanIdAndConnectionStatus(Salesman currentUserSalesman, ConnectionStatusEnum connectionStatusEnum);
+  List<SalesmenConnections> findByUserAndState(User user, StateEnum stateEnum);
 }

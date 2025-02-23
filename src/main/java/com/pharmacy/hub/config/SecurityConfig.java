@@ -1,75 +1,69 @@
 package com.pharmacy.hub.config;
 
-import com.pharmacy.hub.keycloak.KeycloakLogoutHandler;
-
-import com.pharmacy.hub.security.UserGroupCheckFilter;
+import com.pharmacy.hub.security.JwtAuthenticationEntryPoint;
+import com.pharmacy.hub.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
+@EnableMethodSecurity
 @EnableWebSecurity
 public class SecurityConfig
 {
+  @Autowired
+  private JwtAuthenticationEntryPoint point;
+  @Autowired
+  private JwtAuthenticationFilter filter;
+
+  @Autowired
+  private UserDetailsService userDetailsService;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
+  {
+
+    http.csrf(c -> c.disable())
+            .cors(cors -> cors.configurationSource(request -> {
+              CorsConfiguration configuration = new CorsConfiguration();
+              configuration.setAllowedOrigins(Arrays.asList("*"));
+              configuration.setAllowedMethods(Arrays.asList("*"));
+              configuration.setAllowedHeaders(Arrays.asList("*"));
+              return configuration;
+            }))
+            .authorizeRequests().
+            requestMatchers("/api/**").authenticated()
+            .requestMatchers("/**").permitAll()
+            .anyRequest()
+            .authenticated()
+            .and().exceptionHandling(ex -> ex.authenticationEntryPoint(point))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+    return http.build();
+  }
+
+  @Bean
+  public DaoAuthenticationProvider daoAuthenticationProvider()
+  {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder);
+    return provider;
+  }
 
 
-    @Autowired
-    private KeycloakLogoutHandler keycloakLogoutHandler;
-
-
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
-
-
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
-    {
-        http.csrf(
-                csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-            .authorizeHttpRequests(authz -> authz.requestMatchers("/", "/oauth2/**", "/login/**", "/logout/**", "/public/**")
-            .permitAll()
-                                                 .anyRequest()
-                                                 .authenticated())
-            .oauth2Login(oauth2 -> oauth2.loginPage("/oauth2/authorization/keycloak")
-                                         .defaultSuccessUrl(frontendUrl+"/login", true)).oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))).logout(logout -> logout.addLogoutHandler(keycloakLogoutHandler).logoutSuccessUrl(frontendUrl).permitAll());
-
-        return http.build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter()
-    {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-
-        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-        jwtConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtConverter;
-    }
-
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource()
-    {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedOriginPattern(frontendUrl);
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
 }

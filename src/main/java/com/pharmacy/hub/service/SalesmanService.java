@@ -1,37 +1,30 @@
 package com.pharmacy.hub.service;
 
-import com.pharmacy.hub.constants.ConnectionStatusEnum;
 import com.pharmacy.hub.constants.StateEnum;
 import com.pharmacy.hub.constants.UserEnum;
-import com.pharmacy.hub.dto.*;
+import com.pharmacy.hub.dto.PHUserConnectionDTO;
+import com.pharmacy.hub.dto.PHUserDTO;
+import com.pharmacy.hub.dto.SalesmanDTO;
 import com.pharmacy.hub.dto.display.ConnectionDisplayDTO;
 import com.pharmacy.hub.dto.display.UserDisplayDTO;
 import com.pharmacy.hub.engine.PHEngine;
 import com.pharmacy.hub.engine.PHMapper;
 import com.pharmacy.hub.entity.Pharmacist;
 import com.pharmacy.hub.entity.Salesman;
-import com.pharmacy.hub.entity.User;
-import com.pharmacy.hub.entity.connections.PharmacistsConnections;
 import com.pharmacy.hub.entity.connections.ProprietorsConnections;
 import com.pharmacy.hub.entity.connections.SalesmenConnections;
-import com.pharmacy.hub.keycloak.services.Implementation.KeycloakAuthServiceImpl;
-import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImpl;
-import com.pharmacy.hub.repository.*;
+import com.pharmacy.hub.repository.PharmacistRepository;
+import com.pharmacy.hub.repository.PharmacyManagerRepository;
+import com.pharmacy.hub.repository.ProprietorRepository;
+import com.pharmacy.hub.repository.SalesmanRepository;
 import com.pharmacy.hub.repository.connections.SalesmenConnectionsRepository;
-import com.pharmacy.hub.security.TenantContext;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,39 +47,15 @@ public class SalesmanService extends PHEngine implements PHUserService
   private SalesmenConnectionsRepository salesmenConnectionsRepository;
 
   @Autowired
-  private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
-  @Autowired
-  private UserRepository userRepository;
-
-  @Autowired
   private PHMapper phMapper;
-
-  @Autowired
-  private KeycloakAuthServiceImpl keycloakAuthServiceImpl;
-  private final String realm;
-    @Autowired
-    private UserService userService;
-
-  SalesmanService(@org.springframework.beans.factory.annotation.Value("${keycloak.realm}") String realm){
-    this.realm=realm;
-  }
 
   @Override
   public PHUserDTO saveUser(PHUserDTO salesmanDTO)
   {
-    User user= new User();
-    String groupName="SALESMAN";
-    String groupId=keycloakGroupServiceImpl.findGroupIdByName(groupName);
-    keycloakGroupServiceImpl.assignUserToGroup(TenantContext.getCurrentTenant(), groupId);
     Salesman salesman = phMapper.getSalesman((SalesmanDTO) salesmanDTO);
-    user.setId(TenantContext.getCurrentTenant());
-    user.setRegistered(true);
-    user.setOpenToConnect(true);
-    userRepository.save(user);
-    salesman.setUser(user);
-    //    getLoggedInUser().setRegistered(true);
-//    salesman.setUser(getLoggedInUser());
-//    getLoggedInUser().setUserType(UserEnum.SALESMAN.getUserEnum());
+    getLoggedInUser().setRegistered(true);
+    salesman.setUser(getLoggedInUser());
+    getLoggedInUser().setUserType(UserEnum.SALESMAN.getUserEnum());
     Salesman savedSalesman = salesmanRepository.save(salesman);
     return phMapper.getSalesmanDTO(savedSalesman);
   }
@@ -100,26 +69,6 @@ public class SalesmanService extends PHEngine implements PHUserService
     return phMapper.getSalesmanDTO(savedSalesman);
   }
 
-  public void approveStatus(Long id)
-  {
-    Salesman salesman = salesmanRepository.findById(id).orElseThrow(() -> new RuntimeException("Salesman not found"));
-    User requesterId = salesman.getUser();
-    SalesmenConnections salesmenConnections = salesmenConnectionsRepository.findByUserId(requesterId);
-    salesmenConnections.setConnectionStatus(ConnectionStatusEnum.APPROVED);
-    salesmenConnectionsRepository.save(salesmenConnections);
-  }
-
-  public void rejectStatus(Long id)
-  {
-    Salesman salesman = salesmanRepository.findById(id).orElseThrow(() -> new RuntimeException("Salesman not found"));
-    User requesterId = salesman.getUser();
-    SalesmenConnections salesmenConnections = salesmenConnectionsRepository.findByUserId(requesterId);
-    salesmenConnections.setConnectionStatus(ConnectionStatusEnum.REJECTED);
-    salesmenConnectionsRepository.save(salesmenConnections);
-  }
-
-
-
   @Override
   public PHUserDTO findUser(long id)
   {
@@ -127,150 +76,46 @@ public class SalesmanService extends PHEngine implements PHUserService
     return phMapper.getSalesmanDTO(salesman.get());
   }
 
-
-  public void connectWith(SalesmenConnectionsDTO salesmanConnectionsDTO)
+  @Override
+  public List<UserDisplayDTO> findAllUsers()
   {
-    salesmanConnectionsDTO.setUserId(TenantContext.getCurrentTenant());
-    salesmanConnectionsDTO.setConnectionStatus(ConnectionStatusEnum.PENDING);
-    salesmanConnectionsDTO.setNotes("User Want to connect");
-    salesmanConnectionsDTO.setUserGroup(userService.getUserGroup(TenantContext.getCurrentTenant()));
-    SalesmenConnections salesmanConnections = phMapper.getSalesmenConnections(salesmanConnectionsDTO);
-    salesmenConnectionsRepository.save(salesmanConnections);
+    return salesmanRepository.findAll().stream().map(salesman -> {
+      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(salesman.getUser());
+      userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(salesman));
+
+      userDisplayDTO.setConnected(getAllUserConnections().stream().anyMatch(userDisplayDTO1 -> {
+        return userDisplayDTO1.getSalesman().getId().equals(salesman.getId());
+      }));
+
+      return userDisplayDTO;
+    }).collect(Collectors.toList());
   }
 
   @Override
-  public List<UserDisplayDTO> findAllUsers() {
-    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
-    RealmResource realmResource = keycloak.realm(realm);
-
-    // Find the PHARMACIST group
-    Optional<GroupRepresentation> salesmanGroup = realmResource.groups().groups().stream()
-                                                                 .filter(group -> "SALESMAN".equalsIgnoreCase(group.getName()))
-                                                                 .findFirst();
-
-    if (salesmanGroup.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    // Get user IDs in the PHARMACIST group
-    List<String> salesmanUserIds = realmResource.groups().group(salesmanGroup.get().getId()).members().stream()
-                                                  .map(UserRepresentation::getId)
-                                                  .collect(Collectors.toList());
-
-    return salesmanRepository.findAll().stream()
-                               .filter(salesman -> salesmanUserIds.contains(salesman.getUser().getId()))
-                               .map(salesman -> {
-                                 UserRepresentation keycloakUser = realmResource.users().get(salesman.getUser().getId()).toRepresentation();
-                                 UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(salesman.getUser());
-                                 userDisplayDTO.setFirstName(keycloakUser.getFirstName());
-                                 userDisplayDTO.setLastName(keycloakUser.getLastName());
-                                 userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(salesman));
-
-                                 return userDisplayDTO;
-                               }).collect(Collectors.toList());
-  }
-
-
-  public List<UserDisplayDTO> findPendingUsers()
+  public void connectWith(PHUserConnectionDTO phUserConnectionDTO)
   {
-    Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
-    RealmResource realmResource = keycloak.realm(realm);
-    String currentUserId = TenantContext.getCurrentTenant();
+    Salesman salesman = phMapper.getSalesman((SalesmanDTO) findUser(phUserConnectionDTO.getConnectWith()));
+    List<SalesmenConnections> salesmanConnectionsList = salesmenConnectionsRepository.findByUserAndSalesmanAndState(getLoggedInUser(), salesman, StateEnum.READY_TO_CONNECT);
 
-    // Find the PHARMACIST group
-    Optional<GroupRepresentation> salesmanGroup = realmResource.groups().groups().stream().filter(group -> "SALESMAN".equalsIgnoreCase(group.getName())).findFirst();
-
-    if (salesmanGroup.isEmpty())
+    if (salesmanConnectionsList.isEmpty())
     {
-      return Collections.emptyList();
+      SalesmenConnections salesmanConnections = new SalesmenConnections();
+      salesmanConnections.setSalesman(salesman);
+      salesmanConnections.setUser(getLoggedInUser());
+      salesmenConnectionsRepository.save(salesmanConnections);
     }
-
-    // Get user IDs in the PHARMACIST group
-    List<String> salesmenUserIds = realmResource.groups().group(salesmanGroup.get().getId()).members().stream().map(UserRepresentation::getId).collect(Collectors.toList());
-
-    // Get current user's pharmacist record
-    Salesman currentUserSalesman = salesmanRepository.findByUser_Id(currentUserId);
-    if (currentUserSalesman == null)
-    {
-      return Collections.emptyList();
-    }
-
-    // Find all pending connections for the current user's pharmacist ID
-    List<SalesmenConnections> pendingConnections = salesmenConnectionsRepository.findBySalesmanIdAndConnectionStatus(currentUserSalesman, ConnectionStatusEnum.PENDING);
-
-    // Map the connections to UserDisplayDTO
-    return pendingConnections.stream().map(connection -> {
-      // Get the requesting user's information
-      User requestingUser = connection.getUserId();
-      if (!salesmenUserIds.contains(requestingUser.getId()))
-      {
-        return null;
-      }
-
-      UserRepresentation keycloakUser = realmResource.users().get(requestingUser.getId()).toRepresentation();
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(requestingUser);
-      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
-      userDisplayDTO.setLastName(keycloakUser.getLastName());
-
-      // Get the pharmacist details for the requesting user
-      Salesman requestingSalesman = salesmanRepository.findByUser_Id(requestingUser.getId());
-      userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(requestingSalesman));
-      userDisplayDTO.setConnected(true); // Since we found a connection
-
-      return userDisplayDTO;
-    }).filter(Objects::nonNull).collect(Collectors.toList());
   }
-
-
 
   @Override
   public List<UserDisplayDTO> getAllUserConnections()
-  {Keycloak keycloak = keycloakAuthServiceImpl.getKeycloakInstance();
-    RealmResource realmResource = keycloak.realm(realm);
-    String currentUserId = TenantContext.getCurrentTenant();
+  {
+    List<SalesmenConnections> salesmanConnectionsList = salesmenConnectionsRepository.findByUserAndState(getLoggedInUser(), StateEnum.READY_TO_CONNECT);
 
-    // Find the PHARMACIST group
-    Optional<GroupRepresentation> salesmanGroup = realmResource.groups().groups().stream().filter(group -> "SALESMAN".equalsIgnoreCase(group.getName())).findFirst();
-
-    if (salesmanGroup.isEmpty())
-    {
-      return Collections.emptyList();
-    }
-
-    // Get user IDs in the PHARMACIST group
-    List<String> salesmenUserIds = realmResource.groups().group(salesmanGroup.get().getId()).members().stream().map(UserRepresentation::getId).collect(Collectors.toList());
-
-    // Get current user's pharmacist record
-    Salesman currentUserSalesman = salesmanRepository.findByUser_Id(currentUserId);
-    if (currentUserSalesman == null)
-    {
-      return Collections.emptyList();
-    }
-
-    // Find all pending connections for the current user's pharmacist ID
-    List<SalesmenConnections> pendingConnections = salesmenConnectionsRepository.findBySalesmanIdAndConnectionStatus(currentUserSalesman, ConnectionStatusEnum.APPROVED);
-
-    // Map the connections to UserDisplayDTO
-    return pendingConnections.stream().map(connection -> {
-      // Get the requesting user's information
-      User requestingUser = connection.getUserId();
-      if (!salesmenUserIds.contains(requestingUser.getId()))
-      {
-        return null;
-      }
-
-      UserRepresentation keycloakUser = realmResource.users().get(requestingUser.getId()).toRepresentation();
-      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(requestingUser);
-      userDisplayDTO.setFirstName(keycloakUser.getFirstName());
-      userDisplayDTO.setLastName(keycloakUser.getLastName());
-
-      // Get the pharmacist details for the requesting user
-      Salesman requestingSalesman = salesmanRepository.findByUser_Id(requestingUser.getId());
-      userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(requestingSalesman));
-      userDisplayDTO.setConnected(true); // Since we found a connection
-
+    return salesmanConnectionsList.stream().map(salesmanConnection -> {
+      UserDisplayDTO userDisplayDTO = phMapper.getUserDisplayDTO(salesmanConnection.getSalesman().getUser());
+      userDisplayDTO.setSalesman(phMapper.getSalesmanDTO(salesmanConnection.getSalesman()));
       return userDisplayDTO;
-    }).filter(Objects::nonNull).collect(Collectors.toList());
+    }).collect(Collectors.toList());
 
   }
 
@@ -337,7 +182,7 @@ public class SalesmanService extends PHEngine implements PHUserService
   public void updateState(PHUserConnectionDTO userConnectionDTO)
   {
     SalesmenConnections salesmenConnections = salesmenConnectionsRepository.findById(userConnectionDTO.getId()).get();
-//    salesmenConnections.setState(userConnectionDTO.getState());
+    salesmenConnections.setState(userConnectionDTO.getState());
     salesmenConnectionsRepository.save(salesmenConnections);
   }
 
@@ -352,12 +197,12 @@ public class SalesmanService extends PHEngine implements PHUserService
   @Override
   public void disconnectWith(PHUserConnectionDTO phUserConnectionDTO)
   {
-//    Salesman salesman = phMapper.getSalesman((SalesmanDTO) findUser(phUserConnectionDTO.getConnectWith()));
-//    List<SalesmenConnections> salesmanConnectionsList = salesmenConnectionsRepository.findByUserAndSalesmanAndState(getLoggedInUser(), salesman, StateEnum.READY_TO_CONNECT);
-//
-//    SalesmenConnections salesmanConnection = salesmanConnectionsList.stream().findFirst().get();
-////    salesmanConnection.setState(StateEnum.CLIENT_DISCONNECT);
-//    salesmenConnectionsRepository.save(salesmanConnection);
+    Salesman salesman = phMapper.getSalesman((SalesmanDTO) findUser(phUserConnectionDTO.getConnectWith()));
+    List<SalesmenConnections> salesmanConnectionsList = salesmenConnectionsRepository.findByUserAndSalesmanAndState(getLoggedInUser(), salesman, StateEnum.READY_TO_CONNECT);
+
+    SalesmenConnections salesmanConnection = salesmanConnectionsList.stream().findFirst().get();
+    salesmanConnection.setState(StateEnum.CLIENT_DISCONNECT);
+    salesmenConnectionsRepository.save(salesmanConnection);
   }
   
   public Salesman getSalesman(){

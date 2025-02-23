@@ -7,15 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO implements PHUserDTO
 {
-  private String id;
+  private Long id;
   private boolean openToConnect;
   private boolean registered;
   private String userType;
@@ -25,7 +23,7 @@ public class UserDTO implements PHUserDTO
   private String password;
   private String otpCode;
   @JsonIgnore
-  private List<String> role;
+  private Role role;
   private PharmacistDTO pharmacist;
   private ProprietorDTO proprietor;
   private SalesmanDTO salesman;

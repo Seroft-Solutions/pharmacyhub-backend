@@ -46,7 +46,6 @@ public class SalesmanSeeder
                 if (userRepository.findByEmailAddress(email).isEmpty())
                 {
                   User user = new User();
-                    user.setId(i+"@Salesman");
                   user.setFirstName("User " + i);
                   user.setLastName("Salesman");
                   user.setEmailAddress("user" + i + "@pharmacyhub.pk");
@@ -63,9 +62,7 @@ public class SalesmanSeeder
                           .experience("Lahore")
                           .previousPharmacyName("Test pharmacy")
                           .currentJobStatus("Free")
-                          .timePrefernce("Morning")
-                          .saleryExpectation("10000")
-                          .education("Matric")
+                          .shiftTime("Morning")
                           .user(user)
                           .build();
 

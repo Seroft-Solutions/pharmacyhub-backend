@@ -33,12 +33,9 @@ public class Salesman
   private String area;
   private String city;
   private String experience;
-  private String education;
   private String previousPharmacyName;
   private String currentJobStatus;
-  private String timePrefernce;
-  private String saleryExpectation;
-
+  private String shiftTime;
 
   @CreationTimestamp
   @Column(updatable = false, name = "created_at")

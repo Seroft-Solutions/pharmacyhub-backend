@@ -9,6 +9,4 @@ import org.springframework.stereotype.Repository;
 public interface SalesmanRepository extends JpaRepository<Salesman, Long>
 {
   Salesman findByUser(User loggedInUser);
-
-    Salesman findByUser_Id(String currentUserId);
 }

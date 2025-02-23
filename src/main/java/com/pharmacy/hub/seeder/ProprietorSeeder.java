@@ -46,7 +46,6 @@ public class ProprietorSeeder
                 if (userRepository.findByEmailAddress(email).isEmpty())
                 {
                   User user = new User();
-                    user.setId(i+"@Proprietor");
                   user.setFirstName("User " + i);
                   user.setLastName("Proprietor");
                   user.setEmailAddress("user" + i + "@pharmacyhub.pk");
@@ -57,12 +56,14 @@ public class ProprietorSeeder
                   userRepository.save(user);
 
                   Proprietor proprietor = Proprietor.builder()
-                          .licenseRequired("Yes")
-                          .requiredLicenseDuration("2 Year")
+                          .categoryRequired("Yes")
+                          .licenseDuration("2 Year")
+                          .experienced("Yes")
                           .pharmacyName("Pharmacy Cool")
                           .city("Lahore")
-                          .area("Rehmanpura")
+                          .location("Rehmanpura")
                           .contactNumber("03456142607")
+                          .categoryProvince("Punjab")
                           .user(user)
                           .build();
 

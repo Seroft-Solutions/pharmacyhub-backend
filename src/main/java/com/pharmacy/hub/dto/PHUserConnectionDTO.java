@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PHUserConnectionDTO
 {
-  private Long id;
+  private long id;
   private long connectWith;
   private StateEnum state;
   private String notes;
