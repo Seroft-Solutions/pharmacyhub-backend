@@ -3,7 +3,7 @@ package com.pharmacyhub.controller;
 import com.pharmacyhub.dto.LoggedInUserDTO;
 import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
-import com.pharmacyhub.entity.Role;
+import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.JwtHelper;
 import com.pharmacyhub.security.model.LoginRequest;
@@ -90,6 +90,7 @@ public class AuthController
     LoggedInUserDTO loggedInUserDTO = LoggedInUserDTO.builder()
             .openToConnect(loggedInUser.isOpenToConnect())
             .isRegistered(loggedInUser.isRegistered())
+            .userType(loggedInUser.getUserType())
             .jwtToken(token)
             .build();
 
@@ -118,4 +119,3 @@ public class AuthController
   }
 
 }
-

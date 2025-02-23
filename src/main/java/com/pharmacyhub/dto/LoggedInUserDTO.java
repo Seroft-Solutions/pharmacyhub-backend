@@ -1,5 +1,6 @@
 package com.pharmacyhub.dto;
 
+import com.pharmacyhub.entity.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class LoggedInUserDTO
   private boolean openToConnect;
   private boolean isRegistered;
   private String jwtToken;
+  private UserType userType;
 }

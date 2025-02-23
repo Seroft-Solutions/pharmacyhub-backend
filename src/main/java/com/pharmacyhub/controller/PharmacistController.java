@@ -9,7 +9,9 @@ import com.pharmacyhub.service.PharmacistService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.pharmacyhub.security.annotation.RequiresPermission;
+import com.pharmacyhub.security.domain.OperationType;
+import com.pharmacyhub.security.domain.ResourceType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,7 +28,7 @@ public class PharmacistController
 
   @Autowired private PharmacistService pharmacistService;
 
-  @PreAuthorize("isAuthenticated()")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.CREATE)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/add-info",
           method = RequestMethod.POST
@@ -36,7 +38,7 @@ public class PharmacistController
     return new ResponseEntity<PHUserDTO>(pharmacistService.saveUser(pharmacistDTO), HttpStatus.OK);
   }
 
-  @PreAuthorize("isAuthenticated()")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.READ)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/get-all",
           method = RequestMethod.GET
@@ -46,7 +48,7 @@ public class PharmacistController
     return new ResponseEntity<>(pharmacistService.findAllUsers(), HttpStatus.OK);
   }
 
-  @PreAuthorize("isAuthenticated()")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.MANAGE)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/connect",
           method = RequestMethod.POST
@@ -62,7 +64,7 @@ public class PharmacistController
     return responseEntity;
   }
 
-  @PreAuthorize("isAuthenticated()")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.READ)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/get-user-connections",
           method = RequestMethod.GET
@@ -73,7 +75,7 @@ public class PharmacistController
     return new ResponseEntity<>(users, HttpStatus.OK);
   }
 
-  @PreAuthorize("isAuthenticated()")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.MANAGE)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/disconnect",
           method = RequestMethod.PUT
@@ -84,7 +86,7 @@ public class PharmacistController
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @PreAuthorize("isAuthenticated()")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.READ)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/user-eligible-to-connect",
           method = RequestMethod.GET
@@ -99,7 +101,7 @@ public class PharmacistController
     return new ResponseEntity<>(HttpStatus.CONFLICT);
   }
 
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.VIEW_ALL)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/get-all-connections",
           method = RequestMethod.GET
@@ -109,7 +111,7 @@ public class PharmacistController
     return new ResponseEntity<>(pharmacistService.getAllConnections(), HttpStatus.OK);
   }
 
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.MANAGE)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/update-connection-state",
           method = RequestMethod.PUT
@@ -120,7 +122,7 @@ public class PharmacistController
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+  @RequiresPermission(resource = ResourceType.PHARMACIST, operation = OperationType.MANAGE)
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/update-connection-notes",
           method = RequestMethod.PUT
@@ -132,8 +134,3 @@ public class PharmacistController
   }
 
 }
-
-
-
-
-

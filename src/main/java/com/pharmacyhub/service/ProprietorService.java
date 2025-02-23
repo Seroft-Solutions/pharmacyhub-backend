@@ -54,7 +54,7 @@ public class ProprietorService extends PHEngine implements PHUserService
     Proprietor proprietor = phMapper.getProprietor((ProprietorDTO) proprietorDTO);
     getLoggedInUser().setRegistered(true);
     proprietor.setUser(getLoggedInUser());
-    getLoggedInUser().setUserType(UserEnum.PROPRIETOR.getUserEnum());
+    getLoggedInUser().setUserType(com.pharmacyhub.entity.enums.UserType.PROPRIETOR);
     Proprietor savedProprietor = proprietorRepository.save(proprietor);
     return phMapper.getProprietorDTO(savedProprietor);
   }
@@ -208,4 +208,3 @@ public class ProprietorService extends PHEngine implements PHUserService
     return proprietorRepository.findByUser(getLoggedInUser());
   }
 }
-

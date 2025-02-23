@@ -2,12 +2,13 @@ package com.pharmacyhub.entity;
 
 import com.pharmacyhub.security.domain.Group;
 import com.pharmacyhub.security.domain.Role;
+import org.springframework.data.domain.Sort;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.usertype.UserType;
+import com.pharmacyhub.entity.enums.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,6 +32,16 @@ public class User implements UserDetails {
 
     @Column(unique = true)
     private String emailAddress;
+    
+    private String verificationToken;
+    private LocalDateTime tokenCreationDate;
+    private boolean verified;
+    private boolean registered;
+    private boolean openToConnect;
+    
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     private String firstName;
     private String lastName;
@@ -46,7 +57,21 @@ public class User implements UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
+
+    public void setRole(Role role) {
+        this.role = role;
+        if (role != null) {
+            this.roles.add(role);
+        }
+    }
+
+    public Role getRole() {
+        return roles.stream()
+            .min((r1, r2) -> Integer.compare(r1.getPrecedence(), r2.getPrecedence()))
+            .orElse(null);
+    }
     
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -54,6 +79,7 @@ public class User implements UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "group_id")
     )
+    @Builder.Default
     private Set<Group> groups = new HashSet<>();
     
     @ElementCollection(fetch = FetchType.EAGER)
@@ -61,12 +87,15 @@ public class User implements UserDetails {
         name = "user_permissions_override",
         joinColumns = @JoinColumn(name = "user_id")
     )
+    @Builder.Default
     private Set<String> permissionOverrides = new HashSet<>();
     
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
     
     @Column(nullable = false)
+    @Builder.Default
     private boolean accountNonLocked = true;
     
     @Column

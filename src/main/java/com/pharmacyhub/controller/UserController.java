@@ -5,6 +5,7 @@ import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.entity.User;
+import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -96,13 +97,13 @@ public class UserController
           value = APIConstants.API_VERSION_V1 + "/user-data",
           method = RequestMethod.GET
   )
-  public ResponseEntity<String> isUser()
+  public ResponseEntity<UserType> getUserType()
   {
-    if (userService.isUserRole())
-    {
-      return new ResponseEntity<String>(userService.getUserType(), HttpStatus.OK);
+    UserType userType = userService.getUserType();
+    if (userType != null) {
+        return ResponseEntity.ok(userType);
     }
-    return new ResponseEntity<String>("admin", HttpStatus.OK);
+    return ResponseEntity.notFound().build();
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -122,12 +123,8 @@ public class UserController
   )
   public ResponseEntity<Boolean> isUserRegistered()
   {
-    return new ResponseEntity<Boolean>(userService.isUserRole(), HttpStatus.OK);
+    User user = userService.getLoggedInUser();
+    return ResponseEntity.ok(user != null && user.isRegistered());
   }
 
 }
-
-
-
-
-

@@ -50,7 +50,7 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
   {
     PharmacyManager PharmacyManager = phMapper.getPharmacyManager((PharmacyManagerDTO) pharmacyManagerDTO);
     getLoggedInUser().setRegistered(true);
-    getLoggedInUser().setUserType(UserEnum.PHARMACY_MANAGER.getUserEnum());
+    getLoggedInUser().setUserType(com.pharmacyhub.entity.enums.UserType.PHARMACY_MANAGER);
     PharmacyManager.setUser(getLoggedInUser());
     PharmacyManager savedPharmacyManager = pharmacyManagerRepository.save(PharmacyManager);
     return phMapper.getPharmacyManagerDTO(savedPharmacyManager);
@@ -204,6 +204,3 @@ public class PharmacyManagerService extends PHEngine implements PHUserService
     return pharmacyManagerRepository.findByUser(getLoggedInUser());
   }
 }
-
-
-

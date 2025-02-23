@@ -1,13 +1,13 @@
 package com.pharmacyhub.seeder;
 
 import com.pharmacyhub.constants.RoleEnum;
-import com.pharmacyhub.constants.UserEnum;
-import com.pharmacyhub.entity.Role;
 import com.pharmacyhub.entity.Salesman;
 import com.pharmacyhub.entity.User;
-import com.pharmacyhub.repository.RoleRepository;
+import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.repository.SalesmanRepository;
 import com.pharmacyhub.repository.UserRepository;
+import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,64 +18,55 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 @Component
-public class SalesmanSeeder
-{
-  @Value("#{'${pharmacyhub.test.data.salesman}'.split('-')}")
-  private List<Integer> range;
+public class SalesmanSeeder {
+    @Value("#{'${pharmacyhub.test.data.salesman}'.split('-')}")
+    private List<Integer> range;
 
-  @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private RoleRepository roleRepository;
-  @Autowired
-  private PasswordEncoder passwordEncoder;
-  @Autowired
-  private SalesmanRepository salesmanRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private SalesmanRepository salesmanRepository;
 
+    public void loadUsers() {
+        Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.USER);
 
-  public void loadUsers()
-  {
-    Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.USER);
+        IntStream.rangeClosed(range.get(0), range.get(1))
+                .forEach(i -> {
+                    try {
+                        String email = "salesman" + i + "@pharmacyhub.pk";
 
-    IntStream.rangeClosed(range.get(0), range.get(1))
-            .forEach(i -> {
-              try
-              {
-                String email = "user" + i + "@pharmacyhub.pk";
+                        if (userRepository.findByEmailAddress(email).isEmpty()) {
+                            User user = new User();
+                            user.setFirstName("User " + i);
+                            user.setLastName("Salesman");
+                            user.setEmailAddress(email);
+                            user.setPassword(passwordEncoder.encode("salesman" + i));
+                            user.setRole(optionalRole.get());
+                            user.setRegistered(true);
+                            user.setUserType(UserType.SALESMAN);
+                            userRepository.save(user);
 
-                if (userRepository.findByEmailAddress(email).isEmpty())
-                {
-                  User user = new User();
-                  user.setFirstName("User " + i);
-                  user.setLastName("Salesman");
-                  user.setEmailAddress("user" + i + "@pharmacyhub.pk");
-                  user.setPassword(passwordEncoder.encode("user" + i));
-                  user.setRole(optionalRole.get());
-                  user.setRegistered(true);
-                  user.setUserType(UserEnum.SALESMAN.getUserEnum());
-                  userRepository.save(user);
+                            Salesman salesman = Salesman.builder()
+                                    .city("Lahore")
+                                    .area("NFC")
+                                    .contactNumber("03456142607")
+                                    .experience("2 years")
+                                    .previousPharmacyName("ABC Pharmacy")
+                                    .currentJobStatus("Active")
+                                    .shiftTime("Morning")
+                                    .user(user)
+                                    .build();
 
-                  Salesman pharmacist = Salesman.builder()
-                          .contactNumber("03456142607")
-                          .area("Valencia")
-                          .city("FSD")
-                          .experience("Lahore")
-                          .previousPharmacyName("Test pharmacy")
-                          .currentJobStatus("Free")
-                          .shiftTime("Morning")
-                          .user(user)
-                          .build();
-
-                  salesmanRepository.save(pharmacist);
-                }
-              }
-              catch (Exception e)
-              {
-                // Handle the exception appropriately (e.g., log it)
-                e.printStackTrace();
-              }
-            });
-  }
-
-
+                            salesmanRepository.save(salesman);
+                        }
+                    } catch (Exception e) {
+                        // Handle the exception appropriately (e.g., log it)
+                        e.printStackTrace();
+                    }
+                });
+    }
 }

@@ -51,7 +51,7 @@ public class PharmacistService extends PHEngine implements PHUserService
   {
     Pharmacist pharmacist = phMapper.getPharmacist((PharmacistDTO) pharmacistDTO);
     getLoggedInUser().setRegistered(true);
-    getLoggedInUser().setUserType(UserEnum.PHARMACIST.getUserEnum());
+    getLoggedInUser().setUserType(com.pharmacyhub.entity.enums.UserType.PHARMACIST);
     pharmacist.setUser(getLoggedInUser());
     Pharmacist savedPharmacist = pharmacistRepository.save(pharmacist);
     return phMapper.getPharmacistDTO(savedPharmacist);
@@ -204,6 +204,3 @@ public class PharmacistService extends PHEngine implements PHUserService
     return pharmacistRepository.findByUser(getLoggedInUser());
   }
 }
-
-
-

@@ -1,6 +1,7 @@
 package com.pharmacyhub.security.domain;
 
 public enum ResourceType {
+    PERMISSION,
     PHARMACIST,
     PHARMACY_MANAGER,
     PROPRIETOR,

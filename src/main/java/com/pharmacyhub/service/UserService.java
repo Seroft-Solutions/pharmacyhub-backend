@@ -1,7 +1,6 @@
 package com.pharmacyhub.service;
 
 import com.pharmacyhub.constants.RoleEnum;
-import com.pharmacyhub.constants.UserEnum;
 import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.dto.PHUserConnectionDTO;
 import com.pharmacyhub.dto.PHUserDTO;
@@ -16,11 +15,12 @@ import com.pharmacyhub.engine.PHMapper;
 import com.pharmacyhub.entity.Pharmacist;
 import com.pharmacyhub.entity.PharmacyManager;
 import com.pharmacyhub.entity.Proprietor;
-import com.pharmacyhub.entity.Role;
 import com.pharmacyhub.entity.Salesman;
 import com.pharmacyhub.entity.User;
-import com.pharmacyhub.repository.RoleRepository;
+import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.repository.UserRepository;
+import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.security.infrastructure.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,15 +54,14 @@ public class UserService extends PHEngine implements PHUserService {
     @Autowired
     private SalesmanService salesmanService;
 
-
     @Override
     public PHUserDTO saveUser(PHUserDTO phUserDTO) {
-
         UserDTO userDTO = (UserDTO) phUserDTO;
         if (getUserByEmailAddress(userDTO)==null) {
             User user = phMapper.getUser(userDTO);
 
-            Role role = roleRepository.findByName(RoleEnum.USER).get();
+            Role role = roleRepository.findByName(RoleEnum.USER).orElseThrow(() ->
+                new RuntimeException("Default user role not found"));
             String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
             user.setPassword(encodedPassword);
             user.setRole(role);
@@ -70,15 +69,12 @@ public class UserService extends PHEngine implements PHUserService {
             user.setTokenCreationDate(LocalDateTime.now());
 
             User savedUser = userRepository.save(user);
-          try
-          {
-            emailService.sendVerificationEmail(user.getEmailAddress(), user.getVerificationToken());
-          }
-          catch (MessagingException e)
-          {
-              return null;
-          }
-          return phMapper.getUserDTO(savedUser);
+            try {
+                emailService.sendVerificationEmail(user.getEmailAddress(), user.getVerificationToken());
+            } catch (MessagingException e) {
+                return null;
+            }
+            return phMapper.getUserDTO(savedUser);
         }
         return null;
     }
@@ -88,14 +84,12 @@ public class UserService extends PHEngine implements PHUserService {
         UserDTO userDTO = (UserDTO) phUserDTO;
         User user = phMapper.getUser(userDTO);
         User savedUser = userRepository.save(user);
-
         return phMapper.getUserDTO(savedUser);
     }
 
     @Override
     public PHUserDTO findUser(long id) {
         User user = userRepository.findById(id).get();
-
         return phMapper.getUserDTO(user);
     }
 
@@ -106,12 +100,10 @@ public class UserService extends PHEngine implements PHUserService {
 
     @Override
     public void connectWith(PHUserConnectionDTO phUserConnectionDTO) {
-
     }
 
     @Override
     public void disconnectWith(PHUserConnectionDTO phUserConnectionDTO) {
-
     }
 
     @Override
@@ -121,19 +113,16 @@ public class UserService extends PHEngine implements PHUserService {
 
     @Override
     public void updateState(PHUserConnectionDTO userConnectionDTO) {
-
     }
 
     @Override
     public void updateNotes(PHUserConnectionDTO userConnectionDTO) {
-
     }
 
     @Override
     public List getAllConnections() {
         return null;
     }
-
 
     public List<User> findAll() {
         return userRepository.findAll();
@@ -142,12 +131,10 @@ public class UserService extends PHEngine implements PHUserService {
     public PHUserDTO changeUserPassword(ChangePasswordDTO changePasswordDTO) {
         UserDTO user = phMapper.getUserDTO(getLoggedInUser());
 
-
         if (user != null && matchPassword(changePasswordDTO.getCurrentPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
             return updateUser(user);
         }
-
         return null;
     }
 
@@ -157,23 +144,21 @@ public class UserService extends PHEngine implements PHUserService {
 
     public Boolean updateUserStatus() {
         User user = getLoggedInUser();
-
         user.setOpenToConnect(!user.isOpenToConnect());
-
         User savedUser = userRepository.save(user);
-
         return savedUser != null;
     }
 
     public boolean isUserRole() {
-        return getLoggedInUser().getRole().getName().equals(RoleEnum.USER);
+        Role role = getLoggedInUser().getRole();
+        return role != null && role.getName().equals(RoleEnum.USER);
     }
 
-    public String getUserType() {
+    public UserType getUserType() {
         return getLoggedInUser().getUserType();
     }
 
-    public List getUsers() {
+    public List<User> getUsers() {
         return userRepository.findAll();
     }
 
@@ -181,25 +166,22 @@ public class UserService extends PHEngine implements PHUserService {
         User user = getLoggedInUser();
         UserDTO userDTO = phMapper.getUserDTO(user);
 
-        if (user.getUserType().equals(UserEnum.PHARMACIST.getUserEnum())) {
+        if (user.getUserType() == UserType.PHARMACIST) {
             Pharmacist pharmacist = pharmacistService.getPharmacist();
             PharmacistDTO pharmacistDTO = phMapper.getPharmacistDTO(pharmacist);
             userDTO.setPharmacist(pharmacistDTO);
             return userDTO;
-
-        } else if (user.getUserType().equals(UserEnum.PROPRIETOR.getUserEnum())) {
+        } else if (user.getUserType() == UserType.PROPRIETOR) {
             Proprietor proprietor = proprietorService.getProprietor();
             ProprietorDTO proprietorDTO = phMapper.getProprietorDTO(proprietor);
             userDTO.setProprietor(proprietorDTO);
             return userDTO;
-
-        } else if (user.getUserType().equals(UserEnum.PHARMACY_MANAGER.getUserEnum())) {
+        } else if (user.getUserType() == UserType.PHARMACY_MANAGER) {
             PharmacyManager pharmacyManager = pharmacyManagerService.getPharmacyManager();
             PharmacyManagerDTO pharmacyManagerDTO = phMapper.getPharmacyManagerDTO(pharmacyManager);
             userDTO.setPharmacyManager(pharmacyManagerDTO);
             return userDTO;
-
-        } else if (user.getUserType().equals(UserEnum.SALESMAN.getUserEnum())) {
+        } else if (user.getUserType() == UserType.SALESMAN) {
             Salesman salesman = salesmanService.getSalesman();
             SalesmanDTO salesmanDTO = phMapper.getSalesmanDTO(salesman);
             userDTO.setSalesman(salesmanDTO);
@@ -216,7 +198,6 @@ public class UserService extends PHEngine implements PHUserService {
 
         if (phUserDTO.getPharmacist() != null) {
             return pharmacistService.updateUser(phUserDTO.getPharmacist());
-
         } else if (phUserDTO.getProprietor() != null) {
             return proprietorService.updateUser(phUserDTO.getProprietor());
         } else if (phUserDTO.getPharmacyManager() != null) {
@@ -230,17 +211,16 @@ public class UserService extends PHEngine implements PHUserService {
 
     public User getUserByEmailAddress(UserDTO userDTO) {
         Optional<User> byEmailAddress = userRepository.findByEmailAddress(userDTO.getEmailAddress());
-
         if (byEmailAddress.isPresent()) {
             return byEmailAddress.get();
         }
         return null;
     }
 
-
     public boolean forgotPassword(UserDTO changePasswordDTO) {
-        User user = userRepository.findByEmailAddress(changePasswordDTO.getEmailAddress()).get();
-        if (user != null) {
+        Optional<User> userOpt = userRepository.findByEmailAddress(changePasswordDTO.getEmailAddress());
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
             user.setPassword(passwordEncoder.encode(changePasswordDTO.getPassword()));
             userRepository.save(user);
             return true;
@@ -248,12 +228,12 @@ public class UserService extends PHEngine implements PHUserService {
         return false;
     }
 
-    public boolean verifyUser(String token)
-    {
-        User user = userRepository.findByVerificationToken(token).get();
-        if (user == null || user.getTokenCreationDate().plusMinutes(30).isBefore(LocalDateTime.now())) {
+    public boolean verifyUser(String token) {
+        Optional<User> userOpt = userRepository.findByVerificationToken(token);
+        if (userOpt.isEmpty() || userOpt.get().getTokenCreationDate().plusMinutes(30).isBefore(LocalDateTime.now())) {
             return false;
         }
+        User user = userOpt.get();
         user.setVerified(true);
         user.setVerificationToken(null);
         userRepository.save(user);

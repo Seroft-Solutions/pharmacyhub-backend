@@ -24,6 +24,13 @@ public class Role {
 
     @Column
     private String description;
+    
+    @Column(nullable = false)
+    private int precedence;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean system = false;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

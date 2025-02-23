@@ -18,11 +18,13 @@ import java.util.Set;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class PermissionAspect extends PHEngine {
+public class PermissionAspect extends PHEngine
+{
     private final RBACService rbacService;
 
     @Around("@annotation(com.pharmacyhub.security.annotation.RequiresPermission)")
-    public Object checkPermission(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object checkPermission(ProceedingJoinPoint joinPoint) throws Throwable
+    {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         RequiresPermission annotation = method.getAnnotation(RequiresPermission.class);
@@ -32,14 +34,15 @@ public class PermissionAspect extends PHEngine {
 
         // Check if user has required permission
         boolean hasPermission = userPermissions.stream()
-            .anyMatch(permission -> 
-                permission.getResourceType().name().equals(annotation.resource()) &&
-                permission.getOperationType().name().equals(annotation.operation()) &&
-                (!annotation.requiresApproval() || permission.isRequiresApproval()));
+                                               .anyMatch(permission -> permission.getResourceType() == annotation.resource() &&
+                                                       permission.getOperationType() == annotation.operation() &&
+                                                       (!annotation.requiresApproval() ||
+                                                               permission.isRequiresApproval()));
 
-        if (!hasPermission) {
-            throw new AccessDeniedException("User does not have required permission: " + 
-                annotation.resource() + ":" + annotation.operation());
+        if (!hasPermission)
+        {
+            throw new AccessDeniedException(
+                    "User does not have required permission: " + annotation.resource() + ":" + annotation.operation());
         }
 
         return joinPoint.proceed();

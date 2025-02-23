@@ -20,20 +20,27 @@ public class AuditLog {
     private Long id;
 
     @Column(nullable = false)
+    private String username;
+
+    @Column(nullable = false)
     private String action;
 
-    @Column(length = 2048)
+    @Column(length = 1000)
     private String details;
 
     @Column(nullable = false)
-    private String userId;
+    private String outcome;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    @Column
-    private String ipAddress;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column
-    private String userAgent;
+    @PrePersist
+    protected void onCreate() {
+        if (timestamp == null) {
+            timestamp = LocalDateTime.now();
+        }
+    }
 }

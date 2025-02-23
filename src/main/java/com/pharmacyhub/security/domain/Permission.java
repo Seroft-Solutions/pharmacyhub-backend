@@ -22,4 +22,15 @@ public class Permission {
 
     @Column
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ResourceType resourceType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OperationType operationType;
+
+    @Column(nullable = false)
+    private boolean requiresApproval;
 }

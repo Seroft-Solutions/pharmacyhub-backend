@@ -53,7 +53,7 @@ public class SalesmanService extends PHEngine implements PHUserService
     Salesman salesman = phMapper.getSalesman((SalesmanDTO) salesmanDTO);
     getLoggedInUser().setRegistered(true);
     salesman.setUser(getLoggedInUser());
-    getLoggedInUser().setUserType(UserEnum.SALESMAN.getUserEnum());
+    getLoggedInUser().setUserType(com.pharmacyhub.entity.enums.UserType.SALESMAN);
     Salesman savedSalesman = salesmanRepository.save(salesman);
     return phMapper.getSalesmanDTO(savedSalesman);
   }
@@ -207,6 +207,3 @@ public class SalesmanService extends PHEngine implements PHUserService
     return salesmanRepository.findByUser(getLoggedInUser());
   }
 }
-
-
-

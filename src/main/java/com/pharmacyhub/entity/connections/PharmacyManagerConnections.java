@@ -35,6 +35,7 @@ public class PharmacyManagerConnections
   private Long id;
 
   @Enumerated(EnumType.STRING)
+  @Builder.Default
   private StateEnum state = StateEnum.READY_TO_CONNECT;
 
   private String notes;
