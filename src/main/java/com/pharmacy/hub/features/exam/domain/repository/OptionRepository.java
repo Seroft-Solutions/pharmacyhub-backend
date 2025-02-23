@@ -1,0 +1,30 @@
+package com.pharmacy.hub.features.exam.domain.repository;
+
+import com.pharmacy.hub.features.exam.domain.entity.Option;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface OptionRepository extends JpaRepository<Option, Long>
+{
+
+    @Query("SELECT o FROM Option o WHERE o.question.id = :questionId AND o.isDeleted = false ORDER BY o.label")
+    List<Option> findByQuestionId(Long questionId);
+
+    @Query("SELECT o FROM Option o WHERE o.isDeleted = false AND o.id = :id")
+    Optional<Option> findByIdAndNotDeleted(Long id);
+
+    @Query("SELECT o FROM Option o WHERE o.question.id = :questionId AND o.isCorrect = true AND o.isDeleted = false")
+    Optional<Option> findCorrectOptionByQuestionId(Long questionId);
+
+    @Query("SELECT COUNT(o) FROM Option o WHERE o.question.id = :questionId AND o.isDeleted = false")
+    Long countByQuestionId(Long questionId);
+
+    @Query("SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END FROM Option o " +
+            "WHERE o.question.id = :questionId AND o.label = :label AND o.isDeleted = false")
+    boolean existsByQuestionIdAndLabel(Long questionId, String label);
+}
