@@ -12,15 +12,15 @@ import java.util.Optional;
 public interface ExamRepository extends JpaRepository<Exam, Long>
 {
 
-    @Query("SELECT e FROM Exam e WHERE e.isDeleted = false AND e.status = 'PUBLISHED'")
+    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.status = 'PUBLISHED'")
     List<Exam> findAllPublished();
 
-    @Query("SELECT e FROM Exam e WHERE e.isDeleted = false AND e.id = :id")
+    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.id = :id")
     Optional<Exam> findByIdAndNotDeleted(Long id);
 
-    @Query("SELECT e FROM Exam e WHERE e.isDeleted = false AND e.status = :status")
+    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.status = :status")
     List<Exam> findByStatus(Exam.ExamStatus status);
 
-    @Query("SELECT COUNT(e) > 0 FROM Exam e WHERE e.title = :title AND e.isDeleted = false")
+    @Query("SELECT COUNT(e) > 0 FROM Exam e WHERE e.title = :title AND e.deleted = false")
     boolean existsByTitle(String title);
 }

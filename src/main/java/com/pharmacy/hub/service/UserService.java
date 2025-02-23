@@ -23,6 +23,7 @@ import com.pharmacy.hub.keycloak.services.Implementation.KeycloakGroupServiceImp
 import com.pharmacy.hub.repository.RoleRepository;
 import com.pharmacy.hub.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +50,16 @@ public class UserService extends PHEngine implements PHUserService {
     @Autowired
     private KeycloakGroupServiceImpl keycloakGroupServiceImpl;
     @Autowired
+    @Lazy
     private PharmacistService pharmacistService;
     @Autowired
+    @Lazy
     private ProprietorService proprietorService;
     @Autowired
+    @Lazy
     private PharmacyManagerService pharmacyManagerService;
     @Autowired
+    @Lazy
     private SalesmanService salesmanService;
 
 
