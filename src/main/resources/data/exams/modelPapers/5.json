@@ -1,0 +1,1106 @@
+{
+  "title": "Basic Pharmacology Test",
+  "description": "This exam tests basic knowledge of pharmacology concepts",
+  "duration": 60,
+  "totalMarks": 20,
+  "passingMarks": 12,
+  "questions": [
+    {
+      "question_number": 1,
+      "question": "\"Spurious drug\" means a drug that:",
+      "options": {
+        "A": "Purports to be a drug but does not contain the active ingredient",
+        "B": "Purports to be the product of a manufacturer, place, or country of which it is not truly a product",
+        "C": "Is imported or exported for sale under a particular name while actually being another drug",
+        "D": "All of the above"
+      },
+      "answer": "D) All of the above",
+      "explanation": "A spurious drug includes those that lack the claimed active ingredient, falsely claim a different origin, or are misrepresented for sale. Each statement (A, B, and C) contributes to the legal definition of a spurious drug."
+    },
+    {
+      "question_number": 2,
+      "question": "Under Punjab Drug Rules, the licensing authority shall issue a pharmacy license in which form?",
+      "options": {
+        "A": "Form 8",
+        "B": "Form 9",
+        "C": "Form 10",
+        "D": "Form 11"
+      },
+      "answer": "B) Form 9",
+      "explanation": "Form 9 is used for issuing pharmacy licenses under Punjab Drug Rules. (A) Form 8, (C) Form 10, and (D) Form 11 are used for different purposes."
+    },
+    {
+      "question_number": 3,
+      "question": "How many members are nominated by the Federal Government in the Central Pharmacy Council?",
+      "options": {
+        "A": "4",
+        "B": "6",
+        "C": "8",
+        "D": "10"
+      },
+      "answer": "C) 8",
+      "explanation": "Section 4(1)(c) states that the Federal Government nominates eight members to the Central Council, including representatives from each province and teachers of pharmaceutical subjects."
+    },
+    {
+      "question_number": 4,
+      "question": "What is the purpose of Inspectors appointed under The Pharmacy Act, 1967?",
+      "options": {
+        "A": "Conducting pharmacy research",
+        "B": "Inspecting pharmacy institutions and exams",
+        "C": "Issuing licenses to pharmacists",
+        "D": "Auditing financial records"
+      },
+      "answer": "B) Inspecting pharmacy institutions and exams",
+      "explanation": "Section 21(2) states that Inspectors ensure that pharmacy institutions follow approved standards."
+    },
+    {
+      "question_number": 5,
+      "question": "Who has the power to make bye-laws for pharmacy regulations?",
+      "options": {
+        "A": "Central and Provincial Councils",
+        "B": "The Federal Government only",
+        "C": "The Drug Regulatory Authority",
+        "D": "The Pakistan Pharmacists Association"
+      },
+      "answer": "A) Central and Provincial Councils",
+      "explanation": "Section 34(1) grants the Central and Provincial Pharmacy Councils the authority to create bye-laws."
+    },
+    {
+      "question_number": 6,
+      "question": "What is the Pakistan National Formulary?",
+      "options": {
+        "A": "A list of approved medicines for import",
+        "B": "A set of drug advertisements",
+        "C": "A list of drug manufacturing companies",
+        "D": "A drug pricing control system"
+      },
+      "answer": "A) A list of approved medicines for import",
+      "explanation": "Section 8 states that the Pakistan National Formulary contains all drugs allowed for import, manufacture, or sale in Pakistan."
+    },
+    {
+      "question_number": 7,
+      "question": "Who is responsible for the quality control of drugs at the provincial level?",
+      "options": {
+        "A": "Drug Registration Board",
+        "B": "Provincial Drug Authority",
+        "C": "Provincial Quality Control Board",
+        "D": "Ministry of Health"
+      },
+      "answer": "C) Provincial Quality Control Board",
+      "explanation": "The Provincial Quality Control Board (PQCB) is responsible for monitoring drug quality within its province."
+    },
+    {
+      "question_number": 8,
+      "question": "Under The Drugs Act, 1976, who is responsible for ensuring the proper labeling of drugs?",
+      "options": {
+        "A": "The pharmacist dispensing the drug",
+        "B": "The manufacturer of the drug",
+        "C": "The distributor of the drug",
+        "D": "The hospital using the drug"
+      },
+      "answer": "B) The manufacturer of the drug",
+      "explanation": "Section 3(s) states:\n\"A drug shall be deemed to be misbranded if it is not labeled in the prescribed manner or if its labeling is false or misleading.\""
+    },
+    {
+      "question_number": 9,
+      "question": "Which of the following is NOT a function of the Provincial Quality Control Board under The Drugs Act, 1976?",
+      "options": {
+        "A": "Monitoring the quality of drugs sold within a province",
+        "B": "Granting drug manufacturing licenses",
+        "C": "Inspecting pharmaceutical warehouses",
+        "D": "Investigating complaints about drug quality"
+      },
+      "answer": "B) Granting drug manufacturing licenses",
+      "explanation": "Section 11 states that the Central Licensing Board grants manufacturing licenses, while the Provincial Quality Control Board monitors drug quality and investigates complaints."
+    },
+    {
+      "question_number": 10,
+      "question": "Which of the following is NOT a requirement for drug registration under The Drugs Act, 1976?",
+      "options": {
+        "A": "Proof of safety and efficacy",
+        "B": "Approval from a Drug Inspector",
+        "C": "Submission of complete product information",
+        "D": "Compliance with prescribed labeling standards"
+      },
+      "answer": "B) Approval from a Drug Inspector",
+      "explanation": "Section 7 states that drug registration requires compliance with safety, efficacy, and quality standards, but approval from a Drug Inspector is not part of the registration process."
+    },
+    {
+      "question_number": 11,
+      "question": "Which form is used by a drug inspector to submit a monthly inspection report?",
+      "options": {
+        "A": "Form 1",
+        "B": "Form 2",
+        "C": "Form 3",
+        "D": "Form 4"
+      },
+      "answer": "A) Form 1",
+      "explanation": "Form 1 is used for monthly reports by inspectors regarding inspections and quality control of drugs."
+    },
+    {
+      "question_number": 12,
+      "question": "Which form is used to apply for a new pharmacy license under Punjab Drug Rules?",
+      "options": {
+        "A": "Form 8(A)",
+        "B": "Form 8(B)",
+        "C": "Form 9",
+        "D": "Form 10"
+      },
+      "answer": "A) Form 8(A)",
+      "explanation": "Form 8(A) is used to apply for a pharmacy license, while Form 8(B) is used for a medical store license."
+    },
+    {
+      "question_number": 13,
+      "question": "Which of the following drugs is listed under Schedule G?",
+      "options": {
+        "A": "Clonazepam",
+        "B": "Sitagliptin",
+        "C": "Amoxicillin",
+        "D": "Caffeine"
+      },
+      "answer": "A) Clonazepam",
+      "explanation": "Clonazepam is a narcotic drug mentioned in Schedule G."
+    },
+    {
+      "question_number": 14,
+      "question": "According to the Pharmacy Act of 1967, what is the required duration for the continuous publication of a notice concerning pharmacist registration exams?",
+      "options": {
+        "A": "Six months",
+        "B": "Fourteen days",
+        "C": "Thirty days",
+        "D": "Seven days"
+      },
+      "answer": "D) Seven days",
+      "explanation": "Seven days is correct answer."
+    },
+    {
+      "question_number": 15,
+      "question": "Finasteride (Proscar, Propecia) is used in the treatment of:",
+      "options": {
+        "A": "Hypertension",
+        "B": "Benign prostatic hyperplasia (BPH)",
+        "C": "Migraine",
+        "D": "Hyperlipidemia"
+      },
+      "answer": "(B) Benign prostatic hyperplasia (BPH)",
+      "explanation": "Finasteride is a 5-alpha reductase inhibitor that reduces the conversion of testosterone to dihydrotestosterone (DHT), thereby decreasing prostate size and relieving symptoms in BPH. It is also used in male pattern baldness. Hypertension (A) is managed using antihypertensive drugs such as beta-blockers, ACE inhibitors, and calcium channel blockers, whereas migraine (C) is treated with drugs like triptans (e.g., sumatriptan), beta-blockers (e.g., propranolol), and anticonvulsants (e.g., topiramate). Hyperlipidemia (D) is managed with statins (e.g., atorvastatin), fibrates, and cholesterol absorption inhibitors."
+    },
+    {
+      "question_number": 16,
+      "question": "The Schilling test is used to diagnose:",
+      "options": {
+        "A": "Diabetes mellitus",
+        "B": "Pernicious anemia",
+        "C": "Osteoporosis",
+        "D": "Gout"
+      },
+      "answer": "(B) Pernicious anemia",
+      "explanation": "The Schilling test is a diagnostic tool for determining vitamin B12 absorption efficiency, which is crucial in diagnosing pernicious anemia, a condition caused by intrinsic factor deficiency leading to megaloblastic anemia. Diabetes mellitus (A) is diagnosed using fasting blood glucose levels, HbA1c, and OGTT (oral glucose tolerance test). Osteoporosis (C) is diagnosed using bone density scans (DEXA scans), and gout (D) is diagnosed by measuring serum uric acid levels and performing joint fluid analysis to detect urate crystals."
+    },
+    {
+      "question_number": 17,
+      "question": "The major adverse effect associated with long-term use of corticosteroids is:",
+      "options": {
+        "A": "Hypoglycemia",
+        "B": "Osteoporosis",
+        "C": "Bradycardia",
+        "D": "Hyperkalemia"
+      },
+      "answer": "(B) Osteoporosis",
+      "explanation": "Long-term corticosteroid use causes bone demineralization, leading to osteoporosis due to decreased calcium absorption and increased bone resorption. Hypoglycemia (A) is more commonly seen in patients taking insulin or sulfonylureas (e.g., glibenclamide). Bradycardia (C) is usually a result of beta-blockers (e.g., metoprolol) or calcium channel blockers (e.g., verapamil). Hyperkalemia (D) occurs with drugs such as potassium-sparing diuretics (e.g., spironolactone) and ACE inhibitors (e.g., lisinopril)."
+    },
+    {
+      "question_number": 18,
+      "question": "Which drug is classified as a loop diuretic?",
+      "options": {
+        "A": "Spironolactone",
+        "B": "Hydrochlorothiazide",
+        "C": "Furosemide",
+        "D": "Acetazolamide"
+      },
+      "answer": "(C) Furosemide",
+      "explanation": "Furosemide is a loop diuretic that works by inhibiting the Na+/K+/2Cl- co-transporter in the thick ascending limb of the loop of Henle, leading to significant fluid and electrolyte loss, making it useful in conditions like edema and congestive heart failure. Spironolactone (A) is a potassium-sparing diuretic that works by antagonizing aldosterone, primarily used for heart failure and resistant hypertension. Hydrochlorothiazide (B) is a thiazide diuretic that acts on the distal convoluted tubule, often used for hypertension. Acetazolamide (D) is a carbonic anhydrase inhibitor used for glaucoma, altitude sickness, and metabolic alkalosis."
+    },
+    {
+      "question_number": 19,
+      "question": "Which of the following drugs is a cholinergic agonist used in the treatment of neurogenic bladder?",
+      "options": {
+        "A": "Bethanechol",
+        "B": "Atropine",
+        "C": "Tropicamide",
+        "D": "Physostigmine"
+      },
+      "answer": "(A) Bethanechol",
+      "explanation": "Bethanechol is a muscarinic agonist that enhances bladder contraction, helping in conditions like urinary retention and neurogenic bladder. Atropine (B) is a muscarinic antagonist used primarily for bradycardia and organophosphate poisoning. Tropicamide (C) is an anticholinergic drug used for pupil dilation in ophthalmic exams. Physostigmine (D) is a cholinesterase inhibitor, often used to reverse atropine toxicity and treat glaucoma."
+    },
+    {
+      "question_number": 20,
+      "question": "Which of the following is a tertiary amine used in the treatment of Parkinson’s disease?",
+      "options": {
+        "A": "Tolterodine",
+        "B": "Trihexyphenidyl",
+        "C": "Tiotropium",
+        "D": "Dicyclomine"
+      },
+      "answer": "(B) Trihexyphenidyl",
+      "explanation": "Trihexyphenidyl is an anticholinergic drug used to manage tremors and rigidity in Parkinson’s disease by blocking muscarinic receptors in the CNS. Tolterodine (A) is an antimuscarinic agent used for overactive bladder. Tiotropium (C) is a long-acting muscarinic antagonist (LAMA) used for COPD. Dicyclomine (D) is an antispasmodic drug used for irritable bowel syndrome (IBS)."
+    },
+    {
+      "question_number": 21,
+      "question": "Which muscarinic antagonist is used in the management of chronic obstructive pulmonary disease (COPD)?",
+      "options": {
+        "A": "Tiotropium",
+        "B": "Tropicamide",
+        "C": "Pralidoxime",
+        "D": "Physostigmine"
+      },
+      "answer": "(A) Tiotropium",
+      "explanation": "Tiotropium is a long-acting muscarinic antagonist (LAMA) that helps in bronchodilation, making it effective in COPD management. Tropicamide (B) is used for pupil dilation in ophthalmic exams. Pralidoxime (C) is an antidote for organophosphate poisoning, and Physostigmine (D) is used for atropine toxicity and glaucoma."
+    },
+    {
+      "question_number": 22,
+      "question": "Non-selective β-blockers should be avoided in patients with:",
+      "options": {
+        "A": "Hypertension",
+        "B": "COPD or asthma",
+        "C": "Migraine prophylaxis",
+        "D": "Tachycardia"
+      },
+      "answer": "(B) COPD or asthma",
+      "explanation": "Non-selective β-blockers like propranolol block β2 receptors in the lungs, causing bronchoconstriction, which worsens COPD and asthma. Hypertension (A) is treated with beta-blockers, ACE inhibitors, and calcium channel blockers. Migraine prophylaxis (C) often involves beta-blockers like propranolol and calcium channel blockers. Tachycardia (D) can be managed using beta-blockers like esmolol and metoprolol."
+    },
+    {
+      "question_number": 23,
+      "question": "Which β-blocker has an additional vasodilatory effect due to nitric oxide release?",
+      "options": {
+        "A": "Metoprolol",
+        "B": "Nebivolol",
+        "C": "Esmolol",
+        "D": "Timolol"
+      },
+      "answer": "(B) Nebivolol",
+      "explanation": "Nebivolol is a β1-selective beta-blocker that also enhances nitric oxide release, leading to vasodilation. Metoprolol (A) is a β1-selective beta-blocker without nitric oxide effects. Esmolol (C) is a short-acting β1-blocker used in hypertensive emergencies. Timolol (D) is a non-selective beta-blocker used in glaucoma."
+    },
+    {
+      "question_number": 24,
+      "question": "ACE inhibitors decrease blood pressure by which of the following mechanisms?",
+      "options": {
+        "A": "Blocking the conversion of angiotensin I to angiotensin II",
+        "B": "Inhibiting sodium reabsorption in the kidney",
+        "C": "Increasing heart rate",
+        "D": "Blocking the alpha-1 receptors"
+      },
+      "answer": "(A) Blocking the conversion of angiotensin I to angiotensin II",
+      "explanation": "ACE inhibitors such as lisinopril and enalapril block the angiotensin-converting enzyme (ACE), preventing the formation of angiotensin II, a potent vasoconstrictor, thereby reducing blood pressure. Inhibiting sodium reabsorption (B) is the function of diuretics like furosemide and thiazides. Increasing heart rate (C) is an action of sympathomimetic drugs like epinephrine, while blocking alpha-1 receptors (D) is the mechanism of alpha-blockers like prazosin, which reduce blood pressure by relaxing blood vessels."
+    },
+    {
+      "question_number": 25,
+      "question": "Which beta-blocker is used for acute arrhythmias and has a very short half-life?",
+      "options": {
+        "A": "Metoprolol",
+        "B": "Propranolol",
+        "C": "Esmolol",
+        "D": "Atenolol"
+      },
+      "answer": "(C) Esmolol",
+      "explanation": "Esmolol is a ultra-short-acting β1-selective beta-blocker, making it ideal for acute arrhythmias, including supraventricular tachycardia and atrial fibrillation, as it is quickly metabolized by esterases in red blood cells. Metoprolol (A) is a β1-selective beta-blocker, but it has a longer duration of action and is used for chronic hypertension and heart failure. Propranolol (B) is a non-selective beta-blocker used for migraine prophylaxis, essential tremor, and anxiety. Atenolol (D) is a β1-selective blocker with longer action, often used in hypertension."
+    }
+  ]
+[
+  {
+    "question_number": 26,
+    "question": "What is the mechanism of action of Class II antiarrhythmic drugs?",
+    "options": {
+      "A": "Blockade of potassium channels",
+      "B": "Inhibition of sodium channels",
+      "C": "Beta-adrenergic receptor blockade",
+      "D": "Calcium channel blockade"
+    },
+    "answer": "(C) Beta-adrenergic receptor blockade",
+    "explanation": "Class II antiarrhythmic drugs, which include beta-blockers like metoprolol, propranolol, and esmolol, work by blocking beta-adrenergic receptors, reducing sympathetic stimulation of the heart, leading to decreased heart rate and contractility. Blockade of potassium channels (A) is the mechanism of Class III antiarrhythmics like amiodarone. Inhibition of sodium channels (B) is seen in Class I antiarrhythmics like lidocaine and flecainide. Calcium channel blockade (D) is the mechanism of Class IV antiarrhythmics like verapamil and diltiazem."
+  },
+  {
+    "question_number": 27,
+    "question": "What is the primary adverse effect of lidocaine when used as an antiarrhythmic?",
+    "options": {
+      "A": "Neurotoxicity and CNS effects",
+      "B": "Hypertension",
+      "C": "Pulmonary fibrosis",
+      "D": "Thyroid dysfunction"
+    },
+    "answer": "(A) Neurotoxicity and CNS effects",
+    "explanation": "Lidocaine is a Class Ib antiarrhythmic drug that can cause dizziness, confusion, tremors, and even seizures due to its CNS effects. Hypertension (B) is not a typical side effect and is more associated with sympathomimetic drugs. Pulmonary fibrosis (C) is a known side effect of amiodarone, a Class III antiarrhythmic. Thyroid dysfunction (D) is also linked to amiodarone, which contains iodine and can cause hypothyroidism or hyperthyroidism."
+  },
+  {
+    "question_number": 28,
+    "question": "Which of the following drugs has the longest half-life?",
+    "options": {
+      "A": "Esmolol",
+      "B": "Dofetilide",
+      "C": "Amiodarone",
+      "D": "Adenosine"
+    },
+    "answer": "(C) Amiodarone",
+    "explanation": "Amiodarone has an extremely long half-life of 25-60 days, making it effective for long-term rhythm control in atrial fibrillation and ventricular tachycardia. Esmolol (A) has a very short half-life (minutes) and is used in acute arrhythmias. Dofetilide (B), a Class III antiarrhythmic, has a half-life of 10 hours. Adenosine (D) has an ultra-short half-life (seconds) and is used for paroxysmal supraventricular tachycardia (PSVT) termination."
+  },
+  {
+    "question_number": 29,
+    "question": "Which of the following is not a primary goal in the treatment of angina?",
+    "options": {
+      "A": "Increase myocardial oxygen supply",
+      "B": "Decrease myocardial oxygen demand",
+      "C": "Reduce heart rate to zero",
+      "D": "Prevent myocardial infarction"
+    },
+    "answer": "(C) Reduce heart rate to zero",
+    "explanation": "The goal in treating angina is to balance oxygen supply and demand, preventing myocardial ischemia and infarction. Increasing myocardial oxygen supply (A) is achieved with nitrates and calcium channel blockers. Decreasing oxygen demand (B) is achieved using beta-blockers, nitrates, and calcium channel blockers. Preventing myocardial infarction (D) is achieved with antiplatelet therapy (e.g., aspirin, clopidogrel) and statins. Completely stopping the heart (C) would be fatal and is not a treatment goal."
+  },
+  {
+    "question_number": 30,
+    "question": "Which enzyme system metabolizes warfarin?",
+    "options": {
+      "A": "CYP3A4",
+      "B": "CYP2D6",
+      "C": "CYP2C9",
+      "D": "CYP1A2"
+    },
+    "answer": "(C) CYP2C9",
+    "explanation": "Warfarin is primarily metabolized by CYP2C9, and variations in this enzyme affect warfarin metabolism and bleeding risk. CYP3A4 (A) is involved in metabolizing many drugs, including statins and benzodiazepines. CYP2D6 (B) metabolizes beta-blockers, opioids, and antidepressants. CYP1A2 (D) metabolizes caffeine and theophylline."
+  },
+  {
+    "question_number": 31,
+    "question": "Which drug reduces the effectiveness of ticagrelor at high doses (>100 mg)?",
+    "options": {
+      "A": "Warfarin",
+      "B": "Aspirin",
+      "C": "Dabigatran",
+      "D": "Heparin"
+    },
+    "answer": "(B) Aspirin",
+    "explanation": "High-dose aspirin (>100 mg) reduces ticagrelor’s effectiveness, making it less effective for preventing blood clots. Warfarin (A) is an oral anticoagulant that does not directly affect ticagrelor but increases bleeding risk. Dabigatran (C) is a direct thrombin inhibitor used for stroke prevention. Heparin (D) is a parenteral anticoagulant with no direct interaction with ticagrelor."
+  },
+  {
+    "question_number": 32,
+    "question": "Which drug is contraindicated in severe hypertriglyceridemia (>400 mg/dL)?",
+    "options": {
+      "A": "Niacin",
+      "B": "Fenofibrate",
+      "C": "Cholestyramine",
+      "D": "Atorvastatin"
+    },
+    "answer": "(C) Cholestyramine",
+    "explanation": "Cholestyramine is a bile acid sequestrant that can increase triglyceride levels, making it contraindicated in severe hypertriglyceridemia. Niacin (A) and Fenofibrate (B) are used to lower triglycerides. Atorvastatin (D) is a statin that primarily lowers LDL but has mild triglyceride-lowering effects."
+  },
+  {
+    "question_number": 33,
+    "question": "Which of the following lipoproteins is considered anti-atherogenic?",
+    "options": {
+      "A": "LDL",
+      "B": "HDL",
+      "C": "VLDL",
+      "D": "Chylomicrons"
+    },
+    "answer": "(B) HDL",
+    "explanation": "High-density lipoprotein (HDL) removes excess cholesterol from tissues and is considered anti-atherogenic. LDL (A) is atherogenic and promotes plaque formation. VLDL (C) carries triglycerides and is metabolized into LDL. Chylomicrons (D) transport dietary lipids and do not play a major role in atherosclerosis."
+  },
+  {
+    "question_number": 34,
+    "question": "Which of the following is not a mechanism of action of lipid-lowering drugs?",
+    "options": {
+      "A": "PCSK9 inhibition",
+      "B": "HMG-CoA activation",
+      "C": "LDL receptor upregulation",
+      "D": "Triglyceride clearance"
+    },
+    "answer": "(B) HMG-CoA activation",
+    "explanation": "HMG-CoA activation does not lower lipids; instead, HMG-CoA reductase inhibitors (statins) work by blocking HMG-CoA reductase, reducing cholesterol synthesis. PCSK9 inhibition (A) increases LDL receptor expression, promoting LDL clearance. LDL receptor upregulation (C) is a key mechanism of statins and PCSK9 inhibitors. Triglyceride clearance (D) is achieved through fibrates, which activate peroxisome proliferator-activated receptors (PPARs) to increase lipoprotein lipase activity."
+  },
+  {
+    "question_number": 35,
+    "question": "What is the primary mechanism of cephalosporin resistance in bacteria?",
+    "options": {
+      "A": "Ribosomal mutation",
+      "B": "Altered DNA gyrase",
+      "C": "Hydrolysis by β-lactamases",
+      "D": "Inhibition of efflux pumps"
+    },
+    "answer": "(C) Hydrolysis by β-lactamases",
+    "explanation": "Cephalosporin resistance occurs mainly due to β-lactamase enzymes, which hydrolyze the β-lactam ring, rendering the drug ineffective. Ribosomal mutation (A) affects protein synthesis inhibitors like aminoglycosides and macrolides. Altered DNA gyrase (B) is the resistance mechanism for fluoroquinolones (e.g., ciprofloxacin, levofloxacin). Efflux pumps (D) contribute to resistance against tetracyclines and fluoroquinolones."
+  },
+  {
+    "question_number": 36,
+    "question": "Which protein synthesis inhibitor is associated with ototoxicity and nephrotoxicity?",
+    "options": {
+      "A": "Clindamycin",
+      "B": "Chloramphenicol",
+      "C": "Aminoglycosides",
+      "D": "Tetracyclines"
+    },
+    "answer": "(C) Aminoglycosides",
+    "explanation": "Aminoglycosides (e.g., gentamicin, amikacin, tobramycin) can cause irreversible ototoxicity (hearing loss) and nephrotoxicity due to their accumulation in the cochlea and renal tubules. Clindamycin (A) is linked to Clostridium difficile-associated diarrhea. Chloramphenicol (B) may cause bone marrow suppression and aplastic anemia. Tetracyclines (D) can cause teeth discoloration and photosensitivity."
+  },
+  {
+    "question_number": 37,
+    "question": "Which of the following is a major adverse effect of nitrofurantoin?",
+    "options": {
+      "A": "Peripheral neuropathy",
+      "B": "Ototoxicity",
+      "C": "QT prolongation",
+      "D": "Tendon rupture"
+    },
+    "answer": "(A) Peripheral neuropathy",
+    "explanation": "Nitrofurantoin, used for urinary tract infections (UTIs), can cause peripheral neuropathy in long-term use or in patients with renal impairment. Ototoxicity (B) is commonly associated with aminoglycosides. QT prolongation (C) is a side effect of macrolides (e.g., azithromycin) and fluoroquinolones (e.g., levofloxacin). Tendon rupture (D) is a major adverse effect of fluoroquinolones."
+  },
+  {
+    "question_number": 38,
+    "question": "Which fluoroquinolone has the highest bioavailability after oral administration?",
+    "options": {
+      "A": "Ciprofloxacin",
+      "B": "Norfloxacin",
+      "C": "Levofloxacin",
+      "D": "Delafloxacin"
+    },
+    "answer": "(C) Levofloxacin",
+    "explanation": "Levofloxacin has the highest oral bioavailability (near 100%) among fluoroquinolones, making oral and IV doses interchangeable. Ciprofloxacin (A) has lower bioavailability (~70%) and is less effective for respiratory infections. Norfloxacin (B) is mainly used for UTIs and has low systemic absorption. Delafloxacin (D) is a newer fluoroquinolone with broad-spectrum activity but not the highest bioavailability."
+  },
+  {
+    "question_number": 39,
+    "question": "Which of the following is NOT a common side effect of SSRIs?",
+    "options": {
+      "A": "Sexual dysfunction",
+      "B": "Nausea",
+      "C": "Hypertension",
+      "D": "Insomnia"
+    },
+    "answer": "(C) Hypertension",
+    "explanation": "SSRIs (e.g., fluoxetine, sertraline, paroxetine) commonly cause sexual dysfunction, nausea, and insomnia due to increased serotonergic activity. Hypertension (C) is not a common SSRI side effect, but SNRIs (e.g., venlafaxine) may cause elevated blood pressure."
+  },
+  {
+    "question_number": 40,
+    "question": "Which of the following drugs is classified as a benzodiazepine antagonist?",
+    "options": {
+      "A": "Buspirone",
+      "B": "Flumazenil",
+      "C": "Ramelteon",
+      "D": "Suvorexant"
+    },
+    "answer": "(B) Flumazenil",
+    "explanation": "Flumazenil is a GABA-A receptor antagonist, reversing benzodiazepine sedation or overdose. Buspirone (A) is a 5-HT1A partial agonist used for generalized anxiety disorder (GAD). Ramelteon (C) is a melatonin receptor agonist used for insomnia. Suvorexant (D) is an orexin receptor antagonist used for sleep disorders."
+  },
+  {
+    "question_number": 41,
+    "question": "Which second-generation antipsychotic is most associated with weight gain and diabetes mellitus?",
+    "options": {
+      "A": "Aripiprazole",
+      "B": "Ziprasidone",
+      "C": "Olanzapine",
+      "D": "Haloperidol"
+    },
+    "answer": "(C) Olanzapine",
+    "explanation": "Olanzapine and clozapine cause the most weight gain and metabolic issues (hyperglycemia, diabetes, dyslipidemia) among second-generation antipsychotics. Aripiprazole (A) and Ziprasidone (B) have lower risk of weight gain. Haloperidol (D) is a first-generation antipsychotic with extrapyramidal side effects (EPS) but minimal metabolic effects."
+  },
+  {
+    "question_number": 42,
+    "question": "Which AED is classified as a GABA reuptake inhibitor?",
+    "options": {
+      "A": "Levetiracetam",
+      "B": "Tiagabine",
+      "C": "Vigabatrin",
+      "D": "Ethosuximide"
+    },
+    "answer": "(B) Tiagabine",
+    "explanation": "Tiagabine inhibits GABA reuptake, increasing GABA levels and neuronal inhibition, making it useful for partial seizures. Levetiracetam (A) works by modulating synaptic vesicle proteins (SV2A). Vigabatrin (C) inhibits GABA transaminase, preventing GABA breakdown. Ethosuximide (D) is a T-type calcium channel blocker used for absence seizures."
+  },
+  {
+    "question_number": 43,
+    "question": "Which of the following general anesthetics acts by inhibiting NMDA receptors instead of acting on GABA receptors?",
+    "options": {
+      "A": "Propofol",
+      "B": "Isoflurane",
+      "C": "Ketamine",
+      "D": "Thiopental"
+    },
+    "answer": "(C) Ketamine",
+    "explanation": "Ketamine is an NMDA receptor antagonist that induces dissociative anesthesia, maintaining respiration and blood pressure. Propofol (A) and Thiopental (D) are GABA-A agonists that depress CNS activity. Isoflurane (B) is an inhalational anesthetic that enhances GABA transmission."
+  },
+  {
+    "question_number": 44,
+    "question": "Which opioid receptor subtype is primarily responsible for the analgesic effects of opioids?",
+    "options": {
+      "A": "Mu (μ)",
+      "B": "Kappa (κ)",
+      "C": "Delta (δ)",
+      "D": "Sigma (σ)"
+    },
+    "answer": "(A) Mu (μ)",
+    "explanation": "Mu (μ) receptors mediate opioid analgesia, euphoria, and dependence. Kappa (κ) receptors (B) contribute to analgesia but also dysphoria. Delta (δ) receptors (C) modulate analgesia and mood. Sigma (σ) receptors (D) are not true opioid receptors and are involved in psychotomimetic effects."
+  },
+  {
+    "question_number": 45,
+    "question": "Which opioid is known for causing euphoria and dependence due to rapid CNS penetration?",
+    "options": {
+      "A": "Morphine",
+      "B": "Fentanyl",
+      "C": "Heroin",
+      "D": "Methadone"
+    },
+    "answer": "(C) Heroin",
+    "explanation": "Heroin (diacetylmorphine) rapidly crosses the blood-brain barrier, leading to intense euphoria and high addiction potential. Morphine (A) has slower onset and is less potent. Fentanyl (B) is extremely potent but used clinically in anesthesia. Methadone (D) is used for opioid withdrawal due to its long half-life."
+  },
+  {
+    "question_number": 46,
+    "question": "Which azole antifungal is associated with the highest risk of visual disturbances?",
+    "options": {
+      "A": "Fluconazole",
+      "B": "Itraconazole",
+      "C": "Voriconazole",
+      "D": "Posaconazole"
+    },
+    "answer": "(C) Voriconazole",
+    "explanation": "Voriconazole is the azole antifungal most commonly associated with visual disturbances, including photopsia and altered color perception, often occurring within 30 minutes of dosing. Fluconazole (A) is well tolerated with fewer neurological side effects. Itraconazole (B) is known for cardiotoxicity and drug interactions rather than visual effects. Posaconazole (D) is generally well tolerated and used for prophylaxis in immunocompromised patients."
+  },
+  {
+    "question_number": 47,
+    "question": "Which of the following drugs inhibits the M2 proton channel of influenza A virus?",
+    "options": {
+      "A": "Oseltamivir",
+      "B": "Amantadine",
+      "C": "Acyclovir",
+      "D": "Foscarnet"
+    },
+    "answer": "(B) Amantadine",
+    "explanation": "Amantadine blocks the M2 proton channel of influenza A, preventing viral uncoating inside host cells. Oseltamivir (A) is a neuraminidase inhibitor, used for both influenza A and B. Acyclovir (C) is a DNA polymerase inhibitor used for herpes simplex virus (HSV) and varicella-zoster virus (VZV). Foscarnet (D) is a pyrophosphate analog used in acyclovir-resistant HSV and CMV infections."
+  },
+  {
+    "question_number": 48,
+    "question": "Which antiviral drug is an adenosine analog used in hepatitis B treatment?",
+    "options": {
+      "A": "Lamivudine",
+      "B": "Adefovir",
+      "C": "Ribavirin",
+      "D": "Oseltamivir"
+    },
+    "answer": "(B) Adefovir",
+    "explanation": "Adefovir is a nucleotide reverse transcriptase inhibitor (NRTI) that acts as an adenosine analog, inhibiting hepatitis B virus replication. Lamivudine (A) is another NRTI used for both HIV and hepatitis B, but it is a cytosine analog. Ribavirin (C) is a guanosine analog used for hepatitis C and respiratory syncytial virus (RSV). Oseltamivir (D) is an influenza neuraminidase inhibitor."
+  },
+  {
+    "question_number": 49,
+    "question": "What is the main adverse effect of cisplatin?",
+    "options": {
+      "A": "Hepatotoxicity",
+      "B": "Ototoxicity",
+      "C": "Cardiotoxicity",
+      "D": "Neurotoxicity"
+    },
+    "answer": "(B) Ototoxicity",
+    "explanation": "Cisplatin is a platinum-based chemotherapy agent that causes irreversible ototoxicity, particularly in children. Hepatotoxicity (A) is more commonly associated with methotrexate and azathioprine. Cardiotoxicity (C) is a known adverse effect of anthracyclines like doxorubicin. Neurotoxicity (D) is seen with vincristine and paclitaxel."
+  },
+  {
+    "question_number": 50,
+    "question": "Platinum-based chemotherapy drugs work by:",
+    "options": {
+      "A": "Blocking DNA synthesis",
+      "B": "Inhibiting topoisomerase II",
+      "C": "Cross-linking DNA strands",
+      "D": "Inhibiting protein translation"
+    },
+    "answer": "(C) Cross-linking DNA strands",
+    "explanation": "Platinum-based agents (cisplatin, carboplatin, oxaliplatin) work by forming cross-links between DNA strands, leading to apoptosis in cancer cells. Blocking DNA synthesis (A) is the mechanism of antimetabolites like methotrexate and 5-fluorouracil. Inhibiting topoisomerase II (B) is how etoposide and doxorubicin work. Inhibiting protein translation (D) is a function of tetracyclines and aminoglycosides."
+  }
+]
+[
+  {
+    "question_number": 51,
+    "question": "Which of the following H2 blockers is known for causing gynecomastia due to anti-androgenic effects?",
+    "options": {
+      "A": "Ranitidine",
+      "B": "Cimetidine",
+      "C": "Famotidine",
+      "D": "Nizatidine"
+    },
+    "answer": "(B) Cimetidine",
+    "explanation": "Cimetidine is an H2 blocker that inhibits androgen receptors, leading to gynecomastia and impotence. Ranitidine (A), Famotidine (C), and Nizatidine (D) have no significant anti-androgenic effects."
+  },
+  {
+    "question_number": 52,
+    "question": "What is the major adverse effect of COX-2 inhibitors like celecoxib?",
+    "options": {
+      "A": "Gastrointestinal ulceration",
+      "B": "Increased risk of myocardial infarction",
+      "C": "Hepatotoxicity",
+      "D": "Nephrotoxicity"
+    },
+    "answer": "(B) Increased risk of myocardial infarction",
+    "explanation": "COX-2 inhibitors (e.g., celecoxib) selectively inhibit prostacyclin production, increasing the risk of thrombosis, stroke, and myocardial infarction. GI ulceration (A) is more common with non-selective NSAIDs (e.g., ibuprofen, naproxen). Hepatotoxicity (C) is a concern with acetaminophen overdose. Nephrotoxicity (D) occurs with NSAIDs due to reduced renal perfusion."
+  },
+  {
+    "question_number": 53,
+    "question": "What is the main side effect associated with roflumilast use?",
+    "options": {
+      "A": "Hyperglycemia",
+      "B": "Weight loss",
+      "C": "Hypokalemia",
+      "D": "Arrhythmias"
+    },
+    "answer": "(B) Weight loss",
+    "explanation": "Roflumilast is a phosphodiesterase-4 (PDE-4) inhibitor used in COPD, and its most notable side effect is weight loss. Hyperglycemia (A) is seen with corticosteroids. Hypokalemia (C) is common with loop diuretics. Arrhythmias (D) are seen with beta-agonists like salbutamol."
+  },
+  {
+    "question_number": 54,
+    "question": "Acitretin, an oral retinoid used for severe psoriasis, is contraindicated in women planning pregnancy due to its:",
+    "options": {
+      "A": "Hepatotoxicity",
+      "B": "Teratogenicity",
+      "C": "Nephrotoxicity",
+      "D": "Hypersensitivity reactions"
+    },
+    "answer": "(B) Teratogenicity",
+    "explanation": "Acitretin is a retinoid with a long half-life and is highly teratogenic, requiring contraception for at least three years post-treatment. Hepatotoxicity (A) can occur with isotretinoin but is not the primary concern. Nephrotoxicity (C) is seen with aminoglycosides. Hypersensitivity reactions (D) are common with penicillins and sulfonamides."
+  },
+  {
+    "question_number": 55,
+    "question": "Which enzyme is responsible for the breakdown of glycogen?",
+    "options": {
+      "A": "Glycogen synthase",
+      "B": "Glycogen phosphorylase",
+      "C": "Phosphofructokinase",
+      "D": "Glucose-6-phosphate dehydrogenase"
+    },
+    "answer": "(B) Glycogen phosphorylase",
+    "explanation": "Glycogen phosphorylase is the enzyme responsible for breaking down glycogen into glucose-1-phosphate in response to energy demands. Glycogen synthase (A) is the enzyme responsible for glycogen synthesis. Phosphofructokinase (C) is a key regulatory enzyme in glycolysis. Glucose-6-phosphate dehydrogenase (D) plays a role in the pentose phosphate pathway, producing NADPH."
+  },
+  {
+    "question_number": 56,
+    "question": "Which of the following vitamins is required for the carboxylation of clotting factors?",
+    "options": {
+      "A": "Vitamin A",
+      "B": "Vitamin D",
+      "C": "Vitamin E",
+      "D": "Vitamin K"
+    },
+    "answer": "(D) Vitamin K",
+    "explanation": "Vitamin K is essential for the carboxylation of clotting factors II, VII, IX, and X, which are involved in the coagulation cascade. Vitamin A (A) is important for vision and epithelial health. Vitamin D (B) regulates calcium and phosphate metabolism. Vitamin E (C) acts as an antioxidant."
+  },
+  {
+    "question_number": 57,
+    "question": "Which second messenger is activated by adenylate cyclase?",
+    "options": {
+      "A": "cAMP",
+      "B": "cGMP",
+      "C": "Calcium ions",
+      "D": "IP3"
+    },
+    "answer": "(A) cAMP",
+    "explanation": "Adenylate cyclase converts ATP to cyclic AMP (cAMP), which acts as a second messenger in many signaling pathways, including those involving epinephrine and glucagon. cGMP (B) is activated by guanylate cyclase and plays a role in smooth muscle relaxation. Calcium ions (C) serve as a second messenger in various pathways but are not activated by adenylate cyclase. IP3 (D) helps release calcium from the endoplasmic reticulum."
+  },
+  {
+    "question_number": 58,
+    "question": "Which method is used for determining the absolute configuration of a chiral center?",
+    "options": {
+      "A": "X-ray crystallography",
+      "B": "Polarimetry",
+      "C": "NMR spectroscopy",
+      "D": "Mass spectrometry"
+    },
+    "answer": "(A) X-ray crystallography",
+    "explanation": "X-ray crystallography is the gold standard for determining the absolute configuration of chiral molecules by analyzing the crystal structure. Polarimetry (B) measures optical rotation but does not provide absolute configuration. NMR spectroscopy (C) provides structural information but cannot determine absolute stereochemistry. Mass spectrometry (D) determines molecular mass and fragmentation patterns."
+  },
+  {
+    "question_number": 59,
+    "question": "Which light source is commonly used in Atomic Absorption Spectroscopy?",
+    "options": {
+      "A": "Deuterium lamp",
+      "B": "Tungsten lamp",
+      "C": "Hollow cathode lamp",
+      "D": "Xenon arc lamp"
+    },
+    "answer": "(C) Hollow cathode lamp",
+    "explanation": "Hollow cathode lamps are used in Atomic Absorption Spectroscopy (AAS) because they provide the characteristic emission lines required for element-specific analysis. Deuterium lamps (A) are used for UV spectroscopy. Tungsten lamps (B) are commonly used in visible spectroscopy. Xenon arc lamps (D) are used in fluorescence and high-intensity UV-Vis spectroscopy."
+  },
+  {
+    "question_number": 60,
+    "question": "In NMR Spectroscopy, the external magnetic field interacts with:",
+    "options": {
+      "A": "Electrons in the molecule",
+      "B": "Nuclear spins",
+      "C": "Molecular vibrations",
+      "D": "Fluorescent molecules"
+    },
+    "answer": "(B) Nuclear spins",
+    "explanation": "NMR (Nuclear Magnetic Resonance) spectroscopy works by detecting the interaction of nuclear spins (especially hydrogen or carbon nuclei) with an external magnetic field. Electrons (A) are analyzed in electron spin resonance (ESR). Molecular vibrations (C) are examined in Infrared (IR) spectroscopy. Fluorescent molecules (D) are studied using fluorescence spectroscopy."
+  },
+  {
+    "question_number": 61,
+    "question": "Which technique is best for determining the structure of new drug molecules?",
+    "options": {
+      "A": "NMR Spectroscopy",
+      "B": "IR Spectroscopy",
+      "C": "UV/Visible Spectroscopy",
+      "D": "Flame Photometry"
+    },
+    "answer": "(A) NMR Spectroscopy",
+    "explanation": "NMR spectroscopy provides detailed information about molecular structure, including connectivity and functional groups, making it the best choice for new drug molecule characterization. IR spectroscopy (B) identifies functional groups. UV/Visible spectroscopy (C) is used for quantitative analysis of compounds. Flame photometry (D) measures metal ions."
+  },
+  {
+    "question_number": 62,
+    "question": "Which type of chromatography uses antibodies to purify proteins?",
+    "options": {
+      "A": "Ion-exchange chromatography",
+      "B": "Gel filtration chromatography",
+      "C": "Affinity chromatography",
+      "D": "Adsorption chromatography"
+    },
+    "answer": "(C) Affinity chromatography",
+    "explanation": "Affinity chromatography uses antibodies or ligands that specifically bind to a target protein, allowing its purification from complex mixtures. Ion-exchange chromatography (A) separates molecules based on charge. Gel filtration chromatography (B) separates based on molecular size. Adsorption chromatography (D) works on surface interactions."
+  },
+  {
+    "question_number": 63,
+    "question": "Which column type is used in Gas-Liquid Chromatography for high-resolution separations?",
+    "options": {
+      "A": "Packed column",
+      "B": "Open tubular (capillary) column",
+      "C": "Ion-exchange column",
+      "D": "None of the above"
+    },
+    "answer": "(B) Open tubular (capillary) column",
+    "explanation": "Open tubular (capillary) columns provide higher resolution and efficiency in Gas-Liquid Chromatography (GLC) compared to packed columns. Packed columns (A) have a lower separation efficiency. Ion-exchange columns (C) are used in liquid chromatography for separating charged molecules."
+  },
+  {
+    "question_number": 64,
+    "question": "HPLC is widely used in clinical laboratories for:",
+    "options": {
+      "A": "Blood plasma drug level monitoring",
+      "B": "DNA sequencing",
+      "C": "Hormone analysis",
+      "D": "Both (A) and (C)"
+    },
+    "answer": "(D) Both (A) and (C)",
+    "explanation": "High‐Performance Liquid Chromatography (HPLC) is extensively applied in clinical laboratories for quantifying drugs in blood plasma and for hormone analysis because of its high sensitivity and specificity. Although HPLC has been used in certain nucleic acid analyses, modern DNA sequencing is typically performed by methods such as capillary electrophoresis or next‐generation sequencing, making option (B) an uncommon application in the clinical setting."
+  },
+  {
+    "question_number": 65,
+    "question": "Which of the following is NOT a physicochemical property of a drug molecule?",
+    "options": {
+      "A": "Solubility",
+      "B": "Optical Activity",
+      "C": "Chelation",
+      "D": "Partition Coefficient"
+    },
+    "answer": "(C) Chelation",
+    "explanation": "Physicochemical properties refer to the chemical and physical characteristics of a drug that affect its behavior in biological systems. Solubility (A) determines how well a drug dissolves in a given solvent. Optical activity (B) relates to the chiral nature of a molecule and how it interacts with polarized light. Partition coefficient (D) reflects the drug’s ability to distribute between lipid and aqueous phases, influencing its bioavailability and permeability. Chelation (C), however, refers to the ability of a molecule to form complexes with metal ions, which is more of a chemical interaction than a physicochemical property."
+  },
+  {
+    "question_number": 66,
+    "question": "Which of the following is a major constituent of turpentine oil?",
+    "options": {
+      "A": "Menthol",
+      "B": "Pinene",
+      "C": "Thymol",
+      "D": "Eugenol"
+    },
+    "answer": "(B) Pinene",
+    "explanation": "Turpentine oil is primarily composed of monoterpenes, with α-pinene and β-pinene being the dominant constituents. Menthol (A) is a major component of peppermint oil. Thymol (C) is found in thyme oil, while Eugenol (D) is abundant in clove oil."
+  },
+  {
+    "question_number": 67,
+    "question": "Which volatile oil is obtained from Pimpinella anisum?",
+    "options": {
+      "A": "Anise oil",
+      "B": "Myristica oil",
+      "C": "Chenopodium oil",
+      "D": "Eucalyptus oil"
+    },
+    "answer": "(A) Anise oil",
+    "explanation": "Anise oil is derived from Pimpinella anisum and is rich in anethole, which gives it a characteristic licorice-like aroma. Myristica oil (B) comes from nutmeg seeds, Chenopodium oil (C) is used as an anthelmintic, and Eucalyptus oil (D) is obtained from Eucalyptus species and has strong antimicrobial properties."
+  },
+  {
+    "question_number": 68,
+    "question": "Which plant extract is known to improve insulin sensitivity in diabetic patients?",
+    "options": {
+      "A": "Gymnema sylvestre",
+      "B": "Digitalis purpurea",
+      "C": "Punica granatum",
+      "D": "Convallaria majalis"
+    },
+    "answer": "(A) Gymnema sylvestre",
+    "explanation": "Gymnema sylvestre contains gymnemic acids, which are known to enhance insulin secretion and improve glucose uptake, making it beneficial for diabetic patients. Digitalis purpurea (B) is used for cardiac conditions due to its cardiac glycosides. Punica granatum (C) (pomegranate) has antioxidant properties. Convallaria majalis (D) is used for heart failure due to its digitalis-like activity."
+  },
+  {
+    "question_number": 69,
+    "question": "Which alkaloid is responsible for the stimulant and convulsant effects of Strychnos nux-vomica?",
+    "options": {
+      "A": "Brucine",
+      "B": "Strychnine",
+      "C": "Morphine",
+      "D": "THC"
+    },
+    "answer": "(B) Strychnine",
+    "explanation": "Strychnine, found in Strychnos nux-vomica, is a potent neurotoxin that blocks glycine receptors in the spinal cord, leading to muscle spasms and convulsions. Brucine (A) is also found in Strychnos nux-vomica but is less toxic. Morphine (C) is an opioid analgesic, while THC (D) is the psychoactive component of cannabis."
+  },
+  {
+    "question_number": 70,
+    "question": "Which part of Datura stramonium contains the highest concentration of scopolamine?",
+    "options": {
+      "A": "Leaves",
+      "B": "Flowers",
+      "C": "Seeds",
+      "D": "Roots"
+    },
+    "answer": "(C) Seeds",
+    "explanation": "The seeds of Datura stramonium contain the highest levels of scopolamine, a tropane alkaloid with anticholinergic effects. Leaves (A) and flowers (B) also contain scopolamine but in lower amounts. Roots (D) primarily contain other alkaloids like atropine."
+  },
+  {
+    "question_number": 71,
+    "question": "White squill is associated with which glycoside category?",
+    "options": {
+      "A": "Cardioactive glycosides",
+      "B": "Cyanophore glycosides",
+      "C": "Isothiocyanate glycosides",
+      "D": "Anthraquinone glycosides"
+    },
+    "answer": "(A) Cardioactive glycosides",
+    "explanation": "White squill (Urginea maritima) contains cardioactive glycosides like scillaren, which exert a positive inotropic effect on the heart, similar to digitalis glycosides. Cyanophore glycosides (B) release cyanide and are found in bitter almonds and cherry seeds. Isothiocyanate glycosides (C) are present in mustard seeds. Anthraquinone glycosides (D) are laxatives found in senna and aloe."
+  },
+  {
+    "question_number": 72,
+    "question": "The SOAP Note is widely used for clinical documentation. What does \"S\" stand for?",
+    "options": {
+      "A": "Subjective",
+      "B": "Safety",
+      "C": "Standardized",
+      "D": "Scientific"
+    },
+    "answer": "(A) Subjective",
+    "explanation": "SOAP notes (Subjective, Objective, Assessment, Plan) are widely used in clinical documentation. The \"Subjective\" section includes the patient’s symptoms, history, and complaints in their own words. \"Objective\" refers to measurable clinical findings. \"Assessment\" includes diagnosis and clinical reasoning, while \"Plan\" outlines the treatment and follow-up plan."
+  },
+  {
+    "question_number": 73,
+    "question": "The main advantage of sustained-release formulations is:",
+    "options": {
+      "A": "Increased peak plasma concentration",
+      "B": "Reduced frequency of administration",
+      "C": "Faster onset of action",
+      "D": "Increased first-pass metabolism"
+    },
+    "answer": "(B) Reduced frequency of administration",
+    "explanation": "Sustained-release (SR) formulations are designed to release the drug slowly over time, reducing the need for frequent dosing and improving patient compliance. Increased peak plasma concentration (A) is usually seen in immediate-release formulations. Faster onset of action (C) is a feature of rapid-release or immediate-release formulations. Increased first-pass metabolism (D) is not typically a goal of sustained-release drugs."
+  },
+  {
+    "question_number": 74,
+    "question": "A weak base will be more ionized in which of the following conditions?",
+    "options": {
+      "A": "Acidic stomach pH",
+      "B": "Alkaline intestine pH",
+      "C": "Blood plasma pH (7.4)",
+      "D": "None of the above"
+    },
+    "answer": "(A) Acidic stomach pH",
+    "explanation": "A weak base is more ionized in an acidic environment because it accepts protons (H⁺) and becomes charged. The stomach (A) is acidic (pH 1-3), causing weak bases to ionize and become less lipophilic, reducing absorption. In the alkaline intestine (B), weak bases remain unionized and are more readily absorbed. Blood plasma (C) has a neutral pH, and weak bases are generally well-absorbed here."
+  },
+  {
+    "question_number": 75,
+    "question": "Which equation is used to determine the relationship between pH, pKa, and drug ionization?",
+    "options": {
+      "A": "Nernst equation",
+      "B": "Henderson-Hasselbalch equation",
+      "C": "Michaelis-Menten equation",
+      "D": "Arrhenius equation"
+    },
+    "answer": "(B) Henderson-Hasselbalch equation",
+    "explanation": "The Henderson-Hasselbalch equation describes the ratio of ionized to unionized drug depending on the pH of the environment and the pKa of the drug. The Nernst equation (A) relates to electrochemical potentials. The Michaelis-Menten equation (C) describes enzyme kinetics. The Arrhenius equation (D) relates to temperature dependence of reaction rates."
+  }
+]
+[
+  {
+    "question_number": 76,
+    "question": "If a solution contains 2 mg/mL of a drug, how many milligrams are in 15 mL?",
+    "options": {
+      "A": "30 mg",
+      "B": "45 mg",
+      "C": "20 mg",
+      "D": "25 mg"
+    },
+    "answer": "(A) 30 mg",
+    "explanation": "The total amount of drug is calculated as:\n2mg/ml * 15ml =30mg\nThus, the correct answer is 30 mg."
+  },
+  {
+    "question_number": 77,
+    "question": "A pharmacist has a 10% w/v stock solution of a drug. How much of this solution should be diluted with water to prepare 250 mL of a 2.5% w/v solution?",
+    "options": {
+      "A": "50 mL",
+      "B": "62.5 mL",
+      "C": "75 mL",
+      "D": "100 mL"
+    },
+    "answer": "(B) 62.5 mL",
+    "explanation": "Using the dilution formula:\nC1V1=C2V2\n(10%)(v!)=(2.5%)(250ml)\nThus, 62.5 mL of the 10% solution should be diluted with water to 250 mL total."
+  },
+  {
+    "question_number": 78,
+    "question": "An adult dose of a medication is 300 mg. Using Clark's rule, what is the appropriate dose for a child who weighs 50 lbs?",
+    "options": {
+      "A": "50 mg",
+      "B": "75 mg",
+      "C": "100 mg",
+      "D": "150 mg"
+    },
+    "answer": "(C) 100 mg",
+    "explanation": "Clark's Rule for pediatric dosing is:\nChild dose= wt in lbs/150 * adult dose\n\nThus, the appropriate dose for the child is 100 mg."
+  },
+  {
+    "question_number": 79,
+    "question": "Which of the following is used for iron overdose?",
+    "options": {
+      "A": "Dimercaprol",
+      "B": "Penicillamine",
+      "C": "Deferoxamine",
+      "D": "Pralidoxime"
+    },
+    "answer": "(C) Deferoxamine",
+    "explanation": "Deferoxamine is the chelating agent used for iron overdose and iron poisoning, forming a complex that is excreted in urine. Dimercaprol (A) is used for arsenic and lead poisoning. Penicillamine (B) is used for copper poisoning and Wilson’s disease. Pralidoxime (D) is an antidote for organophosphate poisoning."
+  },
+  {
+    "question_number": 80,
+    "question": "Which of the following is the antidote for acetaminophen toxicity?",
+    "options": {
+      "A": "Sodium bicarbonate",
+      "B": "N-acetylcysteine (NAC)",
+      "C": "Flumazenil",
+      "D": "Atropine"
+    },
+    "answer": "(B) N-acetylcysteine (NAC)",
+    "explanation": "N-acetylcysteine (NAC) replenishes glutathione stores, detoxifying NAPQI, the toxic metabolite of acetaminophen. Sodium bicarbonate (A) is used for salicylate poisoning. Flumazenil (C) is a benzodiazepine antagonist. Atropine (D) is used for organophosphate poisoning."
+  },
+  {
+    "question_number": 81,
+    "question": "A relative bioavailability study compares:",
+    "options": {
+      "A": "An oral drug to an IV drug",
+      "B": "A generic drug to a reference drug",
+      "C": "A drug’s solubility in different solvents",
+      "D": "The renal clearance of a drug"
+    },
+    "answer": "(B) A generic drug to a reference drug",
+    "explanation": "Relative bioavailability compares a generic drug’s pharmacokinetic profile to that of a reference (brand) drug, ensuring therapeutic equivalence. Comparing an oral drug to an IV drug (A) measures absolute bioavailability. Drug solubility studies (C) are done in formulation research. Renal clearance (D) is assessed in pharmacokinetic studies."
+  },
+  {
+    "question_number": 82,
+    "question": "In a bioequivalence study, the 90% confidence interval for the ratio of test-to-reference product should fall within:",
+    "options": {
+      "A": "50-150%",
+      "B": "75-135%",
+      "C": "80-125%",
+      "D": "85-120%"
+    },
+    "answer": "(C) 80-125%",
+    "explanation": "Regulatory agencies require that bioequivalence studies show the 90% confidence interval (CI) for the ratio of test to reference product falls within 80-125%. This ensures the generic drug has comparable efficacy and safety to the reference drug."
+  },
+  {
+    "question_number": 83,
+    "question": "Which test detects the presence of starch?",
+    "options": {
+      "A": "Iodine Test",
+      "B": "Benedict’s Test",
+      "C": "Mayer’s Test",
+      "D": "Liebermann-Burchard Test"
+    },
+    "answer": "(A) Iodine Test",
+    "explanation": "The Iodine Test is specific for starch, producing a blue-black color due to starch-iodine complex formation. Benedict’s Test (B) detects reducing sugars. Mayer’s Test (C) detects alkaloids. Liebermann-Burchard Test (D) is used to detect steroids and cholesterol."
+  },
+  {
+    "question_number": 84,
+    "question": "Which test identifies cholesterol and steroids?",
+    "options": {
+      "A": "Liebermann-Burchard Test",
+      "B": "Tollens’ Test",
+      "C": "pH Meter Test",
+      "D": "Biuret Test"
+    },
+    "answer": "(A) Liebermann-Burchard Test",
+    "explanation": "The Liebermann-Burchard test produces a green color in the presence of cholesterol and steroids. Tollens’ Test (B) identifies aldehydes. pH Meter Test (C) measures acidity or alkalinity. Biuret Test (D) detects proteins and peptides."
+  },
+  {
+    "question_number": 85,
+    "question": "According to USP, how long should the sterility test be conducted before concluding results?",
+    "options": {
+      "A": "24 hours",
+      "B": "3 days",
+      "C": "7 days",
+      "D": "14 days"
+    },
+    "answer": "(D) 14 days",
+    "explanation": "Sterility testing in pharmaceuticals requires a 14-day incubation period as per USP guidelines to ensure that no microbial contamination is present in sterile preparations. Shorter durations like 24 hours (A), 3 days (B), or 7 days (C) do not provide sufficient time for microbial growth detection."
+  },
+  {
+    "question_number": 86,
+    "question": "In the leaker’s test, what is the most common dye used for ampoules?",
+    "options": {
+      "A": "Methylene blue",
+      "B": "Crystal violet",
+      "C": "Safranin",
+      "D": "Eosin"
+    },
+    "answer": "(A) Methylene blue",
+    "explanation": "Methylene blue is commonly used in the leaker’s test to detect cracks or defects in ampoules. Crystal violet (B) is used for Gram staining in microbiology. Safranin (C) is used as a counterstain in Gram staining. Eosin (D) is used in histological staining."
+  },
+  {
+    "question_number": 96,
+    "question": "The rheological behavior of pharmaceutical suspensions is best described as:",
+    "options": {
+      "A": "Newtonian",
+      "B": "Pseudoplastic",
+      "C": "Bingham plastic",
+      "D": "Dilatant"
+    },
+    "answer": "(B) Pseudoplastic",
+    "explanation": "Pharmaceutical suspensions exhibit pseudoplastic (shear-thinning) behavior, meaning their viscosity decreases as shear stress increases, improving flow when shaken. Newtonian fluids (A) have constant viscosity, independent of shear stress. Bingham plastic (C) materials behave as solids until a yield stress is exceeded. Dilatant (D) fluids exhibit shear-thickening behavior, increasing viscosity with shear stress."
+  },
+  {
+    "question_number": 97,
+    "question": "The unit of viscosity in the SI system is:",
+    "options": {
+      "A": "Poise",
+      "B": "Pascal-second (Pa.s)",
+      "C": "Newton",
+      "D": "Joule"
+    },
+    "answer": "(B) Pascal-second (Pa.s)",
+    "explanation": "The SI unit for dynamic viscosity is the Pascal-second (Pa.s), where 1 Pa.s = 1 N.s/m². Poise (A) is a CGS unit of viscosity (1 Poise = 0.1 Pa.s). Newton (C) is a unit of force, and Joule (D) is a unit of energy."
+  },
+  {
+    "question_number": 98,
+    "question": "Which of the following is a commonly used polymer in osmotic pump drug delivery?",
+    "options": {
+      "A": "Ethyl cellulose",
+      "B": "Polyvinyl alcohol",
+      "C": "Cellulose acetate",
+      "D": "Gelatin"
+    },
+    "answer": "(C) Cellulose acetate",
+    "explanation": "Cellulose acetate is widely used as a semipermeable membrane in osmotic pump drug delivery systems, allowing controlled water influx to release the drug at a constant rate. Ethyl cellulose (A) is commonly used in sustained-release coatings. Polyvinyl alcohol (B) is used in film coatings and hydrogels. Gelatin (D) is used in capsule shells and biodegradable drug formulations."
+  },
+  {
+    "question_number": 99,
+    "question": "The swelling mechanism in floating drug delivery systems is mainly influenced by:",
+    "options": {
+      "A": "The presence of effervescent agents",
+      "B": "The pH of the gastric environment",
+      "C": "The rate of ion exchange",
+      "D": "The enzymatic degradation of the polymer"
+    },
+    "answer": "(B) The pH of the gastric environment",
+    "explanation": "In floating drug delivery systems that rely on the swelling of hydrophilic polymers, the extent and rate of swelling are predominantly determined by the pH of the gastric fluid. Many swellable polymers (e.g., hydroxypropyl methylcellulose) exhibit pH-dependent hydration and expansion, which reduces the density of the dosage form, allowing it to float. Although effervescent agents (option A) are used in some floating systems, they primarily function by generating CO₂ to reduce the density rather than directly influencing the swelling mechanism. Options (C) and (D) are not relevant to the swelling behavior of these polymers."
+  },
+  {
+    "question_number": 100,
+    "question": "Niosomes are advantageous for transdermal drug delivery because:",
+    "options": {
+      "A": "They enhance drug penetration through the skin",
+      "B": "They rapidly degrade in the bloodstream",
+      "C": "They prevent drug absorption",
+      "D": "They cause irritation at the application site"
+    },
+    "answer": "(A) They enhance drug penetration through the skin",
+    "explanation": "Niosomes are non-ionic surfactant vesicles that increase skin permeability, facilitating drug absorption through the stratum corneum. Rapid degradation in the bloodstream (B) is not an advantage. Preventing drug absorption (C) is undesirable. Irritation (D) is minimized with properly formulated niosomes."
+  }
+]

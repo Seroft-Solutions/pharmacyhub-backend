@@ -1,0 +1,1197 @@
+{
+  "title": "Basic Pharmacology Test",
+  "description": "This exam tests basic knowledge of pharmacology concepts",
+  "duration": 60,
+  "totalMarks": 20,
+  "passingMarks": 12,
+  "questions": [
+    {
+      "question_number": 1,
+      "question": "Which of the following diluents is water-soluble?",
+      "options": {
+        "A": "Calcium phosphate",
+        "B": "Lactose",
+        "C": "Microcrystalline cellulose",
+        "D": "Starch"
+      },
+      "answer": "(B) Lactose",
+      "explanation": "Lactose is a commonly used water-soluble diluent in pharmaceutical formulations, making it ideal for tablet and capsule formulations. Calcium phosphate (A) is water-insoluble and often used in tablet formulations where solubility is not required. Microcrystalline cellulose (C) is an insoluble binder and filler commonly used in direct compression tablet formulations. Starch (D) is a partially soluble excipient primarily used as a disintegrant rather than a diluent."
+    },
+    {
+      "question_number": 2,
+      "question": "Which superdisintegrant is most effective in low concentrations?",
+      "options": {
+        "A": "Corn starch",
+        "B": "Sodium starch glycolate",
+        "C": "Talc",
+        "D": "PVP"
+      },
+      "answer": "(B) Sodium starch glycolate",
+      "explanation": "Sodium starch glycolate is a superdisintegrant that swells in the presence of water, leading to rapid tablet disintegration. It is effective even at low concentrations (2-8%). Corn starch (A) functions as a disintegrant but requires higher concentrations compared to sodium starch glycolate. Talc (C) is used as an anti-adherent and lubricant but does not function as a disintegrant. PVP (D) (polyvinylpyrrolidone) is commonly used as a binder rather than a superdisintegrant."
+    },
+    {
+      "question_number": 3,
+      "question": "Which of the following functions as a thickening agent in creams?",
+      "options": {
+        "A": "Carbopol",
+        "B": "Glycerin",
+        "C": "Lactose",
+        "D": "Acacia"
+      },
+      "answer": "(A) Carbopol",
+      "explanation": "Carbopol is a synthetic polymer that acts as a thickening agent in creams and gels, increasing viscosity and improving stability. Glycerin (B) is a humectant that helps retain moisture in formulations but does not function as a thickener. Lactose (C) is a commonly used excipient in tablets but does not play a role in thickening. Acacia (D) is a natural gum used primarily as a binder and emulsifier in pharmaceutical formulations."
+    },
+    {
+      "question_number": 4,
+      "question": "Which parameter is critical in preventing tablet lamination during compression?",
+      "options": {
+        "A": "Punch penetration depth",
+        "B": "Compression speed",
+        "C": "Granule moisture content",
+        "D": "Tablet thickness"
+      },
+      "answer": "(C) Granule moisture content",
+      "explanation": "Maintaining optimal granule moisture content is essential in preventing tablet lamination. If the granules are too dry, they may not bond properly, leading to delamination. Conversely, excess moisture can cause sticking issues. Punch penetration depth (A) mainly affects the hardness of tablets but is not the primary factor in preventing lamination. Compression speed (B) can influence the process but is not as critical as moisture content. Tablet thickness (D) is influenced by compression force but does not directly prevent lamination."
+    },
+    {
+      "question_number": 5,
+      "question": "Which of the following is NOT a type of tablet?",
+      "options": {
+        "A": "Sustained-release tablet",
+        "B": "Lyophilized tablet",
+        "C": "Pulsatile-release tablet",
+        "D": "Modified-dose tablet"
+      },
+      "answer": "(D) Modified-dose tablet",
+      "explanation": "The term \"modified-dose tablet\" is not a recognized pharmaceutical dosage form. Sustained-release tablets (A) are designed to release the drug gradually over an extended period. Lyophilized tablets (B) are freeze-dried, fast-dissolving dosage forms used for rapid onset of action. Pulsatile-release tablets (C) are designed to release the drug in pulses at predetermined intervals."
+    },
+    {
+      "question_number": 6,
+      "question": "According to USP/BP, what is the maximum allowable weight deviation for tablets weighing ≥ 250 mg?",
+      "options": {
+        "A": "±10%",
+        "B": "±7.5%",
+        "C": "±5%",
+        "D": "±2.5%"
+      },
+      "answer": "(C) ±5%",
+      "explanation": "The United States Pharmacopeia (USP) and British Pharmacopeia (BP) specify weight variation limits for tablets to ensure uniformity in drug content. For tablets weighing 250 mg or more, the allowable deviation is ±5%. Tablets below this weight have higher permissible deviations. ±10% (A) and ±7.5% (B) are applicable for smaller tablet weights, whereas ±2.5% (D) is stricter than the actual standard."
+    },
+    {
+      "question_number": 7,
+      "question": "Which of the following is an example of a pharmaceutical suspension?",
+      "options": {
+        "A": "Milk",
+        "B": "Calamine lotion",
+        "C": "Olive oil",
+        "D": "Saline water"
+      },
+      "answer": "(B) Calamine lotion",
+      "explanation": "A pharmaceutical suspension is a biphasic liquid dosage form in which finely divided solid particles are dispersed in a liquid medium. Calamine lotion (B) is a classic example of a pharmaceutical suspension used for skin irritation. Milk (A) is an emulsion, not a suspension. Olive oil (C) is a lipid-based liquid, and saline water (D) is a true solution, not a suspension."
+    },
+    {
+      "question_number": 8,
+      "question": "Which of the following is an example of a thickening agent used in suspensions?",
+      "options": {
+        "A": "Sodium lauryl sulfate",
+        "B": "Carboxymethylcellulose",
+        "C": "Tween 80",
+        "D": "Polysorbate 20"
+      },
+      "answer": "(B) Carboxymethylcellulose",
+      "explanation": "Carboxymethylcellulose (B) is commonly used as a thickening agent in pharmaceutical suspensions to increase viscosity and improve stability. Sodium lauryl sulfate (A) and Tween 80 (C) are surfactants, not thickening agents. Polysorbate 20 (D) is an emulsifier used in emulsion formulations rather than suspensions."
+    },
+    {
+      "question_number": 9,
+      "question": "Which of the following techniques can be used to improve the stability of suspensions?",
+      "options": {
+        "A": "Particle size reduction",
+        "B": "Addition of suspending agents",
+        "C": "Use of wetting agents",
+        "D": "All of the above"
+      },
+      "answer": "(D) All of the above",
+      "explanation": "Suspension stability can be enhanced by multiple approaches. Particle size reduction (A) increases surface area and helps maintain uniform dispersion. Adding suspending agents (B) prevents sedimentation by increasing viscosity. Wetting agents (C) help disperse hydrophobic drug particles in the liquid medium. Therefore, all three methods (D) contribute to improved stability."
+    },
+    {
+      "question_number": 10,
+      "question": "Which of the following can cause flocculation in emulsions?",
+      "options": {
+        "A": "Addition of electrolytes",
+        "B": "High shear mixing",
+        "C": "Presence of excessive surfactant",
+        "D": "Both (A) and (B)"
+      },
+      "answer": "(A) Addition of electrolytes",
+      "explanation": "Flocculation in emulsions is mainly induced by the addition of electrolytes, which decrease the repulsive forces between the dispersed droplets by neutralizing their surface charges. High shear mixing, on the other hand, tends to break apart flocculated structures rather than cause them. Excessive surfactant generally helps stabilize emulsions. Therefore, the correct cause of flocculation is the addition of electrolytes."
+    },
+    {
+      "question_number": 11,
+      "question": "Which of the following surfactants is commonly used in oil-in-water emulsions?",
+      "options": {
+        "A": "Span 80",
+        "B": "Sodium lauryl sulfate",
+        "C": "Beeswax",
+        "D": "Stearic acid"
+      },
+      "answer": "(B) Sodium lauryl sulfate",
+      "explanation": "Sodium lauryl sulfate (B) is a widely used anionic surfactant in oil-in-water emulsions due to its excellent emulsifying properties. Span 80 (A) is more suitable for water-in-oil emulsions. Beeswax (C) and stearic acid (D) act as stiffening agents rather than surfactants in emulsions."
+    },
+    {
+      "question_number": 12,
+      "question": "Which of the following is a potential issue when using natural emulsifiers like acacia?",
+      "options": {
+        "A": "Microbial contamination",
+        "B": "Incompatibility with some drugs",
+        "C": "Batch-to-batch variability",
+        "D": "All of the above"
+      },
+      "answer": "(D) All of the above",
+      "explanation": "Natural emulsifiers such as acacia have several limitations. They are prone to microbial contamination (A) and may require preservatives. They can also be incompatible with certain drugs (B), leading to stability issues. Additionally, their composition varies between batches (C), affecting reproducibility in formulations. Thus, all the mentioned concerns (D) are valid."
+    },
+    {
+      "question_number": 13,
+      "question": "Which one of the following is NOT a type of adsorption?",
+      "options": {
+        "A": "Physisorption",
+        "B": "Chemisorption",
+        "C": "Ion exchange adsorption",
+        "D": "Vaporization adsorption"
+      },
+      "answer": "(D) Vaporization adsorption",
+      "explanation": "Adsorption refers to the accumulation of molecules on a surface. Physisorption (A) involves weak van der Waals forces, while chemisorption (B) involves stronger chemical bonds. Ion exchange adsorption (C) occurs when ions in a solution are exchanged with those on an adsorbent. Vaporization adsorption (D) is incorrect because vaporization is a phase change, not an adsorption process."
+    },
+    {
+      "question_number": 14,
+      "question": "A buffer solution resists changes in pH upon the addition of:",
+      "options": {
+        "A": "Strong acid only",
+        "B": "Strong base only",
+        "C": "Both strong acid and strong base",
+        "D": "Water"
+      },
+      "answer": "(C) Both strong acid and strong base",
+      "explanation": "A buffer solution consists of a weak acid and its conjugate base or a weak base and its conjugate acid, allowing it to resist pH changes when small amounts of strong acid (A) or strong base (B) are added. Water (D) does not significantly alter the pH of a properly prepared buffer solution."
+    },
+    {
+      "question_number": 15,
+      "question": "The term \"dialysis\" in colloidal systems refers to:",
+      "options": {
+        "A": "Purification of colloids by diffusion through a membrane",
+        "B": "Coagulation of colloidal particles",
+        "C": "Decreasing viscosity of colloids",
+        "D": "Formation of micelles"
+      },
+      "answer": "(A) Purification of colloids by diffusion through a membrane",
+      "explanation": "Dialysis (A) is a process used to purify colloidal dispersions by allowing smaller molecules and ions to diffuse through a semipermeable membrane while retaining the colloidal particles. Coagulation (B) involves the aggregation of colloidal particles, decreasing viscosity (C) is not related to dialysis, and micelle formation (D) occurs in surfactant solutions rather than in colloidal dialysis."
+    },
+    {
+      "question_number": 16,
+      "question": "The process of flocculation in colloidal systems leads to:",
+      "options": {
+        "A": "Increased stability",
+        "B": "Particle aggregation",
+        "C": "Decreased viscosity",
+        "D": "Increased surface area"
+      },
+      "answer": "(B) Particle aggregation",
+      "explanation": "Flocculation in colloidal systems refers to the formation of loose aggregates of particles, leading to particle aggregation (B). This process can be beneficial in suspensions as it prevents the formation of a hard cake. Increased stability (A) can be observed in some cases but is not the primary effect. Decreased viscosity (C) does not always occur, as flocculated systems can maintain viscosity. Increased surface area (D) is incorrect since aggregated particles have a reduced overall exposed surface area."
+    },
+    {
+      "question_number": 17,
+      "question": "Which type of emulsion instability can be reversed by shaking?",
+      "options": {
+        "A": "Cracking",
+        "B": "Coalescence",
+        "C": "Creaming",
+        "D": "Phase inversion"
+      },
+      "answer": "(C) Creaming",
+      "explanation": "Creaming (C) in emulsions occurs when dispersed droplets move to the top or bottom of the container due to density differences. This process is reversible by shaking. Cracking (A) and coalescence (B) are irreversible forms of emulsion instability, where droplets merge and lead to phase separation. Phase inversion (D) is a complete shift of the continuous and dispersed phases and cannot be reversed by simple shaking."
+    },
+    {
+      "question_number": 18,
+      "question": "In deflocculated suspensions, the particles:",
+      "options": {
+        "A": "Form a hard cake upon settling",
+        "B": "Settle rapidly and redisperse easily",
+        "C": "Remain suspended indefinitely",
+        "D": "Float to the top of the liquid"
+      },
+      "answer": "(A) Form a hard cake upon settling",
+      "explanation": "In deflocculated suspensions, particles remain as individual units and settle slowly, leading to the formation of a dense sediment or hard cake (A) that is difficult to redisperse. Flocculated suspensions, in contrast, settle faster but are easily redispersed (B). Particles do not remain indefinitely suspended (C), and they do not float to the top (D) unless they are less dense than the medium."
+    },
+    {
+      "question_number": 19,
+      "question": "The formation of large crystals can be promoted by:",
+      "options": {
+        "A": "Slow cooling",
+        "B": "Rapid cooling",
+        "C": "Adding impurities",
+        "D": "Increasing solute concentration"
+      },
+      "answer": "(A) Slow cooling",
+      "explanation": "Slow cooling (A) allows molecules to align in a structured manner, promoting the formation of large, well-ordered crystals. Rapid cooling (B) results in smaller, less defined crystals. Adding impurities (C) can interfere with crystal formation. Increasing solute concentration (D) may promote crystallization but does not necessarily lead to larger crystals."
+    },
+    {
+      "question_number": 20,
+      "question": "The principle of vacuum distillation is based on:",
+      "options": {
+        "A": "Reducing pressure to lower boiling points",
+        "B": "Increasing pressure to raise boiling points",
+        "C": "Using a solvent for separation",
+        "D": "Crystallization of volatile components"
+      },
+      "answer": "(A) Reducing pressure to lower boiling points",
+      "explanation": "Vacuum distillation (A) works by reducing the pressure within the system, which lowers the boiling points of liquids and allows them to be separated at lower temperatures, minimizing thermal degradation. Increasing pressure (B) raises boiling points, which is not desirable in vacuum distillation. Using a solvent (C) is a principle of solvent extraction, not distillation. Crystallization (D) is unrelated to the distillation process."
+    },
+    {
+      "question_number": 21,
+      "question": "The choice of solvent in liquid-liquid extraction is based on:",
+      "options": {
+        "A": "Polarity differences between solvents",
+        "B": "The molecular weight of the solute",
+        "C": "The solubility of the solvent in water",
+        "D": "The density of the solvent"
+      },
+      "answer": "(A) Polarity differences between solvents",
+      "explanation": "Liquid-liquid extraction relies on differences in polarity between solvents (A) to achieve separation. The molecular weight of the solute (B) is less important than its solubility. While solvent solubility in water (C) is a factor, it is not the primary criterion. The density of the solvent (D) can affect separation efficiency but is not the main factor for solvent selection."
+    },
+    {
+      "question_number": 22,
+      "question": "The duration of maceration for the extraction of medicinal plant materials is usually:",
+      "options": {
+        "A": "A few minutes",
+        "B": "1-2 hours",
+        "C": "3-7 days",
+        "D": "More than a month"
+      },
+      "answer": "(C) 3-7 days",
+      "explanation": "Maceration is a common extraction method where medicinal plant materials are soaked in a suitable solvent for 3-7 days (C) to ensure adequate extraction of active constituents. A few minutes (A) or 1-2 hours (B) are insufficient for complete extraction. Extractions lasting more than a month (D) are rarely necessary."
+    },
+    {
+      "question_number": 23,
+      "question": "The Stefan-Boltzmann Law is applicable to which type of heat transfer?",
+      "options": {
+        "A": "Conduction",
+        "B": "Convection",
+        "C": "Radiation",
+        "D": "None of the above"
+      },
+      "answer": "(C) Radiation",
+      "explanation": "The Stefan-Boltzmann Law (C) describes the heat energy emitted by a black body due to thermal radiation. It does not apply to conduction (A) or convection (B), which involve heat transfer through direct contact or fluid movement."
+    },
+    {
+      "question_number": 24,
+      "question": "Which is the most common manual method for filling hard gelatin capsules?",
+      "options": {
+        "A": "Wet granulation",
+        "B": "Dry granulation",
+        "C": "Auger filling method",
+        "D": "Punch method"
+      },
+      "answer": "(D) Punch method",
+      "explanation": "The punch method (D) is the most common technique for manually filling hard gelatin capsules, where the empty capsule is pressed into a bed of powdered drug. Wet granulation (A) and dry granulation (B) are methods used for tablet formulation. The auger filling method (C) is used in automated capsule filling machines."
+    },
+    {
+      "question_number": 25,
+      "question": "According to DRAP, which form is required for the registration of drugs and biological products using the Common Technical Document (CTD)?",
+      "options": {
+        "a": "Form 5B",
+        "b": "Form 5F",
+        "c": "Form 5A",
+        "d": "Form 5D"
+      },
+      "answer": "b) Form 5F",
+      "explanation": "Form 5F: Application for registration of drugs and biological products using the Common Technical Document (CTD).  Form 5B: Application for renewal of drug registration (Drugs for Human Use).  Form 5A: Application for registration of an imported drug (Drugs for Veterinary Use).  Form 5D: Application for registration of new drug molecules or new combinations (Drugs for Veterinary Use)"
+    },
+    {
+      "question_number": 26,
+      "question": "According to DRAP, which form is required to apply for the grant of a drug manufacturing license?",
+      "options": {
+        "a": "Form 1",
+        "b": "Form 2",
+        "c": "Form 3",
+        "d": "Form 1A"
+      },
+      "answer": "a) Form 1",
+      "explanation": "Form 2: Application for licensing of a contract-giving company (Licensing and Inspections). Form 3: Application for grant of a drug manufacturing license for experimental purposes (Licensing and Inspections). Form 1A: Application for renewal of a drug manufacturing license (Licensing and Inspections)."
+    },
+    {
+      "question_number": 27,
+      "question": "What term describes a pharmaceutical product that lacks the labeling required by regulations?",
+      "options": {
+        "A": "Properly labeled",
+        "B": "Falsely branded",
+        "C": "Misbranded",
+        "D": "Unlabeled"
+      },
+      "answer": "C) Misbranded",
+      "explanation": "A misbranded drug is one that does not comply with the labeling requirements set forth by regulations, meaning it is not labeled as required by law."
+    },
+    {
+      "question_number": 28,
+      "question": "Under Punjab Drug Rules, how long is a drug sale license valid before renewal is required?",
+      "options": {
+        "A": "5 years",
+        "B": "3 years",
+        "C": "4 years",
+        "D": "1 year"
+      },
+      "answer": "C) 5 years",
+      "explanation": "A drug sale license is valid for 5 years unless canceled or suspended earlier."
+    },
+    {
+      "question_number": 29,
+      "question": "Which spectroscopy technique is used to determine the functional groups in a molecule?",
+      "options": {
+        "A": "UV-Visible Spectroscopy",
+        "B": "Infrared (IR) Spectroscopy",
+        "C": "Mass Spectroscopy",
+        "D": "Fluorescence Spectroscopy"
+      },
+      "answer": "B) Infrared (IR) Spectroscopy",
+      "explanation": "Infrared (IR) Spectroscopy is used to identify functional groups in a molecule by measuring their vibrational frequencies. Different functional groups absorb IR radiation at characteristic wavelengths. UV-Visible Spectroscopy (A) is used for electronic transitions, primarily in conjugated systems. Mass Spectroscopy (C) is used for molecular weight determination. Fluorescence Spectroscopy (D) measures the emission of light by excited molecules but is not specific to functional groups."
+    },
+    {
+      "question_number": 30,
+      "question": "What is the primary function of a monochromator in a spectrophotometer?",
+      "options": {
+        "A": "To separate different wavelengths of light",
+        "B": "To amplify the signal",
+        "C": "To detect emitted radiation",
+        "D": "To measure sample absorbance"
+      },
+      "answer": "A) To separate different wavelengths of light",
+      "explanation": "A monochromator is a key component in spectrophotometers used to isolate a specific wavelength of light from a broad spectrum. This ensures accurate absorbance measurements. Signal amplification (B) is the function of electronic amplifiers. Emitted radiation detection (C) is primarily used in fluorescence spectroscopy. Measuring sample absorbance (D) is the function of the detector, not the monochromator."
+    },
+    {
+      "question_number": 31,
+      "question": "Which chromatography technique is best suited for separating volatile compounds?",
+      "options": {
+        "A": "Thin Layer Chromatography (TLC)",
+        "B": "High-Performance Liquid Chromatography (HPLC)",
+        "C": "Gas Chromatography (GC)",
+        "D": "Paper Chromatography"
+      },
+      "answer": "C) Gas Chromatography (GC)",
+      "explanation": "Gas Chromatography (GC) is best suited for the separation of volatile compounds as it uses a gas as the mobile phase. Thin Layer Chromatography (A) and Paper Chromatography (D) are primarily used for non-volatile samples. High-Performance Liquid Chromatography (HPLC) (B) is used for liquid-phase separations."
+    },
+    {
+      "question_number": 32,
+      "question": "The Retention Factor (Rf) in Thin Layer Chromatography (TLC) is calculated as:",
+      "options": {
+        "A": "Distance traveled by the solvent / Distance traveled by the sample",
+        "B": "Distance traveled by the sample / Distance traveled by the solvent",
+        "C": "Distance traveled by the mobile phase / Distance traveled by the stationary phase",
+        "D": "Distance traveled by the sample + Distance traveled by the solvent"
+      },
+      "answer": "B) Distance traveled by the sample / Distance traveled by the solvent",
+      "explanation": "The Rf value is a measure of how far a compound moves in relation to the solvent front in TLC. It is calculated by dividing the distance traveled by the sample by the distance traveled by the solvent. The other options do not correctly describe the Rf formula."
+    },
+    {
+      "question_number": 33,
+      "question": "Which of the following is NOT a type of mass analyzer used in Mass Spectrometry?",
+      "options": {
+        "A": "Quadrupole",
+        "B": "Time-of-Flight (TOF)",
+        "C": "Electron Capture Detector",
+        "D": "Magnetic Sector"
+      },
+      "answer": "C) Electron Capture Detector",
+      "explanation": "Electron Capture Detector (ECD) is used in Gas Chromatography, not Mass Spectrometry. Quadrupole (A), Time-of-Flight (TOF) (B), and Magnetic Sector (D) are all types of mass analyzers used to separate ions based on their mass-to-charge ratio (m/z)."
+    },
+    {
+      "question_number": 34,
+      "question": "Which ionization technique is commonly used in Mass Spectrometry?",
+      "options": {
+        "A": "UV-Visible Absorption",
+        "B": "Electron Impact (EI)",
+        "C": "Fluorescence Emission",
+        "D": "X-Ray Diffraction"
+      },
+      "answer": "B) Electron Impact (EI)",
+      "explanation": "Electron Impact (EI) is one of the most common ionization techniques in Mass Spectrometry, where a high-energy electron beam ionizes molecules. UV-Visible Absorption (A) and Fluorescence Emission (C) are optical techniques, not ionization methods. X-Ray Diffraction (D) is used for structural determination of crystalline materials, not for mass spectrometry."
+    },
+    {
+      "question_number": 35,
+      "question": "The main principle of X-ray Diffraction (XRD) is based on:",
+      "options": {
+        "A": "Absorption of X-rays by molecules",
+        "B": "Scattering of X-rays by a crystalline material",
+        "C": "Emission of X-rays from excited atoms",
+        "D": "Reflection of X-rays from a mirror"
+      },
+      "answer": "B) Scattering of X-rays by a crystalline material",
+      "explanation": "X-ray Diffraction (XRD) is a technique used to determine the atomic structure of crystalline materials. It works by analyzing the scattering pattern of X-rays when they interact with a crystal lattice. Absorption (A), Emission (C), and Reflection (D) are not the primary principles of XRD."
+    },
+    {
+      "question_number": 36,
+      "question": "What is the role of a carrier gas in Gas Chromatography (GC)?",
+      "options": {
+        "A": "To provide a reaction medium",
+        "B": "To act as the stationary phase",
+        "C": "To carry the sample through the column",
+        "D": "To increase detector sensitivity"
+      },
+      "answer": "C) To carry the sample through the column",
+      "explanation": "In Gas Chromatography (GC), the carrier gas (such as helium or nitrogen) serves as the mobile phase and transports the sample through the column. It does not provide a reaction medium (A), act as the stationary phase (B), or directly increase detector sensitivity (D)."
+    },
+    {
+      "question_number": 37,
+      "question": "Which of the following is the mobile phase in High-Performance Liquid Chromatography (HPLC)?",
+      "options": {
+        "A": "Gas",
+        "B": "Liquid",
+        "C": "Solid",
+        "D": "Supercritical Fluid"
+      },
+      "answer": "B) Liquid",
+      "explanation": "In HPLC, the mobile phase is a liquid that carries the sample through the stationary phase, allowing separation based on interactions between the sample and the column. Gas (A) is used in Gas Chromatography. Solid (C) is the stationary phase in some chromatographic methods. Supercritical Fluids (D) are used in Supercritical Fluid Chromatography (SFC)."
+    },
+    {
+      "question_number": 38,
+      "question": "Which of the following detectors is commonly used in HPLC?",
+      "options": {
+        "A": "Flame Ionization Detector (FID)",
+        "B": "Thermal Conductivity Detector (TCD)",
+        "C": "UV-Visible Detector",
+        "D": "Electron Capture Detector (ECD)"
+      },
+      "answer": "C) UV-Visible Detector",
+      "explanation": "The UV-Visible Detector is the most commonly used detector in HPLC, as many organic compounds absorb UV light. Flame Ionization Detector (FID) (A) and Thermal Conductivity Detector (TCD) (B) are used in Gas Chromatography. Electron Capture Detector (ECD) (D) is used for detecting halogenated compounds in Gas Chromatography."
+    },
+    {
+      "question_number": 39,
+      "question": "Which technique is used for separating charged biomolecules such as proteins and nucleic acids?",
+      "options": {
+        "A": "Gas Chromatography",
+        "B": "Ion-Exchange Chromatography",
+        "C": "Thin Layer Chromatography",
+        "D": "Supercritical Fluid Chromatography"
+      },
+      "answer": "B) Ion-Exchange Chromatography",
+      "explanation": "Ion-Exchange Chromatography is used to separate charged biomolecules such as proteins and nucleic acids based on their charge interactions with a charged stationary phase. Gas Chromatography (A) is used for volatile compounds. Thin Layer Chromatography (C) is used for small organic molecules. Supercritical Fluid Chromatography (D) is used for non-polar compounds."
+    },
+    {
+      "question_number": 40,
+      "question": "What is the primary mechanism of action of organophosphate insecticides?",
+      "options": {
+        "A": "Inhibition of acetylcholinesterase",
+        "B": "Blockade of muscarinic receptors",
+        "C": "Stimulation of nicotinic receptors",
+        "D": "Activation of β-adrenergic receptors"
+      },
+      "answer": "A) Inhibition of acetylcholinesterase",
+      "explanation": "Organophosphate insecticides act by irreversibly inhibiting acetylcholinesterase, leading to the accumulation of acetylcholine at synapses and excessive cholinergic stimulation. Blockade of muscarinic receptors (B) is the action of anticholinergic drugs like atropine. Stimulation of nicotinic receptors (C) occurs with nicotine but is not the primary mechanism of organophosphates. Activation of β-adrenergic receptors (D) is the function of adrenergic agonists, not organophosphates."
+    },
+    {
+      "question_number": 41,
+      "question": "Which of the following drugs is an antidote for organophosphate poisoning?",
+      "options": {
+        "A": "Atropine",
+        "B": "Physostigmine",
+        "C": "Edrophonium",
+        "D": "Acetylcholine"
+      },
+      "answer": "A) Atropine",
+      "explanation": "Atropine is the primary antidote for organophosphate poisoning as it blocks muscarinic receptors, reducing the effects of excess acetylcholine. Physostigmine (B) is an acetylcholinesterase inhibitor and would worsen toxicity. Edrophonium (C) is a short-acting acetylcholinesterase inhibitor used to diagnose myasthenia gravis. Acetylcholine (D) would exacerbate organophosphate toxicity."
+    },
+    {
+      "question_number": 42,
+      "question": "Which cholinergic drug is commonly used in the diagnosis of myasthenia gravis?",
+      "options": {
+        "A": "Neostigmine",
+        "B": "Edrophonium",
+        "C": "Pyridostigmine",
+        "D": "Echothiophate"
+      },
+      "answer": "B) Edrophonium",
+      "explanation": "Edrophonium is a short-acting acetylcholinesterase inhibitor used in the Tensilon test to diagnose myasthenia gravis. Neostigmine (A) and Pyridostigmine (C) are used for long-term management, while Echothiophate (D) is an irreversible acetylcholinesterase inhibitor used for glaucoma."
+    },
+    {
+      "question_number": 43,
+      "question": "Which drug is used to treat atropine toxicity?",
+      "options": {
+        "A": "Atropine",
+        "B": "Pralidoxime",
+        "C": "Physostigmine",
+        "D": "Epinephrine"
+      },
+      "answer": "C) Physostigmine",
+      "explanation": "Physostigmine is a reversible acetylcholinesterase inhibitor that can cross the blood-brain barrier and counteract central anticholinergic toxicity caused by atropine. Pralidoxime (B) is used in organophosphate poisoning, not atropine toxicity. Atropine (A) itself causes toxicity. Epinephrine (D) has no role in atropine poisoning treatment."
+    },
+    {
+      "question_number": 44,
+      "question": "Which drug is most commonly used for the treatment of bradycardia?",
+      "options": {
+        "A": "Atropine",
+        "B": "Dopamine",
+        "C": "Epinephrine",
+        "D": "Isoproterenol"
+      },
+      "answer": "A) Atropine",
+      "explanation": "Atropine is the first-line drug for treating symptomatic bradycardia as it blocks vagal stimulation of the heart, increasing heart rate. Dopamine (B) and Epinephrine (C) can be used if atropine is ineffective, but they are primarily vasopressors. Isoproterenol (D) is a β-agonist with some chronotropic effects but is not the first choice."
+    },
+    {
+      "question_number": 45,
+      "question": "Which drug is an ultra-short-acting β-blocker used in hypertensive emergencies?",
+      "options": {
+        "A": "Propranolol",
+        "B": "Esmolol",
+        "C": "Atenolol",
+        "D": "Nadolol"
+      },
+      "answer": "B) Esmolol",
+      "explanation": "Esmolol is an ultra-short-acting β1-blocker used in hypertensive emergencies due to its rapid onset and short duration of action. Propranolol (A) is a non-selective β-blocker with a longer duration. Atenolol (C) is a selective β1-blocker but is longer-acting. Nadolol (D) is a long-acting β-blocker."
+    },
+    {
+      "question_number": 46,
+      "question": "Which α2-adrenergic agonist is used in hypertension and opioid withdrawal?",
+      "options": {
+        "A": "Clonidine",
+        "B": "Phenylephrine",
+        "C": "Dobutamine",
+        "D": "Midodrine"
+      },
+      "answer": "A) Clonidine",
+      "explanation": "Clonidine is an α2-adrenergic agonist that reduces sympathetic outflow, leading to decreased blood pressure and is also used for opioid withdrawal symptoms. Phenylephrine (B) is an α1-agonist used for nasal congestion. Dobutamine (C) is a β1-agonist used for heart failure. Midodrine (D) is an α1-agonist used for orthostatic hypotension."
+    },
+    {
+      "question_number": 47,
+      "question": "Which β-blocker is preferred in patients with heart failure?",
+      "options": {
+        "A": "Metoprolol",
+        "B": "Propranolol",
+        "C": "Atenolol",
+        "D": "Esmolol"
+      },
+      "answer": "A) Metoprolol",
+      "explanation": "Metoprolol is a selective β1-blocker that improves survival in heart failure patients by reducing cardiac workload. Propranolol (B) is non-selective and not recommended in heart failure. Atenolol (C) has less evidence supporting its use in heart failure. Esmolol (D) is ultra-short-acting and not used for chronic heart failure."
+    },
+    {
+      "question_number": 48,
+      "question": "Which drug is a selective α1-blocker used for benign prostatic hyperplasia (BPH)?",
+      "options": {
+        "A": "Phentolamine",
+        "B": "Prazosin",
+        "C": "Tamsulosin",
+        "D": "Yohimbine"
+      },
+      "answer": "C) Tamsulosin",
+      "explanation": "Tamsulosin is a selective α1A-blocker that relaxes smooth muscle in the prostate and bladder neck, improving urinary flow in BPH. Phentolamine (A) is a non-selective α-blocker used in pheochromocytoma. Prazosin (B) is used for hypertension but is not as selective for BPH. Yohimbine (D) is an α2-antagonist with different pharmacological effects."
+    },
+    {
+      "question_number": 49,
+      "question": "Which of the following drugs is an α1-agonist used as a decongestant?",
+      "options": {
+        "A": "Phenylephrine",
+        "B": "Clonidine",
+        "C": "Dobutamine",
+        "D": "Albuterol"
+      },
+      "answer": "A) Phenylephrine",
+      "explanation": "Phenylephrine is a selective α1-agonist used as a nasal decongestant by causing vasoconstriction in nasal mucosa. Clonidine (B) is an α2-agonist used for hypertension. Dobutamine (C) is a β1-agonist used in heart failure. Albuterol (D) is a β2-agonist used for asthma."
+    },
+    {
+      "question_number": 50,
+      "question": "Which muscarinic antagonist is used for overactive bladder treatment?",
+      "options": {
+        "A": "Atropine",
+        "B": "Oxybutynin",
+        "C": "Scopolamine",
+        "D": "Pilocarpine"
+      },
+      "answer": "B) Oxybutynin",
+      "explanation": "Oxybutynin is a muscarinic antagonist that reduces bladder contractions, making it useful for treating overactive bladder. Atropine (A) is primarily used for bradycardia. Scopolamine (C) is used for motion sickness. Pilocarpine (D) is a muscarinic agonist used in glaucoma, not overactive bladder."
+    },
+    {
+      "question_number": 51,
+      "question": "Which β-blocker is most commonly used in heart failure with reduced ejection fraction (HFrEF)?",
+      "options": {
+        "A": "Propranolol",
+        "B": "Carvedilol",
+        "C": "Esmolol",
+        "D": "Atenolol"
+      },
+      "answer": "B) Carvedilol",
+      "explanation": "Carvedilol is a non-selective β-blocker with α1-blocking properties that improves survival in heart failure patients by reducing afterload and improving left ventricular function. Propranolol (A) is a non-selective β-blocker but is not typically used in HFrEF. Esmolol (C) is a short-acting β-blocker used in hypertensive emergencies. Atenolol (D) is a selective β1-blocker but is not the preferred choice for heart failure."
+    },
+    {
+      "question_number": 52,
+      "question": "Which of the following drugs is an aldosterone antagonist used in heart failure?",
+      "options": {
+        "A": "Furosemide",
+        "B": "Spironolactone",
+        "C": "Hydrochlorothiazide",
+        "D": "Acetazolamide"
+      },
+      "answer": "B) Spironolactone",
+      "explanation": "Spironolactone is a potassium-sparing diuretic and aldosterone antagonist used in heart failure to reduce fluid retention and prevent cardiac remodeling. Furosemide (A) is a loop diuretic, Hydrochlorothiazide (C) is a thiazide diuretic, and Acetazolamide (D) is a carbonic anhydrase inhibitor, none of which antagonize aldosterone."
+    },
+    {
+      "question_number": 53,
+      "question": "Which of the following is a potassium-sparing diuretic that blocks sodium channels in the distal tubule?",
+      "options": {
+        "A": "Amiloride",
+        "B": "Furosemide",
+        "C": "Hydrochlorothiazide",
+        "D": "Acetazolamide"
+      },
+      "answer": "A) Amiloride",
+      "explanation": "Amiloride is a potassium-sparing diuretic that directly blocks sodium channels in the distal tubule, reducing sodium reabsorption and potassium loss. Furosemide (B) is a loop diuretic, Hydrochlorothiazide (C) is a thiazide diuretic, and Acetazolamide (D) is a carbonic anhydrase inhibitor."
+    },
+    {
+      "question_number": 54,
+      "question": "Which of the following calcium channel blockers is a dihydropyridine?",
+      "options": {
+        "A": "Verapamil",
+        "B": "Diltiazem",
+        "C": "Amlodipine",
+        "D": "Digoxin"
+      },
+      "answer": "C) Amlodipine",
+      "explanation": "Amlodipine is a dihydropyridine calcium channel blocker primarily used for hypertension and angina by causing vasodilation. Verapamil (A) and Diltiazem (B) are non-dihydropyridine calcium channel blockers that also affect cardiac conduction. Digoxin (D) is a cardiac glycoside, not a calcium channel blocker."
+    },
+    {
+      "question_number": 55,
+      "question": "Which antihypertensive drug is contraindicated in pregnancy due to teratogenic effects?",
+      "options": {
+        "A": "Methyldopa",
+        "B": "Labetalol",
+        "C": "Enalapril",
+        "D": "Hydralazine"
+      },
+      "answer": "C) Enalapril",
+      "explanation": "Enalapril, an angiotensin-converting enzyme (ACE) inhibitor, is contraindicated in pregnancy due to the risk of fetal renal dysfunction and developmental abnormalities. Methyldopa (A) and Labetalol (B) are safe options for hypertension in pregnancy. Hydralazine (D) is used in hypertensive emergencies during pregnancy."
+    },
+    {
+      "question_number": 56,
+      "question": "Which drug is used for hypertensive emergency and acts by releasing nitric oxide?",
+      "options": {
+        "A": "Hydralazine",
+        "B": "Sodium nitroprusside",
+        "C": "Labetalol",
+        "D": "Clonidine"
+      },
+      "answer": "B) Sodium nitroprusside",
+      "explanation": "Sodium nitroprusside is a potent vasodilator that releases nitric oxide, leading to rapid blood pressure reduction in hypertensive emergencies. Hydralazine (A) also acts via nitric oxide but is not as fast-acting. Labetalol (C) is a combined α- and β-blocker used in hypertensive emergencies. Clonidine (D) is an α2-agonist used for chronic hypertension but not emergencies."
+    },
+    {
+      "question_number": 57,
+      "question": "Which of the following antiarrhythmic drugs belongs to Class IB?",
+      "options": {
+        "A": "Amiodarone",
+        "B": "Lidocaine",
+        "C": "Flecainide",
+        "D": "Sotalol"
+      },
+      "answer": "B) Lidocaine",
+      "explanation": "Lidocaine is a Class IB antiarrhythmic drug that blocks sodium channels and is used for ventricular arrhythmias. Amiodarone (A) and Sotalol (D) are Class III agents. Flecainide (C) is a Class IC antiarrhythmic."
+    },
+    {
+      "question_number": 58,
+      "question": "Which anticoagulant acts by directly inhibiting thrombin (Factor IIa)?",
+      "options": {
+        "A": "Warfarin",
+        "B": "Heparin",
+        "C": "Dabigatran",
+        "D": "Clopidogrel"
+      },
+      "answer": "C) Dabigatran",
+      "explanation": "Dabigatran is a direct thrombin (Factor IIa) inhibitor used for stroke prevention in atrial fibrillation. Warfarin (A) inhibits vitamin K-dependent clotting factors. Heparin (B) enhances antithrombin III activity. Clopidogrel (D) is an antiplatelet drug, not an anticoagulant."
+    },
+    {
+      "question_number": 59,
+      "question": "Which fibrinolytic drug is used in the treatment of acute ischemic stroke?",
+      "options": {
+        "A": "Streptokinase",
+        "B": "Alteplase",
+        "C": "Heparin",
+        "D": "Warfarin"
+      },
+      "answer": "B) Alteplase",
+      "explanation": "Alteplase is a recombinant tissue plasminogen activator (tPA) used to dissolve thrombi in acute ischemic stroke. Streptokinase (A) is a non-recombinant thrombolytic agent. Heparin (C) and Warfarin (D) are anticoagulants, not fibrinolytics."
+    },
+    {
+      "question_number": 60,
+      "question": "Which drug is a selective inhibitor of Factor Xa?",
+      "options": {
+        "A": "Dabigatran",
+        "B": "Rivaroxaban",
+        "C": "Warfarin",
+        "D": "Clopidogrel"
+      },
+      "answer": "B) Rivaroxaban",
+      "explanation": "Rivaroxaban is a direct Factor Xa inhibitor used for stroke prevention in atrial fibrillation and deep vein thrombosis (DVT) prophylaxis. Dabigatran (A) inhibits thrombin. Warfarin (C) inhibits vitamin K-dependent clotting factors. Clopidogrel (D) is an antiplatelet agent."
+    },
+    {
+      "question_number": 61,
+      "question": "Which lipid-lowering drug is a PCSK9 inhibitor?",
+      "options": {
+        "A": "Atorvastatin",
+        "B": "Ezetimibe",
+        "C": "Alirocumab",
+        "D": "Fenofibrate"
+      },
+      "answer": "C) Alirocumab",
+      "explanation": "Alirocumab is a PCSK9 inhibitor that enhances LDL receptor recycling, leading to reduced LDL cholesterol levels. Atorvastatin (A) is an HMG-CoA reductase inhibitor (statin). Ezetimibe (B) inhibits cholesterol absorption. Fenofibrate (D) is a fibrate used for hypertriglyceridemia."
+    },
+    {
+      "question_number": 62,
+      "question": "Which of the following drugs is a bile acid sequestrant?",
+      "options": {
+        "A": "Colesevelam",
+        "B": "Ezetimibe",
+        "C": "Rosuvastatin",
+        "D": "Niacin"
+      },
+      "answer": "A) Colesevelam",
+      "explanation": "Colesevelam is a bile acid sequestrant that binds bile acids in the intestine, reducing cholesterol levels. Ezetimibe (B) inhibits cholesterol absorption. Rosuvastatin (C) is a statin. Niacin (D) reduces triglyceride and LDL levels."
+    },
+    {
+      "question_number": 63,
+      "question": "Which drug is a selective estrogen receptor modulator (SERM) used for osteoporosis?",
+      "options": {
+        "A": "Raloxifene",
+        "B": "Alendronate",
+        "C": "Denosumab",
+        "D": "Teriparatide"
+      },
+      "answer": "A) Raloxifene",
+      "explanation": "Raloxifene is a selective estrogen receptor modulator (SERM) that mimics estrogen's beneficial effects on bone while acting as an antagonist in breast tissue, reducing the risk of breast cancer. Alendronate (B) is a bisphosphonate. Denosumab (C) is a RANKL inhibitor. Teriparatide (D) is a parathyroid hormone analog that stimulates bone formation."
+    },
+    {
+      "question_number": 64,
+      "question": "Which of the following is a rapid-acting insulin analog?",
+      "options": {
+        "A": "Insulin glargine",
+        "B": "Insulin aspart",
+        "C": "Insulin detemir",
+        "D": "Insulin degludec"
+      },
+      "answer": "B) Insulin aspart",
+      "explanation": "Insulin aspart is a rapid-acting insulin analog that has a fast onset of action and is used for postprandial glucose control. Insulin glargine (A), Insulin detemir (C), and Insulin degludec (D) are long-acting insulins used for basal insulin therapy."
+    },
+    {
+      "question_number": 65,
+      "question": "Which drug is a dipeptidyl peptidase-4 (DPP-4) inhibitor used for type 2 diabetes?",
+      "options": {
+        "A": "Metformin",
+        "B": "Sitagliptin",
+        "C": "Pioglitazone",
+        "D": "Glipizide"
+      },
+      "answer": "B) Sitagliptin",
+      "explanation": "Sitagliptin is a DPP-4 inhibitor that enhances incretin hormone action, increasing insulin release and decreasing glucagon secretion. Metformin (A) is a biguanide. Pioglitazone (C) is a thiazolidinedione. Glipizide (D) is a sulfonylurea."
+    },
+    {
+      "question_number": 66,
+      "question": "Which of the following is a sodium-glucose co-transporter-2 (SGLT2) inhibitor?",
+      "options": {
+        "A": "Canagliflozin",
+        "B": "Exenatide",
+        "C": "Liraglutide",
+        "D": "Glimepiride"
+      },
+      "answer": "A) Canagliflozin",
+      "explanation": "Canagliflozin is an SGLT2 inhibitor that reduces glucose reabsorption in the kidney, leading to increased glucose excretion in urine. Exenatide (B) and Liraglutide (C) are GLP-1 receptor agonists. Glimepiride (D) is a sulfonylurea."
+    },
+    {
+      "question_number": 67,
+      "question": "Which drug is a glucagon-like peptide-1 (GLP-1) receptor agonist?",
+      "options": {
+        "A": "Acarbose",
+        "B": "Liraglutide",
+        "C": "Repaglinide",
+        "D": "Rosiglitazone"
+      },
+      "answer": "B) Liraglutide",
+      "explanation": "Liraglutide is a GLP-1 receptor agonist that enhances glucose-dependent insulin secretion, delays gastric emptying, and reduces appetite. Acarbose (A) is an alpha-glucosidase inhibitor. Repaglinide (C) is a meglitinide. Rosiglitazone (D) is a thiazolidinedione."
+    },
+    {
+      "question_number": 68,
+      "question": "Which thyroid drug is preferred for the treatment of hypothyroidism?",
+      "options": {
+        "A": "Liothyronine",
+        "B": "Levothyroxine",
+        "C": "Methimazole",
+        "D": "Propylthiouracil"
+      },
+      "answer": "B) Levothyroxine",
+      "explanation": "Levothyroxine is the preferred drug for hypothyroidism as it provides a stable source of T4, which is converted into the active T3 hormone in the body. Liothyronine (A) is synthetic T3 but has a shorter half-life. Methimazole (C) and Propylthiouracil (D) are used for hyperthyroidism."
+    },
+    {
+      "question_number": 69,
+      "question": "Which drug is the first-line treatment for hyperthyroidism?",
+      "options": {
+        "A": "Levothyroxine",
+        "B": "Methimazole",
+        "C": "Liothyronine",
+        "D": "Fludrocortisone"
+      },
+      "answer": "B) Methimazole",
+      "explanation": "Methimazole is the first-line drug for hyperthyroidism as it inhibits thyroid hormone synthesis by blocking the enzyme thyroid peroxidase. Levothyroxine (A) and Liothyronine (C) are thyroid hormone replacements used for hypothyroidism. Fludrocortisone (D) is a mineralocorticoid used in adrenal insufficiency."
+    },
+    {
+      "question_number": 70,
+      "question": "Which hormone stimulates the release of insulin from the pancreas?",
+      "options": {
+        "A": "Glucagon",
+        "B": "Somatostatin",
+        "C": "Incretins",
+        "D": "Cortisol"
+      },
+      "answer": "C) Incretins",
+      "explanation": "Incretins, such as GLP-1 and GIP, enhance glucose-dependent insulin secretion from pancreatic beta cells. Glucagon (A) increases blood sugar by promoting glycogen breakdown. Somatostatin (B) inhibits insulin and glucagon secretion. Cortisol (D) is a glucocorticoid that increases blood sugar levels."
+    },
+    {
+      "question_number": 71,
+      "question": "Which corticosteroid has the highest mineralocorticoid activity?",
+      "options": {
+        "A": "Hydrocortisone",
+        "B": "Fludrocortisone",
+        "C": "Prednisolone",
+        "D": "Dexamethasone"
+      },
+      "answer": "B) Fludrocortisone",
+      "explanation": "Fludrocortisone has the highest mineralocorticoid activity and is used in Addison’s disease and adrenal insufficiency to maintain sodium balance. Hydrocortisone (A) has both glucocorticoid and mineralocorticoid activity. Prednisolone (C) and Dexamethasone (D) are primarily glucocorticoids."
+    },
+    {
+      "question_number": 72,
+      "question": "Which drug is a first-line option to prevent preterm labor now a days?",
+      "options": {
+        "A": "Oxytocin",
+        "B": "Misoprostol",
+        "C": "Nifedipine",
+        "D": "Carboprost"
+      },
+      "answer": "C) Nifedipine",
+      "explanation": "Nifedipine, a calcium channel blocker, is a preferred tocolytic for preterm labor due to its efficacy and safety profile. Ritodrine, a β2-agonist, is less commonly used now due to maternal side effects (used in history). Oxytocin (A) and Misoprostol (B) stimulate contractions. Carboprost (D) induces labor."
+    },
+    {
+      "question_number": 73,
+      "question": "Which drug is used for medical termination of pregnancy?",
+      "options": {
+        "A": "Levonorgestrel",
+        "B": "Mifepristone",
+        "C": "Clomiphene",
+        "D": "Letrozole"
+      },
+      "answer": "B) Mifepristone",
+      "explanation": "Mifepristone is a progesterone receptor antagonist used for medical termination of pregnancy in combination with Misoprostol. Levonorgestrel (A) is an emergency contraceptive. Clomiphene (C) and Letrozole (D) are used for ovulation induction."
+    },
+    {
+      "question_number": 74,
+      "question": "Which hormone stimulates milk ejection during breastfeeding?",
+      "options": {
+        "A": "Prolactin",
+        "B": "Oxytocin",
+        "C": "Estrogen",
+        "D": "Progesterone"
+      },
+      "answer": "B) Oxytocin",
+      "explanation": "Oxytocin causes contraction of myoepithelial cells in the mammary glands, leading to milk ejection. Prolactin (A) stimulates milk production. Estrogen (C) and Progesterone (D) inhibit lactation during pregnancy."
+    },
+    {
+      "question_number": 75,
+      "question": "Which drug is used to treat acromegaly by inhibiting growth hormone secretion?",
+      "options": {
+        "A": "Octreotide",
+        "B": "Somatropin",
+        "C": "Cabergoline",
+        "D": "Leuprolide"
+      },
+      "answer": "A) Octreotide",
+      "explanation": "Octreotide is a somatostatin analog that inhibits growth hormone secretion, making it useful for treating acromegaly. Somatropin (B) is a recombinant growth hormone. Cabergoline (C) is a dopamine agonist used for prolactinomas. Leuprolide (D) is a GnRH agonist used for prostate cancer and endometriosis."
+    },
+    {
+      "question_number": 76,
+      "question": "Which cephalosporin has anti-anaerobic activity and is used for Bacteroides fragilis infections?",
+      "options": {
+        "A": "Cefepime",
+        "B": "Cefoxitin",
+        "C": "Ceftriaxone",
+        "D": "Cefazolin"
+      },
+      "answer": "B) Cefoxitin",
+      "explanation": "Cefoxitin is a second-generation cephalosporin with strong activity against anaerobes, including Bacteroides fragilis, making it useful in intra-abdominal and pelvic infections. Cefepime (A) is a fourth-generation cephalosporin with broad-spectrum activity but lacks significant anaerobic coverage. Ceftriaxone (C) is effective against gram-negative bacteria but has limited anaerobic activity. Cefazolin (D) is a first-generation cephalosporin that mainly covers gram-positive bacteria."
+    },
+    {
+      "question_number": 77,
+      "question": "Which cephalosporin is preferred for treating Neisseria gonorrhoeae infections due to its long half-life and good penetration?",
+      "options": {
+        "A": "Cefotaxime",
+        "B": "Ceftriaxone",
+        "C": "Cephalexin",
+        "D": "Cefepime"
+      },
+      "answer": "B) Ceftriaxone",
+      "explanation": "Ceftriaxone is a third-generation cephalosporin with excellent penetration into tissues and a long half-life, making it the drug of choice for Neisseria gonorrhoeae infections. Cefotaxime (A) is also a third-generation cephalosporin but is used more for bacterial meningitis. Cephalexin (C) is a first-generation cephalosporin with poor activity against Neisseria gonorrhoeae. Cefepime (D) is a fourth-generation cephalosporin with broad-spectrum activity but is not the preferred choice for gonorrhea."
+    },
+    {
+      "question_number": 78,
+      "question": "Which antiviral agent is used as a topical treatment for genital warts caused by human papillomavirus (HPV)?",
+      "options": {
+        "A": "Foscarnet",
+        "B": "Imiquimod",
+        "C": "Ganciclovir",
+        "D": "Cidofovir"
+      },
+      "answer": "B) Imiquimod",
+      "explanation": "Imiquimod is an immune response modifier that enhances the body's ability to clear HPV-related genital warts. It works by stimulating cytokine release, particularly interferon-α. Foscarnet (A) is used for resistant herpes infections. Ganciclovir (C) treats cytomegalovirus (CMV) infections. Cidofovir (D) is also used for CMV infections and is not a first-line treatment for HPV warts."
+    },
+    {
+      "question_number": 79,
+      "question": "What is the primary mechanism of action of azathioprine?",
+      "options": {
+        "A": "mTOR inhibition",
+        "B": "DNA alkylation",
+        "C": "Purine synthesis inhibition",
+        "D": "Calcineurin inhibition"
+      },
+      "answer": "C) Purine synthesis inhibition",
+      "explanation": "Azathioprine is an immunosuppressant that gets converted to 6-mercaptopurine, which inhibits purine synthesis, reducing DNA replication in rapidly dividing immune cells. This makes it useful for preventing organ transplant rejection and treating autoimmune diseases. mTOR inhibitors (A) like sirolimus work differently. DNA alkylation (B) is a mechanism used by chemotherapy drugs. Calcineurin inhibitors (D), such as cyclosporine and tacrolimus, work by suppressing T-cell activation."
+    },
+    {
+      "question_number": 80,
+      "question": "Which medicinal plant used for diabetes is also known as bitter melon?",
+      "options": {
+        "A": "Momordica charantia",
+        "B": "Gymnema sylvestre",
+        "C": "Punica granatum",
+        "D": "Melia azadirachta"
+      },
+      "answer": "A) Momordica charantia",
+      "explanation": "Momordica charantia, commonly known as bitter melon, is used in traditional medicine for managing diabetes due to its hypoglycemic effects. Gymnema sylvestre (B) is known for reducing sugar cravings. Punica granatum (C), or pomegranate, has antioxidant properties. Melia azadirachta (D), or neem, is used for its antimicrobial effects but is not primarily known for diabetes management."
+    },
+    {
+      "question_number": 81,
+      "question": "Which of the following is an opioid alkaloid derived from Papaver somniferum?",
+      "options": {
+        "A": "Thebaine",
+        "B": "Strychnine",
+        "C": "Atropine",
+        "D": "Scopolamine"
+      },
+      "answer": "A) Thebaine",
+      "explanation": "Thebaine is an opioid alkaloid found in the opium poppy (Papaver somniferum), serving as a precursor for the synthesis of semi-synthetic opioids like oxycodone and buprenorphine. Strychnine (B) is a toxic alkaloid derived from Strychnos nux-vomica. Atropine (C) and Scopolamine (D) are tropane alkaloids found in Datura and Atropa belladonna."
+    },
+    {
+      "question_number": 82,
+      "question": "Which CNS-active alkaloid is found in Datura stramonium?",
+      "options": {
+        "A": "Atropine",
+        "B": "Strychnine",
+        "C": "Morphine",
+        "D": "Cannabinol"
+      },
+      "answer": "A) Atropine",
+      "explanation": "Datura stramonium contains atropine, a tropane alkaloid with anticholinergic effects, used medically for bradycardia and organophosphate poisoning. Strychnine (B) is a potent neurotoxin. Morphine (C) is an opioid analgesic. Cannabinol (D) is a cannabinoid found in cannabis."
+    },
+    {
+      "question_number": 83,
+      "question": "Which part of Digitalis is used for medicinal purposes?",
+      "options": {
+        "A": "Root",
+        "B": "Leaves",
+        "C": "Bark",
+        "D": "Seeds"
+      },
+      "answer": "B) Leaves",
+      "explanation": "The leaves of Digitalis contain cardiac glycosides, such as digoxin and digitoxin, used to treat heart failure and atrial fibrillation. The root (A), bark (C), and seeds (D) do not contain significant medicinal compounds."
+    },
+    {
+      "question_number": 84,
+      "question": "Which solvent is commonly used for the extraction of anthraquinone glycosides?",
+      "options": {
+        "A": "Chloroform",
+        "B": "Methanol",
+        "C": "Hexane",
+        "D": "Benzene"
+      },
+      "answer": "B) Methanol",
+      "explanation": "Methanol is commonly used to extract anthraquinone glycosides from plants due to its polarity, allowing efficient solubilization. Chloroform (A) and Benzene (D) are non-polar solvents and less effective. Hexane (C) is used for lipid extractions."
+    },
+    {
+      "question_number": 85,
+      "question": "The presence of saponins in Glycyrrhiza contributes to which of the following actions?",
+      "options": {
+        "A": "Expectorant activity",
+        "B": "Hypnotic effect",
+        "C": "Antipyretic action",
+        "D": "Sedative property"
+      },
+      "answer": "A) Expectorant activity",
+      "explanation": "Glycyrrhiza (licorice) contains saponins, which promote expectoration by reducing mucus viscosity, making it easier to clear the airways. Hypnotic (B) and sedative (D) effects are associated with other herbs like valerian. Antipyretic action (C) is primarily seen with aspirin-like compounds."
+    },
+    {
+      "question_number": 86,
+      "question": "Which test is commonly used to detect the presence of Vanillin?",
+      "options": {
+        "A": "Ferric chloride test",
+        "B": "Schiff’s test",
+        "C": "Molisch’s test",
+        "D": "Fehling’s test"
+      },
+      "answer": "B) Schiff’s test",
+      "explanation": "Schiff’s test is used to detect aldehydes, including vanillin, producing a characteristic color change. Ferric chloride test (A) is used for phenolic compounds. Molisch’s test (C) detects carbohydrates. Fehling’s test (D) identifies reducing sugars."
+    },
+    {
+      "question_number": 88,
+      "question": "A solution contains 4% w/v of a drug. How much drug is in 250 mL?",
+      "options": {
+        "A": "5 g",
+        "B": "8 g",
+        "C": "10 g",
+        "D": "15 g"
+      },
+      "answer": "C) 10 g",
+      "explanation": "A 4% w/v solution means 4 g of drug is present in 100 mL of solution. To calculate the drug amount in 250 mL:\n4g/100ml * 250ml= 10g\nThus, the correct answer is 10 g."
+    },
+    {
+      "question_number": 89,
+      "question": "A physician prescribes 2.5 mg/kg of a drug for a 70 kg patient. If the drug is available in a 1:500 solution, what volume (in mL) should be administered?",
+      "options": {
+        "A": "35 mL",
+        "B": "87.5 mL",
+        "C": "17.5 mL",
+        "D": "50 mL"
+      },
+      "answer": "B) 87.5 mL",
+      "explanation": "First, calculate the total drug dose:\n2.5mg/kg * 70= 175mg\nA 1:500 solution means 1 g (1000 mg) is present in 500 mL, so:\n1000mg/500ml * 175 = 87.5ml\nThus, the correct answer is 87.5 mL."
+    },
+    {
+      "question_number": 90,
+      "question": "An infant is 15 months old. If the adult dose is 300 mg, what is the dose for the infant using Fried's rule?",
+      "options": {
+        "A": "20 mg",
+        "B": "25 mg",
+        "C": "30 mg",
+        "D": "35 mg"
+      },
+      "answer": "C) 30 mg",
+      "explanation": "Fried’s Rule formula:\nChild dose= age in months * Adult dose/150\nThus, the correct answer is 30 mg."
+    },
+    {
+      "question_number": 91,
+      "question": "Which method is commonly used in tincture preparation?",
+      "options": {
+        "A": "Percolation",
+        "B": "Levigation",
+        "C": "Trituration",
+        "D": "Direct compression"
+      },
+      "answer": "A) Percolation",
+      "explanation": "Percolation is a process of extracting active ingredients from plant materials using a solvent. It is commonly used in tincture preparation. Levigation (B) is used for reducing particle size. Trituration (C) involves grinding substances. Direct compression (D) is used in tablet formulation."
+    },
+    {
+      "question_number": 92,
+      "question": "Which property increases with stronger intermolecular forces in a liquid?",
+      "options": {
+        "A": "Volatility",
+        "B": "Vapor pressure",
+        "C": "Boiling point",
+        "D": "Compressibility"
+      },
+      "answer": "C) Boiling point",
+      "explanation": "Stronger intermolecular forces increase the boiling point because more energy is required to convert the liquid into vapor. Volatility (A) and vapor pressure (B) decrease with stronger intermolecular forces. Compressibility (D) is not significantly affected by intermolecular forces."
+    },
+    {
+      "question_number": 93,
+      "question": "Which of the following describes a supercritical fluid?",
+      "options": {
+        "A": "It behaves as both a liquid and a gas",
+        "B": "It is only found in the plasma state",
+        "C": "It forms only at very low temperatures",
+        "D": "It can only exist under vacuum conditions"
+      },
+      "answer": "A) It behaves as both a liquid and a gas",
+      "explanation": "A supercritical fluid exists at conditions above its critical temperature and pressure, where it exhibits properties of both a liquid (density) and a gas (diffusivity). It is not a plasma (B), does not form at low temperatures (C), and does not require a vacuum (D)."
+    },
+    {
+      "question_number": 94,
+      "question": "Biopharmaceutics is the study of:",
+      "options": {
+        "A": "Drug movement in the body",
+        "B": "The relationship between the physical and chemical properties of a drug and its bioavailability",
+        "C": "The formulation of drugs into dosage forms",
+        "D": "The study of drug metabolism"
+      },
+      "answer": "B) The relationship between the physical and chemical properties of a drug and its bioavailability",
+      "explanation": "Biopharmaceutics examines how a drug’s physicochemical properties affect its absorption, distribution, metabolism, and elimination (ADME). Drug movement (A) is part of pharmacokinetics. Drug formulation (C) is part of pharmaceutics. Drug metabolism (D) is a subset of pharmacokinetics."
+    },
+    {
+      "question_number": 95,
+      "question": "The process by which drug molecules enter cells via engulfment by the membrane is known as:",
+      "options": {
+        "A": "Passive diffusion",
+        "B": "Endocytosis",
+        "C": "Active transport",
+        "D": "Efflux transport"
+      },
+      "answer": "B) Endocytosis",
+      "explanation": "Endocytosis is a cellular process where drug molecules are engulfed by the cell membrane and internalized. Passive diffusion (A) occurs without energy. Active transport (C) requires energy and carrier proteins. Efflux transport (D) removes drugs from cells."
+    },
+    {
+      "question_number": 96,
+      "question": "Which of the following transport mechanisms requires energy for drug absorption?",
+      "options": {
+        "A": "Passive diffusion",
+        "B": "Facilitated diffusion",
+        "C": "Active transport",
+        "D": "Endocytosis"
+      },
+      "answer": "C) Active transport",
+      "explanation": "Active transport moves molecules against a concentration gradient using ATP and transport proteins. Passive diffusion (A) occurs along the gradient without energy. Facilitated diffusion (B) uses carriers but no energy. Endocytosis (D) is an energy-dependent engulfment process."
+    },
+    {
+      "question_number": 97,
+      "question": "The dissolution rate of a poorly soluble drug can be increased by:",
+      "options": {
+        "A": "Increasing drug particle size",
+        "B": "Using a more hydrophilic salt form",
+        "C": "Decreasing the drug surface area",
+        "D": "Reducing drug permeability"
+      },
+      "answer": "B) Using a more hydrophilic salt form",
+      "explanation": "A hydrophilic salt form increases drug solubility and dissolution. Increasing particle size (A) and reducing surface area (C) lower dissolution rates. Reducing permeability (D) affects absorption, not dissolution."
+    },
+    {
+      "question_number": 98,
+      "question": "Which of the following is an example of a two-compartment model drug?",
+      "options": {
+        "A": "Paracetamol",
+        "B": "Digoxin",
+        "C": "Ibuprofen",
+        "D": "Amoxicillin"
+      },
+      "answer": "B) Digoxin",
+      "explanation": "Digoxin follows a two-compartment model where it distributes into central (plasma) and peripheral (tissue) compartments before elimination. Paracetamol (A), Ibuprofen (C), and Amoxicillin (D) follow a one-compartment model."
+    },
+    {
+      "question_number": 99,
+      "question": "Which equation represents the mean residence time (MRT)?",
+      "options": {
+        "A": "MRT = AUC/AUMC",
+        "B": "MRT = AUMC/AUC",
+        "C": "MRT = 1/k",
+        "D": "MRT = Vd × Cl"
+      },
+      "answer": "B) MRT = AUMC/AUC",
+      "explanation": "Mean residence time (MRT) is calculated as the ratio of the area under the first moment curve (AUMC) to the area under the concentration-time curve (AUC). MRT=AUMC/AUC. The other options are incorrect pharmacokinetic equations."
+    },
+    {
+      "question_number": 100,
+      "question": "Apparent volume of distribution increases when:",
+      "options": {
+        "A": "More tissue binding of drug",
+        "B": "More protein binding of drug",
+        "C": "Both",
+        "D": "None"
+      },
+      "answer": "A) More tissue binding of drug",
+      "explanation": "The apparent volume of distribution (Vd) represents the extent to which a drug distributes into body tissues relative to the plasma. When a drug binds extensively to tissues (A), it moves out of plasma, increasing Vd. More protein binding in plasma (B) reduces free drug available for tissue distribution, leading to a lower Vd. Therefore, only tissue binding increases Vd."
+    }
+  ]
+}

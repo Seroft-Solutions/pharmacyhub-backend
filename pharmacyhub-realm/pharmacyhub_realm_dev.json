@@ -1,6 +1,6 @@
 {
   "id": "bf1d2e85-0034-4772-b864-b0409d596ff4",
-  "realm": "pharmacyhub-realm",
+  "realm": "pharmacyhub",
   "displayName": "Pharmacy Hub",
   "displayNameHtml": "Pharmacy Hub",
   "notBefore": 0,
@@ -194,7 +194,7 @@
       },
       {
         "id": "7f0a206f-78aa-4e04-94c6-d28c456dc7ec",
-        "name": "default-roles-pharmacyhub-realm",
+        "name": "default-roles-pharmacyhub",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
@@ -334,7 +334,7 @@
         "VIEW_PHARMACISTS",
         "EDIT_ADMIN",
         "CREATE_PHARMACISTS",
-        "default-roles-pharmacyhub-realm",
+        "default-roles-pharmacyhub",
         "EDIT_SALESMAN",
         "DELETE_SALESMAN",
         "EDIT_PROPRIETORS"
@@ -344,7 +344,7 @@
   ],
   "defaultRole": {
     "id": "7f0a206f-78aa-4e04-94c6-d28c456dc7ec",
-    "name": "default-roles-pharmacyhub-realm",
+    "name": "default-roles-pharmacyhub",
     "description": "${role_default-roles}",
     "composite": true,
     "clientRole": false,

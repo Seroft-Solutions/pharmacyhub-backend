@@ -43,11 +43,11 @@ spring:
               - email
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/pharmacyhub-realm
+            issuer-uri: http://localhost:8080/realms/pharmacyhub
             user-name-attribute: preferred_username
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/pharmacyhub-realm
+          issuer-uri: http://localhost:8080/realms/pharmacyhub
   #Configurations to send email
   mail:
     username: syedus06@gmail.com
@@ -77,7 +77,7 @@ keycloak:
   admin:
     username: admin
     password: admin
-  realm: pharmacyhub-realm
+  realm: pharmacyhub
 
 data:
   load:

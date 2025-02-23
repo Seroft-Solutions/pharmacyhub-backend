@@ -1,0 +1,1209 @@
+{
+  "title": "Basic Pharmacology Test",
+  "description": "This exam tests basic knowledge of pharmacology concepts",
+  "duration": 60,
+  "totalMarks": 20,
+  "passingMarks": 12,
+  "questions": [
+    {
+      "question_number": 1,
+      "question": "Which of the following drugs is classified as a leukotriene receptor antagonist?",
+      "options": {
+        "A": "Ipratropium bromide",
+        "B": "Montelukast",
+        "C": "Diphenhydramine",
+        "D": "Ranitidine"
+      },
+      "answer": "(B) Montelukast",
+      "explanation": "Montelukast is a leukotriene receptor antagonist used to manage asthma and allergic rhinitis.\nWhy other options are incorrect?\n• Ipratropium bromide (A): It is an anticholinergic bronchodilator used in COPD and asthma.\n• Diphenhydramine (C): A first-generation H1 antihistamine used for allergies and motion sickness.\n• Ranitidine (D): A histamine H2 receptor blocker used for acid reflux and ulcers (withdrawn in many countries)."
+    },
+    {
+      "question_number": 2,
+      "question": "Which of the following beta-blockers has the highest lipid solubility?",
+      "options": {
+        "A": "Propranolol",
+        "B": "Esmolol",
+        "C": "Atenolol",
+        "D": "Pindolol"
+      },
+      "answer": "(A) Propranolol",
+      "explanation": "Propranolol is a highly lipophilic beta-blocker, allowing it to cross the blood-brain barrier and cause CNS effects like sedation.\nWhy other options are incorrect?\n• Esmolol (B): Ultra-short-acting beta-blocker with low lipid solubility, used in acute cardiac conditions.\n• Atenolol (C): Hydrophilic beta-blocker with minimal CNS penetration, used in hypertension.\n• Pindolol (D): A beta-blocker with intrinsic sympathomimetic activity but lower lipid solubility than propranolol."
+    },
+    {
+      "question_number": 3,
+      "question": "Which of the following is an adverse effect of serotonin receptor agonists (triptans)?",
+      "options": {
+        "A": "Hypotension",
+        "B": "Vasoconstriction",
+        "C": "Increased appetite",
+        "D": "Sedation"
+      },
+      "answer": "(B) Vasoconstriction",
+      "explanation": "Triptans activate serotonin (5-HT1) receptors, leading to vasoconstriction, which helps in migraine relief.\nWhy other options are incorrect?\n• Hypotension (A): Triptans can cause hypertension, not hypotension.\n• Increased appetite (C): Not a known effect; serotonin agonists generally suppress appetite.\n• Sedation (D): Unlike first-generation antihistamines, triptans do not cause sedation."
+    },
+    {
+      "question_number": 4,
+      "question": "Which of the following drugs produces euphoria followed by an intense depressive “crash”?",
+      "options": {
+        "A": "Heroin",
+        "B": "Cocaine",
+        "C": "LSD",
+        "D": "MDMA"
+      },
+      "answer": "(B) Cocaine",
+      "explanation": "Cocaine blocks dopamine reuptake, causing intense euphoria followed by a severe depressive crash.\nWhy other options are incorrect?\n• Heroin (A): An opioid that induces euphoria but causes respiratory depression instead of a crash.\n• LSD (C): A hallucinogen that alters perception rather than causing a \"crash.\" \n• MDMA (D): Causes euphoria but also induces emotional closeness instead of a depressive crash."
+    },
+    {
+      "question_number": 5,
+      "question": "Which of the following drugs is used as a maintenance treatment for opioid dependence?",
+      "options": {
+        "A": "Diazepam",
+        "B": "Disulfiram",
+        "C": "Buprenorphine",
+        "D": "Alprazolam"
+      },
+      "answer": "(C) Buprenorphine",
+      "explanation": "Buprenorphine is a partial opioid agonist used in opioid dependence treatment.\nWhy other options are incorrect?\n• Diazepam (A): A benzodiazepine used for anxiety and seizures, not opioid dependence.\n• Disulfiram (B): Used for alcohol dependence, not opioid addiction.\n• Alprazolam (D): A short-acting benzodiazepine used for anxiety disorders."
+    },
+    {
+      "question_number": 6,
+      "question": "The mechanism of action of coal tar in psoriasis involves:",
+      "options": {
+        "A": "Inhibition of tyrosinase",
+        "B": "Suppression of DNA synthesis",
+        "C": "Activation of TNF-alpha",
+        "D": "Increasing sebum production"
+      },
+      "answer": "(B) Suppression of DNA synthesis",
+      "explanation": "Coal tar slows down excessive skin cell production in psoriasis.\nWhy other options are incorrect?\n• Inhibition of tyrosinase (A): This is the mechanism of action of skin-lightening agents like hydroquinone.\n• Activation of TNF-alpha (C): TNF-alpha is a pro-inflammatory cytokine; coal tar actually reduces inflammation.\n• Increasing sebum production (D): Coal tar is not involved in sebaceous gland stimulation."
+    },
+    {
+      "question_number": 7,
+      "question": "Which of the following drugs should NOT be used for the treatment of gastroesophageal reflux disease (GERD)?",
+      "options": {
+        "A": "Omeprazole",
+        "B": "Ranitidine",
+        "C": "Metoclopramide",
+        "D": "Aspirin"
+      },
+      "answer": "(D) Aspirin",
+      "explanation": "Aspirin is an NSAID that can worsen GERD by increasing gastric acid secretion and mucosal damage.\nWhy other options are incorrect?\n• Omeprazole (A): A proton pump inhibitor used to reduce stomach acid.\n• Ranitidine (B): A former H2 receptor antagonist used for acid reflux (withdrawn in many places).\n• Metoclopramide (C): A prokinetic agent that helps in GERD by improving gastric motility."
+    },
+    {
+      "question_number": 8,
+      "question": "Which of the following drugs is a short-acting β2-adrenergic agonist (SABA) used for acute asthma relief?",
+      "options": {
+        "A": "Formoterol",
+        "B": "Salmeterol",
+        "C": "Albuterol",
+        "D": "Tiotropium"
+      },
+      "answer": "(C) Albuterol",
+      "explanation": "Albuterol is a short-acting β2 agonist (SABA) that provides quick bronchodilation in acute asthma.\nWhy other options are incorrect?\n• Formoterol (A): A long-acting β2 agonist (LABA) used for maintenance therapy.\n• Salmeterol (B): Another LABA used in asthma but not for acute relief.\n• Tiotropium (D): A long-acting anticholinergic used for COPD rather than asthma."
+    },
+    {
+      "question_number": 9,
+      "question": "Which NSAID is most potent for postoperative pain relief?",
+      "options": {
+        "A": "Aspirin",
+        "B": "Naproxen",
+        "C": "Ketorolac",
+        "D": "Celecoxib"
+      },
+      "answer": "(C) Ketorolac",
+      "explanation": "Ketorolac is a potent NSAID used for short-term management of moderate to severe pain, often postoperatively.\nWhy other options are incorrect?\n• Aspirin (A): A mild NSAID mostly used for pain and antiplatelet effects.\n• Naproxen (B): Longer-acting NSAID used for chronic pain rather than acute postoperative pain.\n• Celecoxib (D): A selective COX-2 inhibitor used mainly for arthritis, not severe acute pain."
+    },
+    {
+      "question_number": 10,
+      "question": "Which drug is a first-generation H1 antihistamine used for motion sickness?",
+      "options": {
+        "A": "Cetirizine",
+        "B": "Diphenhydramine",
+        "C": "Loratadine",
+        "D": "Fexofenadine"
+      },
+      "answer": "(B) Diphenhydramine",
+      "explanation": "Diphenhydramine is a first-generation antihistamine that crosses the blood-brain barrier and is effective in motion sickness.\nWhy other options are incorrect?\n• Cetirizine (A): A second-generation antihistamine with minimal sedation, not used for motion sickness.\n• Loratadine (C): A non-drowsy antihistamine mainly for allergies, not motion sickness.\n• Fexofenadine (D): Another non-sedating antihistamine, not effective for motion sickness."
+    },
+    {
+      "question_number": 11,
+      "question": "Which cephalosporin is effective against Pseudomonas aeruginosa?",
+      "options": {
+        "A": "Cefazolin",
+        "B": "Cephalexin",
+        "C": "Ceftazidime",
+        "D": "Ceftriaxone"
+      },
+      "answer": "(C) Ceftazidime",
+      "explanation": "Ceftazidime is a third-generation cephalosporin with strong activity against Pseudomonas aeruginosa.\nWhy other options are incorrect?\n• Cefazolin (A): A first-generation cephalosporin with no activity against Pseudomonas.\n• Cephalexin (B): Another first-generation cephalosporin used for Gram-positive infections.\n• Ceftriaxone (D): A broad-spectrum third-generation cephalosporin but ineffective against Pseudomonas."
+    },
+    {
+      "question_number": 12,
+      "question": "Which class of β-lactam antibiotics has the broadest spectrum and is resistant to most β-lactamases?",
+      "options": {
+        "A": "Penicillins",
+        "B": "Cephalosporins",
+        "C": "Carbapenems",
+        "D": "Monobactams"
+      },
+      "answer": "(C) Carbapenems",
+      "explanation": "Carbapenems (e.g., imipenem, meropenem) have the broadest spectrum and are resistant to most β-lactamases.\nWhy other options are incorrect?\n• Penicillins (A): Less broad spectrum and susceptible to β-lactamases.\n• Cephalosporins (B): Broader than penicillins but still susceptible to some β-lactamases.\n• Monobactams (D): Effective against Gram-negative bacteria but not as broad as carbapenems."
+    },
+    {
+      "question_number": 13,
+      "question": "Which fluoroquinolone has activity against Bacteroides fragilis?",
+      "options": {
+        "A": "Ciprofloxacin",
+        "B": "Moxifloxacin",
+        "C": "Levofloxacin",
+        "D": "Norfloxacin"
+      },
+      "answer": "(B) Moxifloxacin",
+      "explanation": "Moxifloxacin has anaerobic coverage, including Bacteroides fragilis.\nWhy other options are incorrect?\n• Ciprofloxacin (A): Mainly covers Gram-negative aerobes but lacks anaerobic activity.\n• Levofloxacin (C): Active against Gram-positive and Gram-negative bacteria but weak against Bacteroides.\n• Norfloxacin (D): A narrow-spectrum quinolone used for UTIs."
+    },
+    {
+      "question_number": 14,
+      "question": "Which antifungal agent is most likely to cause QT interval prolongation, leading to torsades de pointes?",
+      "options": {
+        "A": "Amphotericin B",
+        "B": "Fluconazole",
+        "C": "Voriconazole",
+        "D": "Isavuconazole"
+      },
+      "answer": "(C) Voriconazole",
+      "explanation": "Voriconazole is known to prolong the QT interval, increasing the risk of torsades de pointes.\nWhy other options are incorrect?\n• Amphotericin B (A): Causes nephrotoxicity but does not affect QT interval.\n• Fluconazole (B): Can cause QT prolongation but less than voriconazole.\n• Isavuconazole (D): Shortens QT interval rather than prolonging it."
+    },
+    {
+      "question_number": 15,
+      "question": "Which drug is a second-line treatment for multidrug-resistant tuberculosis (MDR-TB)?",
+      "options": {
+        "A": "Amikacin",
+        "B": "Rifampin",
+        "C": "Pyrazinamide",
+        "D": "Isoniazid"
+      },
+      "answer": "(A) Amikacin",
+      "explanation": "Amikacin, an aminoglycoside, is used in MDR-TB when first-line drugs fail.\nWhy other options are incorrect?\n• Rifampin (B): A first-line TB drug.\n• Pyrazinamide (C): First-line drug used in combination therapy for TB.\n• Isoniazid (D): A primary anti-TB drug, not second-line."
+    },
+    {
+      "question_number": 16,
+      "question": "Which of the following antimycobacterial drugs can cause red-orange discoloration of body fluids?",
+      "options": {
+        "A": "Isoniazid",
+        "B": "Rifampin",
+        "C": "Pyrazinamide",
+        "D": "Ethambutol"
+      },
+      "answer": "(B) Rifampin",
+      "explanation": "Rifampin causes red-orange discoloration of urine, sweat, and tears.\nWhy other options are incorrect?\n• Isoniazid (A): Causes hepatotoxicity and peripheral neuropathy but no discoloration.\n• Pyrazinamide (C): Can cause hyperuricemia and hepatotoxicity but not discoloration.\n• Ethambutol (D): Causes optic neuritis but does not affect body fluid color."
+    },
+    {
+      "question_number": 17,
+      "question": "What is a common adverse effect of somatropin?",
+      "options": {
+        "A": "Osteoporosis",
+        "B": "Hyperglycemia",
+        "C": "Bradycardia",
+        "D": "Hypotension"
+      },
+      "answer": "(B) Hyperglycemia",
+      "explanation": "Somatropin (recombinant GH) can induce insulin resistance, leading to hyperglycemia.\nWhy other options are incorrect?\n• Osteoporosis (A): GH promotes bone growth rather than causing osteoporosis.\n• Bradycardia (C): GH does not significantly affect heart rate.\n• Hypotension (D): GH does not cause hypotension."
+    },
+    {
+      "question_number": 18,
+      "question": "Which drug inhibits the enzyme dipeptidyl peptidase-4 (DPP-4)?",
+      "options": {
+        "A": "Acarbose",
+        "B": "Sitagliptin",
+        "C": "Repaglinide",
+        "D": "Pioglitazone"
+      },
+      "answer": "(B) Sitagliptin",
+      "explanation": "Sitagliptin inhibits DPP-4, increasing incretin levels and improving glycemic control.\nWhy other options are incorrect?\n• Acarbose (A): An α-glucosidase inhibitor that delays carbohydrate digestion.\n• Repaglinide (C): A meglitinide that stimulates insulin release.\n• Pioglitazone (D): A thiazolidinedione that enhances insulin sensitivity."
+    },
+    {
+      "question_number": 19,
+      "question": "Which of the following insulins is an intermediate-acting insulin?",
+      "options": {
+        "A": "Insulin detemir",
+        "B": "Insulin glulisine",
+        "C": "NPH insulin",
+        "D": "Insulin degludec"
+      },
+      "answer": "(C) NPH insulin",
+      "explanation": "NPH insulin is an intermediate-acting insulin with a duration of about 12-16 hours.\nWhy other options are incorrect?\n• Insulin detemir (A): Long-acting insulin with a duration of ~24 hours.\n• Insulin glulisine (B): A rapid-acting insulin.\n• Insulin degludec (D): Ultra-long-acting insulin."
+    },
+    {
+      "question_number": 20,
+      "question": "Which corticosteroid has the longest duration of action?",
+      "options": {
+        "A": "Hydrocortisone",
+        "B": "Dexamethasone",
+        "C": "Prednisone",
+        "D": "Methylprednisolone"
+      },
+      "answer": "(B) Dexamethasone",
+      "explanation": "Dexamethasone has the longest duration of action, lasting 36-72 hours.\nWhy other options are incorrect?\n• Hydrocortisone (A): Short-acting corticosteroid.\n• Prednisone (C): Intermediate-acting corticosteroid.\n• Methylprednisolone (D): Also intermediate-acting but shorter than dexamethasone."
+    },
+    {
+      "question_number": 21,
+      "question": "Which class of antihypertensives primarily works by decreasing cardiac output and inhibiting renin release?",
+      "options": {
+        "A": "ACE inhibitors",
+        "B": "Beta-blockers",
+        "C": "Calcium channel blockers",
+        "D": "Alpha-blockers"
+      },
+      "answer": "(B) Beta-blockers",
+      "explanation": "Beta-blockers reduce cardiac output and suppress renin release from the kidneys, leading to decreased blood pressure.\nWhy other options are incorrect?\n• ACE inhibitors (A): Block angiotensin-converting enzyme to lower blood pressure.\n• Calcium channel blockers (C): Reduce vascular resistance by relaxing blood vessels.\n• Alpha-blockers (D): Reduce blood pressure by dilating blood vessels but do not significantly affect renin release."
+    },
+    {
+      "question_number": 22,
+      "question": "Which diuretic has the highest risk of hyperkalemia?",
+      "options": {
+        "A": "Spironolactone",
+        "B": "Furosemide",
+        "C": "Hydrochlorothiazide",
+        "D": "Acetazolamide"
+      },
+      "answer": "(A) Spironolactone",
+      "explanation": "Spironolactone is a potassium-sparing diuretic that inhibits aldosterone, increasing potassium retention.\nWhy other options are incorrect?\n• Furosemide (B): A loop diuretic that causes potassium loss.\n• Hydrochlorothiazide (C): A thiazide diuretic that also leads to potassium loss.\n• Acetazolamide (D): A carbonic anhydrase inhibitor that causes metabolic acidosis but not significant hyperkalemia."
+    },
+    {
+      "question_number": 23,
+      "question": "Which diuretic is most commonly used for symptomatic relief of congestion in heart failure?",
+      "options": {
+        "A": "Acetazolamide",
+        "B": "Furosemide",
+        "C": "Hydrochlorothiazide",
+        "D": "Spironolactone"
+      },
+      "answer": "(B) Furosemide",
+      "explanation": "Furosemide is a loop diuretic used to relieve pulmonary and peripheral congestion in heart failure.\nWhy other options are incorrect?\n• Acetazolamide (A): Used for glaucoma and altitude sickness.\n• Hydrochlorothiazide (C): Less effective for acute congestion.\n• Spironolactone (D): Used in heart failure but mainly for long-term aldosterone antagonism."
+    },
+    {
+      "question_number": 24,
+      "question": "Which drug can be used as an alternative to ACE inhibitors in patients who cannot tolerate them due to a persistent cough?",
+      "options": {
+        "A": "Losartan",
+        "B": "Metoprolol",
+        "C": "Digoxin",
+        "D": "Dobutamine"
+      },
+      "answer": "(A) Losartan",
+      "explanation": "Losartan is an angiotensin receptor blocker (ARB) that does not cause the bradykinin-related cough associated with ACE inhibitors.\nWhy other options are incorrect?\n• Metoprolol (B): A beta-blocker used for hypertension and heart failure but does not block the renin-angiotensin system.\n• Digoxin (C): Used for heart failure and atrial fibrillation but does not replace ACE inhibitors.\n• Dobutamine (D): A β1-agonist used in acute heart failure, not for chronic hypertension management."
+    },
+    {
+      "question_number": 25,
+      "question": "Which drug is most likely to cause QT prolongation?",
+      "options": {
+        "A": "Verapamil",
+        "B": "Dofetilide",
+        "C": "Digoxin",
+        "D": "Lidocaine"
+      },
+      "answer": "(B) Dofetilide",
+      "explanation": "Dofetilide is a Class III antiarrhythmic drug that blocks potassium channels, leading to QT prolongation.\nWhy other options are incorrect?\n• Verapamil (A): A calcium channel blocker that affects conduction but not significantly the QT interval.\n• Digoxin (C): Affects cardiac conduction but does not primarily prolong QT.\n• Lidocaine (D): A Class IB antiarrhythmic that shortens repolarization rather than prolonging QT."
+    },
+    {
+      "question_number": 26,
+      "question": "What is a potential life-threatening side effect of Class III antiarrhythmic drugs?",
+      "options": {
+        "A": "Torsades de pointes",
+        "B": "Bradycardia",
+        "C": "Hypertension",
+        "D": "Hypoglycemia"
+      },
+      "answer": "(A) Torsades de pointes",
+      "explanation": "Class III antiarrhythmics, like amiodarone and dofetilide, can prolong the QT interval, increasing the risk of torsades de pointes.\nWhy other options are incorrect?\n• Bradycardia (B): A side effect but not the most life-threatening.\n• Hypertension (C): Class III drugs do not typically cause significant hypertension.\n• Hypoglycemia (D): Not associated with Class III antiarrhythmics."
+    },
+    {
+      "question_number": 27,
+      "question": "Which of the following is a low-molecular-weight heparin (LMWH)?",
+      "options": {
+        "A": "Rivaroxaban",
+        "B": "Enoxaparin",
+        "C": "Warfarin",
+        "D": "Aspirin"
+      },
+      "answer": "(B) Enoxaparin",
+      "explanation": "Enoxaparin is an LMWH that enhances antithrombin III activity to prevent clot formation.\nWhy other options are incorrect?\n• Rivaroxaban (A): A direct factor Xa inhibitor.\n• Warfarin (C): A vitamin K antagonist, not an LMWH.\n• Aspirin (D): An antiplatelet agent, not an anticoagulant."
+    },
+    {
+      "question_number": 28,
+      "question": "Which vitamin is essential for the synthesis of clotting factors inhibited by warfarin?",
+      "options": {
+        "A": "Vitamin A",
+        "B": "Vitamin D",
+        "C": "Vitamin K",
+        "D": "Vitamin C"
+      },
+      "answer": "(C) Vitamin K",
+      "explanation": "Warfarin inhibits vitamin K-dependent clotting factors (II, VII, IX, and X).\nWhy other options are incorrect?\n• Vitamin A (A): Important for vision and immune function.\n• Vitamin D (B): Regulates calcium metabolism.\n• Vitamin C (D): Important for collagen synthesis but not clotting."
+    },
+    {
+      "question_number": 29,
+      "question": "Which statin has the longest half-life?",
+      "options": {
+        "A": "Lovastatin",
+        "B": "Atorvastatin",
+        "C": "Pravastatin",
+        "D": "Simvastatin"
+      },
+      "answer": "(B) Atorvastatin",
+      "explanation": "Atorvastatin has a long half-life (~14 hours) and is effective in lowering LDL cholesterol.\nWhy other options are incorrect?\n• Lovastatin (A): Shorter half-life (~3-4 hours).\n• Pravastatin (C): Has a moderate half-life (~1.5-2 hours).\n• Simvastatin (D): Shorter half-life (~2-3 hours)."
+    },
+    {
+      "question_number": 30,
+      "question": "What is the therapeutic use of bethanechol?",
+      "options": {
+        "A": "Myasthenia gravis",
+        "B": "Urinary retention",
+        "C": "Parkinson’s disease",
+        "D": "Hypertension"
+      },
+      "answer": "(B) Urinary retention",
+      "explanation": "Bethanechol is a muscarinic agonist that stimulates bladder contraction in urinary retention.\nWhy other options are incorrect?\n• Myasthenia gravis (A): Treated with acetylcholinesterase inhibitors like pyridostigmine.\n• Parkinson’s disease (C): Treated with dopamine agonists and anticholinergics.\n• Hypertension (D): Bethanechol has no role in blood pressure management."
+    },
+    {
+      "question_number": 31,
+      "question": "What is the primary function of α2-agonists like clonidine?",
+      "options": {
+        "A": "Increase blood pressure",
+        "B": "Increase norepinephrine release",
+        "C": "Decrease sympathetic outflow",
+        "D": "Bronchodilation"
+      },
+      "answer": "(C) Decrease sympathetic outflow",
+      "explanation": "Clonidine reduces norepinephrine release, leading to decreased blood pressure."
+    },
+    {
+      "question_number": 32,
+      "question": "Which drug is combined with levodopa to prevent its peripheral conversion to dopamine?",
+      "options": {
+        "A": "Entacapone",
+        "B": "Carbidopa",
+        "C": "Bromocriptine",
+        "D": "Amantadine"
+      },
+      "answer": "(B) Carbidopa",
+      "explanation": "Carbidopa inhibits dopa decarboxylase, preventing peripheral conversion of levodopa to dopamine, increasing its availability in the CNS.\nWhy other options are incorrect?\n• Entacapone (A): A COMT inhibitor that prevents levodopa breakdown but does not inhibit decarboxylase.\n• Bromocriptine (C): A dopamine agonist, not a decarboxylase inhibitor.\n• Amantadine (D): Enhances dopamine release but does not affect levodopa metabolism."
+    },
+    {
+      "question_number": 33,
+      "question": "Which drug can be used as an alternative to interferon-beta in multiple sclerosis?",
+      "options": {
+        "A": "Dimethyl fumarate",
+        "B": "Levodopa",
+        "C": "Apomorphine",
+        "D": "Ropinirole"
+      },
+      "answer": "(A) Dimethyl fumarate",
+      "explanation": "Dimethyl fumarate is an immunomodulator used as an oral alternative to interferon-beta in relapsing-remitting multiple sclerosis.\nWhy other options are incorrect?\n• Levodopa (B): Used for Parkinson’s disease, not multiple sclerosis.\n• Apomorphine (C): A dopamine agonist for Parkinson’s disease.\n• Ropinirole (D): A dopamine agonist used for Parkinson’s and restless legs syndrome."
+    },
+    {
+      "question_number": 34,
+      "question": "Which SSRI has the longest half-life and is therefore associated with the lowest risk of discontinuation syndrome?",
+      "options": {
+        "A": "Sertraline",
+        "B": "Fluoxetine",
+        "C": "Escitalopram",
+        "D": "Paroxetine"
+      },
+      "answer": "(B) Fluoxetine",
+      "explanation": "Fluoxetine has a long half-life (~4-6 days), reducing withdrawal symptoms when discontinued.\nWhy other options are incorrect?\n• Sertraline (A): Moderate half-life (~26 hours), risk of withdrawal symptoms.\n• Escitalopram (C): Half-life of ~27-32 hours, shorter than fluoxetine.\n• Paroxetine (D): Shortest half-life (~24 hours), highest risk of withdrawal."
+    },
+    {
+      "question_number": 35,
+      "question": "Which of the following atypical antipsychotics is most associated with akathisia (restlessness)?",
+      "options": {
+        "A": "Risperidone",
+        "B": "Clozapine",
+        "C": "Olanzapine",
+        "D": "Aripiprazole"
+      },
+      "answer": "(A) Risperidone",
+      "explanation": "Risperidone is the atypical antipsychotic most associated with akathisia due to its strong D2 receptor antagonism. Aripiprazole (partial agonist) has a lower risk compared to risperidone but higher than clozapine or olanzapine.\nWhy Other Options Are Incorrect:\n• Clozapine (B): Least likely to cause extrapyramidal symptoms (EPS), including akathisia.\n• Olanzapine (C): Lower risk of akathisia compared to risperidone.\n• Aripiprazole (D): Partial agonist activity reduces D2 antagonism, leading to lower akathisia risk than risperidone."
+    },
+    {
+      "question_number": 36,
+      "question": "Which inhalational anesthetic has the lowest minimum alveolar concentration (MAC), making it the most potent?",
+      "options": {
+        "A": "Halothane",
+        "B": "Isoflurane",
+        "C": "Desflurane",
+        "D": "Nitrous oxide"
+      },
+      "answer": "(A) Halothane",
+      "explanation": "Halothane has the lowest MAC, meaning it is the most potent inhalational anesthetic.\nWhy other options are incorrect?\n• Isoflurane (B): Less potent than halothane.\n• Desflurane (C): Rapid onset and offset but higher MAC than halothane.\n• Nitrous oxide (D): Highest MAC, meaning the least potent."
+    },
+    {
+      "question_number": 37,
+      "question": "Which CNS stimulant is a non-stimulant drug approved for ADHD and selectively inhibits norepinephrine reuptake?",
+      "options": {
+        "A": "Methylphenidate",
+        "B": "Atomoxetine",
+        "C": "Dextroamphetamine",
+        "D": "Modafinil"
+      },
+      "answer": "(B) Atomoxetine",
+      "explanation": "Atomoxetine is a selective norepinephrine reuptake inhibitor (NRI) used for ADHD treatment.\nWhy other options are incorrect?\n• Methylphenidate (A): A stimulant that increases dopamine and norepinephrine.\n• Dextroamphetamine (C): A stimulant that enhances dopamine release.\n• Modafinil (D): Used for narcolepsy and shift work sleep disorder, not first-line ADHD treatment."
+    },
+    {
+      "question_number": 38,
+      "question": "Which CNS stimulant is commonly used to improve cognitive function in shift workers?",
+      "options": {
+        "A": "Methylphenidate",
+        "B": "Modafinil",
+        "C": "Cocaine",
+        "D": "Atomoxetine"
+      },
+      "answer": "(B) Modafinil",
+      "explanation": "Modafinil is a wakefulness-promoting agent used for shift work sleep disorder and narcolepsy.\nWhy other options are incorrect?\n• Methylphenidate (A): Primarily used for ADHD and narcolepsy, not shift workers.\n• Cocaine (C): An illegal stimulant with short-term effects and high abuse potential.\n• Atomoxetine (D): Used for ADHD but does not improve cognitive function in shift workers."
+    },
+    {
+      "question_number": 39,
+      "question": "Which of the following herbs is known as the \"sugar destroyer\" due to its antidiabetic activity?",
+      "options": {
+        "A": "Momordica charantia",
+        "B": "Gymnema sylvestre",
+        "C": "Syzygium jambolana",
+        "D": "Melia azadirachta"
+      },
+      "answer": "(B) Gymnema sylvestre",
+      "explanation": "Gymnema sylvestre contains gymnemic acids that reduce glucose absorption and stimulate insulin release, leading to its nickname \"sugar destroyer.\" \nWhy other options are incorrect?\n• Momordica charantia (A): Bitter melon, known for its hypoglycemic properties but not the \"sugar destroyer.\" \n• Syzygium jambolana (C): Used for diabetes but works differently by affecting pancreatic β-cells.\n• Melia azadirachta (D): Has antimicrobial and blood sugar-lowering properties but is not specifically known as the \"sugar destroyer.\""
+    },
+    {
+      "question_number": 40,
+      "question": "Which cardiac glycoside-containing plant is used in congestive heart failure treatment?",
+      "options": {
+        "A": "Digitalis lanata",
+        "B": "Punica granatum",
+        "C": "Allium sativum",
+        "D": "Syzygium jambolana"
+      },
+      "answer": "(A) Digitalis lanata",
+      "explanation": "Digitalis lanata contains digoxin, a cardiac glycoside that strengthens myocardial contractions and is used in heart failure.\nWhy other options are incorrect?\n• Punica granatum (B): Pomegranate, known for antioxidant effects, not cardiac glycosides.\n• Allium sativum (C): Garlic, used for cholesterol and hypertension but not cardiac glycosides.\n• Syzygium jambolana (D): Used for diabetes, not heart failure."
+    },
+    {
+      "question_number": 41,
+      "question": "Which alkaloid from Atropa belladonna is used to dilate pupils in ophthalmology?",
+      "options": {
+        "A": "Atropine",
+        "B": "Morphine",
+        "C": "Strychnine",
+        "D": "Thebaine"
+      },
+      "answer": "(A) Atropine",
+      "explanation": "Atropine blocks muscarinic receptors, causing pupil dilation (mydriasis) in ophthalmic examinations.\nWhy other options are incorrect?\n• Morphine (B): A narcotic analgesic, not used for pupil dilation.\n• Strychnine (C): A neurotoxin causing muscle spasms, not ophthalmic use.\n• Thebaine (D): A precursor for opioid synthesis, not used in ophthalmology."
+    },
+    {
+      "question_number": 42,
+      "question": "Which herbal drug is commonly used to improve libido and sexual performance?",
+      "options": {
+        "A": "Tribulus terrestris",
+        "B": "Claviceps purpurea",
+        "C": "Saraca indica",
+        "D": "Glycyrrhiza glabra"
+      },
+      "answer": "(A) Tribulus terrestris",
+      "explanation": "Tribulus terrestris is traditionally used to enhance libido and testosterone levels.\nWhy other options are incorrect?\n• Claviceps purpurea (B): Source of ergot alkaloids, used in migraines but not for libido.\n• Saraca indica (C): Used in gynecological disorders, not libido enhancement.\n• Glycyrrhiza glabra (D): Licorice root, used for ulcers and respiratory issues."
+    },
+    {
+      "question_number": 43,
+      "question": "Which of the following methods is commonly used for extracting volatile oils?",
+      "options": {
+        "A": "Distillation",
+        "B": "Cold pressing",
+        "C": "Solvent extraction",
+        "D": "All of the above"
+      },
+      "answer": "(D) All of the above",
+      "explanation": "Different volatile oils require different extraction techniques, including distillation (e.g., peppermint oil), cold pressing (e.g., citrus oils), and solvent extraction (e.g., delicate flowers)."
+    },
+    {
+      "question_number": 44,
+      "question": "Which volatile oil has been traditionally used to treat bronchitis due to its expectorant properties?",
+      "options": {
+        "A": "Eucalyptus oil",
+        "B": "Anise oil",
+        "C": "Rosemary oil",
+        "D": "Myristica oil"
+      },
+      "answer": "(A) Eucalyptus oil",
+      "explanation": "Eucalyptus oil contains cineole, which has mucolytic and expectorant properties helpful in bronchitis.\nWhy other options are incorrect?\n• Anise oil (B): Used as an expectorant but less potent than eucalyptus oil.\n• Rosemary oil (C): Used for relaxation and memory enhancement, not bronchitis.\n• Myristica oil (D): Found in nutmeg, primarily used as a stimulant and carminative."
+    },
+    {
+      "question_number": 45,
+      "question": "Senna belongs to which class of glycosides?",
+      "options": {
+        "A": "Isothiocyanate glycosides",
+        "B": "Cyanophore glycosides",
+        "C": "Anthraquinone glycosides",
+        "D": "Aldehyde glycosides"
+      },
+      "answer": "(C) Anthraquinone glycosides",
+      "explanation": "Senna contains anthraquinone glycosides, which have a stimulant laxative effect on the colon.\nWhy other options are incorrect?\n• Isothiocyanate glycosides (A): Found in mustard plants, not in Senna.\n• Cyanophore glycosides (B): Found in cyanogenic plants like cassava, releasing cyanide.\n• Aldehyde glycosides (D): Found in vanilla, contributing to its aroma."
+    },
+    {
+      "question_number": 46,
+      "question": "Vanilla contains which type of glycosides?",
+      "options": {
+        "A": "Cyanophore glycosides",
+        "B": "Lactone glycosides",
+        "C": "Aldehyde glycosides",
+        "D": "Isothiocyanate glycosides"
+      },
+      "answer": "(C) Aldehyde glycosides",
+      "explanation": "Vanilla contains vanillin, which is an aldehyde glycoside responsible for its flavor and aroma.\nWhy other options are incorrect?\n• Cyanophore glycosides (A): Found in plants releasing hydrogen cyanide.\n• Lactone glycosides (B): Found in coumarins and used in anticoagulants.\n• Isothiocyanate glycosides (D): Found in mustard and horseradish, causing a pungent taste."
+    },
+    {
+      "question_number": 47,
+      "question": "Which government is responsible for establishing the Central Pharmacy Council?",
+      "options": {
+        "A": "Provincial Government",
+        "B": "Federal Government",
+        "C": "Pakistan Medical Council",
+        "D": "Health Regulatory Authority"
+      },
+      "answer": "(B) Federal Government",
+      "explanation": "As per Section 3(1)(a), the Federal Government is responsible for establishing the Pharmacy Council of Pakistan, which functions as the Central Council."
+    },
+    {
+      "question_number": 48,
+      "question": "How often is the Vice-President of the Pharmacy Council elected?",
+      "options": {
+        "A": "Every six months",
+        "B": "Every year",
+        "C": "Every three years",
+        "D": "Every five years"
+      },
+      "answer": "(B) Every year",
+      "explanation": "Section 11(1) states that a Vice-President is elected every year and holds office for one year."
+    },
+    {
+      "question_number": 49,
+      "question": "Which section defines adulterated drugs?",
+      "options": {
+        "A": "Section 2",
+        "B": "Section 3",
+        "C": "Section 5",
+        "D": "Section 7"
+      },
+      "answer": "(B) Section 3",
+      "explanation": "Section 3(a) defines adulterated drugs as drugs that contain filthy, putrid, decomposed substances, or foreign matter such as insects, dirt, or chemicals that make them harmful to health.\nOther Related Sections:\n• Section 3(f): Defines counterfeit drugs\n• Section 3(s): Defines misbranded drugs\n• Section 3(zb): Defines spurious drugs"
+    },
+    {
+      "question_number": 50,
+      "question": "Who has the power to fix drug prices?",
+      "options": {
+        "A": "Provincial Drug Authority",
+        "B": "Federal Government",
+        "C": "Drug Pricing Board",
+        "D": "Provincial Quality Control Board"
+      },
+      "answer": "(B) Federal Government",
+      "explanation": "Section 12(1) states that the Federal Government has the power to fix drug prices and regulate the profit percentage of drug manufacturers.\nOther Related Sections:\n• Section 13: Allows the Federal Government to issue directions to provinces\n• Section 14: Covers the establishment of drug testing laboratories"
+    },
+    {
+      "question_number": 51,
+      "question": "Under The Drugs Act, 1976, who is responsible for ensuring that a drug is properly tested for safety before it is sold?",
+      "options": {
+        "A": "The Drug Testing Laboratory",
+        "B": "The Provincial Government",
+        "C": "The pharmacist who dispenses it",
+        "D": "The hospital purchasing the drug"
+      },
+      "answer": "(A) The Drug Testing Laboratory",
+      "explanation": "Section 14(1) states:\n\"The Drug Testing Laboratory shall be responsible for conducting tests to determine the safety, efficacy, and quality of drugs before they are made available for sale.\""
+    },
+    {
+      "question_number": 52,
+      "question": "What is the role of the Appellate Board under The Drugs Act, 1976?",
+      "options": {
+        "A": "To regulate drug prices",
+        "B": "To grant manufacturing licenses",
+        "C": "To hear appeals against decisions of licensing or registration authorities",
+        "D": "To inspect drug manufacturing units"
+      },
+      "answer": "(C) To hear appeals against decisions of licensing or registration authorities",
+      "explanation": "Section 9(1) states that the Appellate Board is responsible for handling appeals against decisions made by the Central Licensing Board, Registration Board, or Licensing Authority."
+    },
+    {
+      "question_number": 53,
+      "question": "If a manufacturer violates drug labeling regulations under The Drugs Act, 1976, what action can be taken?",
+      "options": {
+        "A": "The drug can be immediately banned",
+        "B": "The manufacturer can be fined or imprisoned",
+        "C": "The pharmacist selling the drug will be penalized",
+        "D": "The manufacturer will receive a verbal warning"
+      },
+      "answer": "(B) The manufacturer can be fined or imprisoned",
+      "explanation": "Section 27(2) states that violating drug labeling laws can result in imprisonment up to 7 years and a fine."
+    },
+    {
+      "question_number": 54,
+      "question": "Under the Drugs Act of 1976, which section empowers a Drug Inspector to seal a medical store?",
+      "options": {
+        "A": "Section 14",
+        "B": "Section 17",
+        "C": "Section 18",
+        "D": "Section 21"
+      },
+      "answer": "(C) Section 18",
+      "explanation": "Section 18 of the Drugs Act, 1976, authorizes a Drug Inspector to lock and seal any premises, such as a medical store, if drugs are being manufactured, stored, sold, or exhibited for sale in contravention of the Act's provisions."
+    },
+    {
+      "question_number": 55,
+      "question": "In which schedule are the standards for establishing drug manufacturing facilities detailed?",
+      "options": {
+        "A": "Schedule A",
+        "B": "Schedule B",
+        "C": "Schedule D",
+        "D": "Schedule E"
+      },
+      "answer": "(B) Schedule B",
+      "explanation": "Schedule B outlines the necessary guidelines and standards for setting up drug manufacturing premises, ensuring compliance with regulatory requirements."
+    },
+    {
+      "question_number": 56,
+      "question": "The end product of glycolysis under anaerobic conditions in muscle cells is:",
+      "options": {
+        "A": "Acetyl-CoA",
+        "B": "Pyruvate",
+        "C": "Lactate",
+        "D": "Oxaloacetate"
+      },
+      "answer": "(C) Lactate",
+      "explanation": "Under anaerobic conditions, pyruvate is converted into lactate by lactate dehydrogenase to regenerate NAD⁺ for glycolysis continuation.\nWhy other options are incorrect?\n• Acetyl-CoA (A): Produced under aerobic conditions when pyruvate enters the mitochondria.\n• Pyruvate (B): Intermediate product of glycolysis, but it gets converted into lactate in anaerobic conditions.\n• Oxaloacetate (D): A key intermediate in the citric acid cycle, not directly related to anaerobic glycolysis."
+    },
+    {
+      "question_number": 57,
+      "question": "Which enzyme is responsible for DNA replication in eukaryotic cells?",
+      "options": {
+        "A": "DNA polymerase",
+        "B": "RNA polymerase",
+        "C": "Helicase",
+        "D": "Ligase"
+      },
+      "answer": "(A) DNA polymerase",
+      "explanation": "DNA polymerase synthesizes new DNA strands during replication by adding nucleotides to the growing strand.\nWhy other options are incorrect?\n• RNA polymerase (B): Involved in transcription, not DNA replication.\n• Helicase (C): Unwinds the DNA double helix but does not synthesize new strands.\n• Ligase (D): Joins Okazaki fragments in lagging strand synthesis."
+    },
+    {
+      "question_number": 58,
+      "question": "The optical isomer that rotates plane-polarized light to the right is called:",
+      "options": {
+        "A": "Dextrorotatory",
+        "B": "Levorotatory",
+        "C": "Mesomeric",
+        "D": "Racemic"
+      },
+      "answer": "(A) Dextrorotatory",
+      "explanation": "Dextrorotatory compounds rotate plane-polarized light to the right (+).\nWhy other options are incorrect?\n• Levorotatory (B): Rotates light to the left (-).\n• Mesomeric (C): Refers to resonance, not optical rotation.\n• Racemic (D): Contains equal amounts of dextrorotatory and levorotatory isomers, making it optically inactive."
+    },
+    {
+      "question_number": 59,
+      "question": "The type of vibration observed in IR spectroscopy includes:",
+      "options": {
+        "A": "Stretching and bending",
+        "B": "Rotational and translational",
+        "C": "Vibrational and translational",
+        "D": "Spin-spin coupling"
+      },
+      "answer": "(A) Stretching and bending",
+      "explanation": "In IR spectroscopy, molecular vibrations are classified as stretching (bond length changes) and bending (bond angle changes).\nWhy other options are incorrect?\n• Rotational and translational (B): Observed in microwave and gas-phase spectroscopy.\n• Vibrational and translational (C): Translational motions occur in gases but are not IR-specific.\n• Spin-spin coupling (D): A concept in NMR spectroscopy, not IR."
+    },
+    {
+      "question_number": 60,
+      "question": "Which of the following is a major limitation of Flame Photometry?",
+      "options": {
+        "A": "Only specific elements can be analyzed",
+        "B": "Requires expensive equipment",
+        "C": "Can analyze only non-metallic compounds",
+        "D": "Requires vacuum conditions"
+      },
+      "answer": "(A) Only specific elements can be analyzed",
+      "explanation": "Flame photometry is limited to detecting alkali and alkaline earth metals like Na, K, Ca, and Li.\nWhy other options are incorrect?\n• Requires expensive equipment (B): While some instruments are costly, flame photometry itself is relatively inexpensive.\n• Can analyze only non-metallic compounds (C): It primarily analyzes metals, not non-metals.\n• Requires vacuum conditions (D): Unlike mass spectrometry, flame photometry does not need a vacuum."
+    },
+    {
+      "question_number": 61,
+      "question": "Which spectroscopy technique is commonly used for the analysis of drug metabolites in urine?",
+      "options": {
+        "A": "Mass Spectrometry",
+        "B": "UV/Vis Spectroscopy",
+        "C": "IR Spectroscopy",
+        "D": "Atomic Absorption Spectroscopy"
+      },
+      "answer": "(A) Mass Spectrometry",
+      "explanation": "Mass spectrometry is widely used in pharmacokinetics to detect and quantify drug metabolites in biological samples.\nWhy other options are incorrect?\n• UV/Vis Spectroscopy (B): Used for absorbance studies but lacks specificity for metabolites.\n• IR Spectroscopy (C): Identifies functional groups but is not highly specific for metabolites.\n• Atomic Absorption Spectroscopy (D): Used for metal ion analysis, not drug metabolites."
+    },
+    {
+      "question_number": 62,
+      "question": "Which spectroscopy technique is best suited for real-time reaction monitoring in pharmaceutical manufacturing?",
+      "options": {
+        "A": "Infrared (IR) Spectroscopy",
+        "B": "Atomic Absorption Spectroscopy",
+        "C": "UV/Vis Spectroscopy",
+        "D": "Flame Photometry"
+      },
+      "answer": "(A) Infrared (IR) Spectroscopy",
+      "explanation": "IR spectroscopy can monitor chemical changes in real-time by tracking functional group transformations.\nWhy other options are incorrect?\n• Atomic Absorption Spectroscopy (B): Measures metal concentrations, not organic reaction monitoring.\n• UV/Vis Spectroscopy (C): Measures absorbance but is not ideal for continuous reaction monitoring.\n• Flame Photometry (D): Limited to metal ion analysis."
+    },
+    {
+      "question_number": 63,
+      "question": "In redox potentiometry, the potential difference is due to:",
+      "options": {
+        "A": "Hydrogen ion activity",
+        "B": "Electron transfer between oxidizing and reducing agents",
+        "C": "Light absorption",
+        "D": "Conductivity changes"
+      },
+      "answer": "(B) Electron transfer between oxidizing and reducing agents",
+      "explanation": "Redox potentiometry measures the potential difference generated by redox reactions involving electron transfer.\nWhy other options are incorrect?\n• Hydrogen ion activity (A): Measured in pH potentiometry, not redox potentiometry.\n• Light absorption (C): Basis of UV/Vis spectroscopy.\n• Conductivity changes (D): Used in conductometric titrations."
+    },
+    {
+      "question_number": 64,
+      "question": "Which type of DSC is more commonly used in pharmaceutical analysis?",
+      "options": {
+        "A": "Adiabatic DSC",
+        "B": "Isothermal DSC",
+        "C": "Heat flux DSC",
+        "D": "High-pressure DSC"
+      },
+      "answer": "(C) Heat flux DSC",
+      "explanation": "Heat flux DSC is commonly used in pharmaceuticals to analyze melting points, polymorphism, and thermal stability.\nWhy other options are incorrect?\n• Adiabatic DSC (A): Not widely used in routine pharmaceutical analysis.\n• Isothermal DSC (B): Used for kinetic studies rather than routine analysis.\n• High-pressure DSC (D): Used for specialized high-pressure applications."
+    },
+    {
+      "question_number": 65,
+      "question": "Which factor improves the resolution of column chromatography?",
+      "options": {
+        "A": "Decreasing particle size of stationary phase",
+        "B": "Increasing column length",
+        "C": "Optimizing flow rate",
+        "D": "All of the above"
+      },
+      "answer": "(D) All of the above",
+      "explanation": "Decreasing particle size, increasing column length, and optimizing flow rate all contribute to improved resolution in chromatography."
+    },
+    {
+      "question_number": 66,
+      "question": "The stationary phase in GLC must be:",
+      "options": {
+        "A": "Volatile",
+        "B": "Non-volatile",
+        "C": "Gaseous",
+        "D": "None of the above"
+      },
+      "answer": "(B) Non-volatile",
+      "explanation": "The stationary phase in gas-liquid chromatography (GLC) is a liquid coated on a solid support and must be non-volatile to remain fixed inside the column."
+    },
+    {
+      "question_number": 67,
+      "question": "Phase-II drug metabolism reactions are also called?",
+      "options": {
+        "A": "Non-synthetic reactions",
+        "B": "Synthetic reactions",
+        "C": "Both conjugation and synthetic reactions",
+        "D": "Conjugation reactions"
+      },
+      "answer": "(D) Conjugation reactions",
+      "explanation": "Phase-II metabolism involves conjugation reactions such as glucuronidation and sulfation, increasing drug water solubility."
+    },
+    {
+      "question_number": 68,
+      "question": "Which of the following pharmacokinetic parameters is mostly affected by renal failure?",
+      "options": {
+        "A": "Volume of distribution",
+        "B": "Clearance",
+        "C": "Half-life",
+        "D": "Absorption rate"
+      },
+      "answer": "(B) Clearance",
+      "explanation": "Renal failure significantly reduces drug clearance, leading to drug accumulation and potential toxicity.\nWhy other options are incorrect?\n• Volume of distribution (A): Affected by protein binding and tissue distribution but not primarily by renal failure.\n• Half-life (C): Changes as a consequence of reduced clearance but is not the most directly affected.\n• Absorption rate (D): Renal failure has minimal impact on drug absorption."
+    },
+    {
+      "question_number": 69,
+      "question": "The primary site for drug metabolism is:",
+      "options": {
+        "A": "Kidney",
+        "B": "Liver",
+        "C": "Intestine",
+        "D": "Lungs"
+      },
+      "answer": "(B) Liver",
+      "explanation": "The liver contains enzymes like cytochrome P450, which are responsible for drug metabolism.\nWhy other options are incorrect?\n• Kidney (A): Primarily responsible for drug excretion.\n• Intestine (C): Involved in some first-pass metabolism but not the primary site.\n• Lungs (D): Some drugs (e.g., inhaled anesthetics) undergo metabolism here, but it is not the main site."
+    },
+    {
+      "question_number": 70,
+      "question": "Which of the following factors can influence the absorption of weak acids and bases?",
+      "options": {
+        "A": "pH of the environment",
+        "B": "Drug solubility",
+        "C": "Presence of food in the stomach",
+        "D": "All of the above"
+      },
+      "answer": "(D) All of the above",
+      "explanation": "The absorption of weak acids and bases depends on pH, solubility, and food presence, which can alter gastric emptying time and pH."
+    },
+    {
+      "question_number": 71,
+      "question": "In a two-compartment model, what does the α phase represent?",
+      "options": {
+        "A": "Elimination phase",
+        "B": "Distribution phase",
+        "C": "Absorption phase",
+        "D": "Bioavailability phase"
+      },
+      "answer": "(B) Distribution phase",
+      "explanation": "The α phase represents the initial rapid distribution of the drug from the central compartment to peripheral tissues.\nWhy other options are incorrect?\n• Elimination phase (A): Occurs later (β phase).\n• Absorption phase (C): Involves drug movement into circulation, not distribution.\n• Bioavailability phase (D): Describes the extent of drug absorption, not distribution."
+    },
+    {
+      "question_number": 72,
+      "question": "Which of the following parameters is NOT typically used to evaluate bioequivalence?",
+      "options": {
+        "A": "Cmax",
+        "B": "AUC",
+        "C": "Tmax",
+        "D": "Drug stability"
+      },
+      "answer": "(D) Drug stability",
+      "explanation": "Bioequivalence is determined by comparing Cmax, AUC, and Tmax, whereas drug stability is related to formulation quality."
+    },
+    {
+      "question_number": 73,
+      "question": "A lower Tmax indicates:",
+      "options": {
+        "A": "Slower drug absorption",
+        "B": "Faster drug absorption",
+        "C": "Higher drug clearance",
+        "D": "Lower drug distribution"
+      },
+      "answer": "(B) Faster drug absorption",
+      "explanation": "A lower Tmax means the drug reaches its peak concentration faster, indicating rapid absorption."
+    },
+    {
+      "question_number": 74,
+      "question": "The time required for a drug to reach 90% of steady-state concentration without a loading dose is:",
+      "options": {
+        "A": "1 half-life",
+        "B": "3.32 half-lives",
+        "C": "4.32 half-lives",
+        "D": "6.65 half-lives"
+      },
+      "answer": "(B) 3.32 half-lives",
+      "explanation": "Steady-state concentration is achieved at approximately 3.32 half-lives for 90% accumulation."
+    },
+    {
+      "question_number": 75,
+      "question": "Using Fried's rule, calculate the dose for an infant aged 6 months if the adult dose is 200 mg.",
+      "options": {
+        "A": "4 mg",
+        "B": "6 mg",
+        "C": "8 mg",
+        "D": "10 mg"
+      },
+      "answer": "(C) 8 mg",
+      "explanation": "Fried's rule:\n  ________________________________________\nFor a 6-month-old infant: Dose = (Age in months / 150) x Adult Dose = (6/150) x 200 mg = 8 mg."
+    },
+    {
+      "question_number": 76,
+      "question": "A 1 L IV bag contains 1.5 g of an antibiotic. How much solution (mL) is needed to administer a 375 mg dose?",
+      "options": {
+        "A": "100 mL",
+        "B": "150 mL",
+        "C": "200 mL",
+        "D": "250 mL"
+      },
+      "answer": "(D) 250 mL",
+      "explanation": "________________________________________\nExplanation: 1.5 g is equivalent to 1500 mg in 1000 mL, so the concentration is 1.5 mg/mL. To deliver 375 mg: 375 mg / 1.5 mg/mL = 250 mL."
+    },
+    {
+      "question_number": 77,
+      "question": "If a prescription calls for 10 mEq of potassium chloride (KCl) and the available stock solution is 2 mEq/mL, how much solution (in mL) should be administered?",
+      "options": {
+        "A": "2.5 mL",
+        "B": "3 mL",
+        "C": "5 mL",
+        "D": "7.5 mL"
+      },
+      "answer": "(C) 5 mL",
+      "explanation": "________________________________________\nExplanation: Dose required = 10 mEq. Stock concentration = 2 mEq/mL. Therefore, volume = 10 mEq / 2 mEq/mL = 5 mL."
+    },
+    {
+      "question_number": 78,
+      "question": "Which drug delivery system bypasses first-pass metabolism?",
+      "options": {
+        "A": "Oral tablets",
+        "B": "Rectal suppositories",
+        "C": "Intravenous injection",
+        "D": "Both B and C"
+      },
+      "answer": "(D) Both B and C",
+      "explanation": "IV injections and rectal suppositories (partially) bypass first-pass metabolism, increasing bioavailability."
+    },
+    {
+      "question_number": 79,
+      "question": "What is the function of glycerin in tinctures?",
+      "options": {
+        "A": "Acts as a preservative",
+        "B": "Increases solubility of active ingredients",
+        "C": "Prevents precipitation of inactive constituents",
+        "D": "Both B and C"
+      },
+      "answer": "(D) Both B and C",
+      "explanation": "Glycerin improves solubility and prevents precipitation, enhancing tincture stability."
+    },
+    {
+      "question_number": 80,
+      "question": "Which of the following molecules would have the highest boiling point?",
+      "options": {
+        "A": "CH₄",
+        "B": "NH₃",
+        "C": "O₂",
+        "D": "CO₂"
+      },
+      "answer": "(B) NH₃",
+      "explanation": "NH₃ has strong hydrogen bonding, leading to a higher boiling point compared to CH₄, O₂, and CO₂."
+    },
+    {
+      "question_number": 81,
+      "question": "Which of the following phase transitions is exothermic?",
+      "options": {
+        "A": "Melting",
+        "B": "Evaporation",
+        "C": "Sublimation",
+        "D": "Freezing"
+      },
+      "answer": "(D) Freezing",
+      "explanation": "Freezing releases heat (exothermic), while melting, evaporation, and sublimation absorb heat (endothermic)."
+    },
+    {
+      "question_number": 82,
+      "question": "What is the primary function of the sterility test?",
+      "options": {
+        "A": "To determine drug content",
+        "B": "To check for the presence of microorganisms",
+        "C": "To measure the clarity of a solution",
+        "D": "To assess the stability of a formulation"
+      },
+      "answer": "(B) To check for the presence of microorganisms",
+      "explanation": "The sterility test is performed to ensure that parenteral and ophthalmic products are free from viable microorganisms.\nWhy other options are incorrect?\n• To determine drug content (A): Drug content is determined using assays, not sterility tests.\n• To measure the clarity of a solution (C): Clarity testing is separate and ensures the absence of visible particles.\n• To assess the stability of a formulation (D): Stability tests assess degradation over time, not sterility."
+    },
+    {
+      "question_number": 83,
+      "question": "What is the principle of the clarity test in parenteral preparations?",
+      "options": {
+        "A": "Detection of pyrogens",
+        "B": "Identification of microbial contamination",
+        "C": "Detection of particulate matter",
+        "D": "Measurement of drug potency"
+      },
+      "answer": "(C) Detection of particulate matter",
+      "explanation": "The clarity test ensures that parenteral solutions are free from visible particulate contamination.\nWhy other options are incorrect?\n• Detection of pyrogens (A): Pyrogen testing is done separately to detect fever-inducing substances.\n• Identification of microbial contamination (B): This is checked using sterility tests.\n• Measurement of drug potency (D): Drug potency is assessed using analytical assays."
+    },
+    {
+      "question_number": 84,
+      "question": "What is the USP-recommended method for testing large-volume parenterals for sterility?",
+      "options": {
+        "A": "Direct inoculation",
+        "B": "Membrane filtration",
+        "C": "Pyrogen test",
+        "D": "Karl Fischer titration"
+      },
+      "answer": "(B) Membrane filtration",
+      "explanation": "Membrane filtration is preferred for sterility testing of large-volume parenterals because it allows for better recovery of microorganisms.\nWhy other options are incorrect?\n• Direct inoculation (A): Used for small-volume parenterals but not ideal for large-volume samples.\n• Pyrogen test (C): Detects fever-producing substances but does not confirm sterility.\n• Karl Fischer titration (D): Measures moisture content, not sterility."
+    },
+    {
+      "question_number": 85,
+      "question": "Which of the following is a major advantage of in vitro bioassays?",
+      "options": {
+        "A": "They are more ethical than in vivo assays",
+        "B": "They provide immediate clinical applications",
+        "C": "They use whole animals",
+        "D": "They are more expensive than in vivo tests"
+      },
+      "answer": "(A) They are more ethical than in vivo assays",
+      "explanation": "In vitro bioassays eliminate the need for live animal testing, making them more ethical and widely accepted in drug screening."
+    },
+    {
+      "question_number": 86,
+      "question": "What is the standard drying temperature for Loss on Drying in most pharmaceutical samples?",
+      "options": {
+        "A": "50°C",
+        "B": "105°C",
+        "C": "150°C",
+        "D": "200°C"
+      },
+      "answer": "(B) 105°C",
+      "explanation": "Loss on Drying (LOD) is typically performed at 105°C to remove moisture content from pharmaceutical samples."
+    },
+    {
+      "question_number": 87,
+      "question": "According to pharmacopeial standards, what is the acceptable weight variation limit for suppositories weighing less than 1.5g?",
+      "options": {
+        "A": "±2%",
+        "B": "±5%",
+        "C": "±10%",
+        "D": "±15%"
+      },
+      "answer": "(C) ±10%",
+      "explanation": "The standard acceptable weight variation for suppositories weighing less than 1.5g is ±10%, as per pharmacopeial regulations."
+    },
+    {
+      "question_number": 88,
+      "question": "Which excipient is commonly used in chewable tablet formulations to enhance palatability?",
+      "options": {
+        "A": "Sucrose",
+        "B": "Sodium starch glycolate",
+        "C": "Polyvinylpyrrolidone (PVP)",
+        "D": "Lactose"
+      },
+      "answer": "(A) Sucrose",
+      "explanation": "Sucrose is added to chewable tablets to improve taste and increase patient compliance."
+    },
+    {
+      "question_number": 89,
+      "question": "Which of the following is an example of a gastro-retentive drug delivery system?",
+      "options": {
+        "A": "Orally disintegrating tablet",
+        "B": "Floating tablet",
+        "C": "Sublingual tablet",
+        "D": "Chewable tablet"
+      },
+      "answer": "(B) Floating tablet",
+      "explanation": "Floating tablets remain buoyant in the stomach for prolonged drug release, making them an example of a gastro-retentive system."
+    },
+    {
+      "question_number": 90,
+      "question": "Which organization regulates the quality of pharmaceutical tablets in the United States?",
+      "options": {
+        "A": "WHO",
+        "B": "USP",
+        "C": "FDA",
+        "D": "Both B and C"
+      },
+      "answer": "(D) Both B and C",
+      "explanation": "The USP (United States Pharmacopeia) sets quality standards, while the FDA (Food and Drug Administration) enforces compliance."
+    },
+    {
+      "question_number": 91,
+      "question": "Which of the following heat transfer mechanisms does not require a medium?",
+      "options": {
+        "A": "Conduction",
+        "B": "Convection",
+        "C": "Radiation",
+        "D": "All of the above require a medium"
+      },
+      "answer": "(C) Radiation",
+      "explanation": "Radiation transfers heat through electromagnetic waves and does not require a medium."
+    },
+    {
+      "question_number": 92,
+      "question": "In fluidized bed drying, the solid particles are:",
+      "options": {
+        "A": "Stationary",
+        "B": "Suspended and agitated by a stream of air",
+        "C": "Rotated in a drum",
+        "D": "Compressed under high pressure"
+      },
+      "answer": "(B) Suspended and agitated by a stream of air",
+      "explanation": "In fluidized bed drying, air lifts the particles, creating a fluid-like motion that enhances drying efficiency."
+    },
+    {
+      "question_number": 93,
+      "question": "Which size analysis method involves passing particles through a series of sieves with decreasing mesh sizes?",
+      "options": {
+        "A": "Microscopy",
+        "B": "Sedimentation",
+        "C": "Sieving",
+        "D": "Laser diffraction"
+      },
+      "answer": "(C) Sieving",
+      "explanation": "Sieving uses progressively smaller mesh sizes to separate particles based on size."
+    },
+    {
+      "question_number": 94,
+      "question": "Which mill utilizes high-velocity air to induce particle-particle collisions for size reduction?",
+      "options": {
+        "A": "Ball Mill",
+        "B": "Hammer Mill",
+        "C": "Fluid Energy Mill",
+        "D": "Cutter Mill"
+      },
+      "answer": "(C) Fluid Energy Mill",
+      "explanation": "Fluid Energy Mills use high-velocity air or steam to achieve ultra-fine particle size reduction."
+    },
+    {
+      "question_number": 95,
+      "question": "Which of the following processes is used in the production of dry powders for inhalation?",
+      "options": {
+        "A": "Lyophilization",
+        "B": "Spray Drying",
+        "C": "Vaporization",
+        "D": "Decantation"
+      },
+      "answer": "(B) Spray Drying",
+      "explanation": "Spray drying is the standard method for producing dry inhalation powders (e.g., for DPIs).\nWhy other options are incorrect:\n• Lyophilization (A): Used for thermolabile drugs, not typical for inhalers.\n• Vaporization (C): Not a pharmaceutical manufacturing process.\n• Decantation (D): Separates liquids from solids, irrelevant to powder production."
+    },
+    {
+      "question_number": 96,
+      "question": "The rate of hydrolysis increases with:",
+      "options": {
+        "A": "Increased temperature",
+        "B": "Decreased solvent polarity",
+        "C": "Decreased humidity",
+        "D": "Increased crystallinity"
+      },
+      "answer": "(A) Increased temperature",
+      "explanation": "Higher temperatures accelerate hydrolysis by increasing molecular interactions and reaction rates."
+    },
+    {
+      "question_number": 97,
+      "question": "Which of the following methods is commonly used for the preparation of suspensions?",
+      "options": {
+        "A": "Trituration",
+        "B": "Precipitation",
+        "C": "Homogenization",
+        "D": "All of the above"
+      },
+      "answer": "(D) All of the above",
+      "explanation": "Suspensions can be prepared using trituration, precipitation, or homogenization methods, depending on the formulation requirements."
+    },
+    {
+      "question_number": 98,
+      "question": "Which method is commonly employed to incorporate solid drug substances into an ointment base?",
+      "options": {
+        "A": "Fusion method",
+        "B": "Trituration method",
+        "C": "Levigation method",
+        "D": "Percolation method"
+      },
+      "answer": "(C) Levigation method",
+      "explanation": "Levigation reduces particle size by mixing the drug with a small amount of liquid before incorporating it into the base."
+    },
+    {
+      "question_number": 99,
+      "question": "Which test is used to detect reducing sugars?",
+      "options": {
+        "A": "Biuret Test",
+        "B": "Benedict’s Test",
+        "C": "Salkowski Test",
+        "D": "Disintegration Test"
+      },
+      "answer": "(B) Benedict’s Test",
+      "explanation": "Benedict’s test is used to detect reducing sugars (e.g., glucose, fructose) based on their ability to reduce copper(II) sulfate to copper(I) oxide, forming a red precipitate.\nWhy other options are incorrect?\n• Biuret Test (A): Used for detecting proteins, not sugars.\n• Salkowski Test (C): Used to detect steroids, not sugars.\n• Disintegration Test (D): Determines tablet disintegration time, unrelated to sugar detection."
+    },
+    {
+      "question_number": 100,
+      "question": "Which test detects aldehydes and reducing sugars?",
+      "options": {
+        "A": "Tollens’ Test",
+        "B": "Fehling’s Test",
+        "C": "Molisch’s Test",
+        "D": "Iodine Test"
+      },
+      "answer": "(B) Fehling’s Test",
+      "explanation": "Fehling’s Test detects reducing sugars (aldoses and ketoses) and aldehydes by reducing copper(II) ions to copper(I) oxide, forming a brick-red precipitate.\nWhy other options are incorrect?\n• Tollens’ Test (A): Specific to aldehydes only (does not detect ketoses).\n• Molisch’s Test (C): General test for carbohydrates, not specific to reducing sugars.\n• Iodine Test (D): Detects starch via a blue-black color, unrelated to reducing sugars or aldehydes."
+    }
+  ]
+}

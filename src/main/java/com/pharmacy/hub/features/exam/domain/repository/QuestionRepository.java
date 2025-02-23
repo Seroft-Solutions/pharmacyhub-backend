@@ -12,15 +12,15 @@ import java.util.Optional;
 public interface QuestionRepository extends JpaRepository<Question, Long>
 {
 
-    @Query("SELECT q FROM Question q WHERE q.exam.id = :examId AND q.isDeleted = false ORDER BY q.questionNumber")
+    @Query("SELECT q FROM Question q WHERE q.exam.id = :examId AND q.deleted = false ORDER BY q.questionNumber")
     List<Question> findByExamId(Long examId);
 
-    @Query("SELECT q FROM Question q WHERE q.isDeleted = false AND q.id = :id")
+    @Query("SELECT q FROM Question q WHERE q.deleted = false AND q.id = :id")
     Optional<Question> findByIdAndNotDeleted(Long id);
 
     @Query("SELECT COALESCE(MAX(q.questionNumber), 0) FROM Question q WHERE q.exam.id = :examId")
     Integer findMaxQuestionNumberByExamId(Long examId);
 
-    @Query("SELECT COUNT(q) FROM Question q WHERE q.exam.id = :examId AND q.isDeleted = false")
+    @Query("SELECT COUNT(q) FROM Question q WHERE q.exam.id = :examId AND q.deleted = false")
     Long countByExamId(Long examId);
 }

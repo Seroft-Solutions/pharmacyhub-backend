@@ -40,7 +40,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./pharmacyhub-realm/pharmacyhub_realm_local.json:/opt/keycloak/data/import/realm.json
+      - ./pharmacyhub/pharmacyhub_realm_local.json:/opt/keycloak/data/import/realm.json
       - keycloak-data:/opt/keycloak/data
     command:
       - "start-dev"
