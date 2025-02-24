@@ -7,5 +7,6 @@ public enum RoleEnum {
     PHARMACIST,
     PHARMACY_MANAGER,
     PROPRIETOR,
-    SALESMAN
+    SALESMAN,
+    INVENTORY_MANAGER
 }

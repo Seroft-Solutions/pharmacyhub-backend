@@ -7,6 +7,7 @@ import lombok.Data;
 import com.pharmacyhub.constants.RoleEnum;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -40,7 +41,8 @@ public class Role {
         joinColumns = @JoinColumn(name = "role_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<Permission> permissions;
+    @Builder.Default
+    private Set<Permission> permissions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -48,7 +50,8 @@ public class Role {
         joinColumns = @JoinColumn(name = "parent_role_id"),
         inverseJoinColumns = @JoinColumn(name = "child_role_id")
     )
-    private Set<Role> childRoles;
+    @Builder.Default
+    private Set<Role> childRoles = new HashSet<>();
 
     public String getName() {
         return name.toString();

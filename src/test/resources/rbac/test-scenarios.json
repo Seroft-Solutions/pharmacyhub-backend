@@ -1,0 +1,379 @@
+{
+  "testScenarios": [
+    {
+      "name": "Pharmacist Basic Access",
+      "description": "Tests basic access control for a standard pharmacist",
+      "user": {
+        "role": "PHARMACIST",
+        "permissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION"]
+      },
+      "accessTests": [
+        {
+          "resource": "MEDICINE",
+          "operation": "READ",
+          "expected": true
+        },
+        {
+          "resource": "MEDICINE",
+          "operation": "CREATE",
+          "expected": false
+        },
+        {
+          "resource": "PRESCRIPTION",
+          "operation": "READ",
+          "expected": true
+        },
+        {
+          "resource": "PRESCRIPTION",
+          "operation": "APPROVE",
+          "expected": false
+        }
+      ]
+    },
+    {
+      "name": "Pharmacy Manager Access",
+      "description": "Tests access control for a pharmacy manager with elevated permissions",
+      "user": {
+        "role": "PHARMACY_MANAGER",
+        "permissions": ["VIEW_MEDICINE", "CREATE_MEDICINE", "VIEW_PRESCRIPTION", "APPROVE_PRESCRIPTION"]
+      },
+      "accessTests": [
+        {
+          "resource": "MEDICINE",
+          "operation": "READ",
+          "expected": true
+        },
+        {
+          "resource": "MEDICINE",
+          "operation": "CREATE",
+          "expected": true
+        },
+        {
+          "resource": "PRESCRIPTION",
+          "operation": "READ",
+          "expected": true
+        },
+        {
+          "resource": "PRESCRIPTION",
+          "operation": "APPROVE",
+          "expected": true
+        },
+        {
+          "resource": "PRESCRIPTION",
+          "operation": "DELETE",
+          "expected": false
+        }
+      ]
+    },
+    {
+      "name": "Admin Full Access",
+      "description": "Tests access control for an administrator with full access",
+      "user": {
+        "role": "ADMIN",
+        "permissions": ["MANAGE_ALL"]
+      },
+      "accessTests": [
+        {
+          "resource": "MEDICINE",
+          "operation": "READ",
+          "expected": true
+        },
+        {
+          "resource": "MEDICINE",
+          "operation": "CREATE",
+          "expected": true
+        },
+        {
+          "resource": "MEDICINE",
+          "operation": "UPDATE",
+          "expected": true
+        },
+        {
+          "resource": "MEDICINE",
+          "operation": "DELETE",
+          "expected": true
+        },
+        {
+          "resource": "PRESCRIPTION",
+          "operation": "MANAGE",
+          "expected": true
+        },
+        {
+          "resource": "USER",
+          "operation": "MANAGE",
+          "expected": true
+        }
+      ]
+    },
+    {
+      "name": "Role Hierarchy Test",
+      "description": "Tests the role hierarchy functionality",
+      "hierarchy": [
+        {
+          "parentRole": "SENIOR_PHARMACIST",
+          "childRole": "PHARMACIST"
+        },
+        {
+          "parentRole": "PHARMACY_MANAGER",
+          "childRole": "SENIOR_PHARMACIST"
+        },
+        {
+          "parentRole": "ADMIN",
+          "childRole": "PHARMACY_MANAGER"
+        }
+      ],
+      "users": [
+        {
+          "name": "Basic Pharmacist",
+          "role": "PHARMACIST",
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION"]
+        },
+        {
+          "name": "Senior Pharmacist",
+          "role": "SENIOR_PHARMACIST",
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION", "ORDER_MEDICINE", "MANAGE_INVENTORY"]
+        },
+        {
+          "name": "Pharmacy Manager",
+          "role": "PHARMACY_MANAGER",
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION", "ORDER_MEDICINE", "MANAGE_INVENTORY", "CREATE_MEDICINE", "APPROVE_PRESCRIPTION", "MANAGE_STAFF"]
+        },
+        {
+          "name": "Administrator",
+          "role": "ADMIN",
+          "expectedPermissions": ["MANAGE_ALL"]
+        }
+      ]
+    },
+    {
+      "name": "Group Based Permissions",
+      "description": "Tests permission assignment through group membership",
+      "groups": [
+        {
+          "name": "PRESCRIPTION_TEAM",
+          "roles": ["PHARMACIST"],
+          "additionalPermissions": ["VIEW_PRESCRIPTION_HISTORY", "EXPORT_PRESCRIPTIONS"]
+        },
+        {
+          "name": "INVENTORY_TEAM",
+          "roles": ["PHARMACIST"],
+          "additionalPermissions": ["VIEW_INVENTORY", "ORDER_SUPPLIES"]
+        },
+        {
+          "name": "MANAGEMENT_TEAM",
+          "roles": ["PHARMACY_MANAGER"],
+          "additionalPermissions": ["VIEW_REPORTS", "MANAGE_BUDGET"]
+        }
+      ],
+      "users": [
+        {
+          "name": "Prescription Team Member",
+          "role": "PHARMACIST",
+          "groups": ["PRESCRIPTION_TEAM"],
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION", "VIEW_PRESCRIPTION_HISTORY", "EXPORT_PRESCRIPTIONS"]
+        },
+        {
+          "name": "Inventory Team Member",
+          "role": "PHARMACIST",
+          "groups": ["INVENTORY_TEAM"],
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION", "VIEW_INVENTORY", "ORDER_SUPPLIES"]
+        },
+        {
+          "name": "Cross-Functional Member",
+          "role": "PHARMACIST",
+          "groups": ["PRESCRIPTION_TEAM", "INVENTORY_TEAM"],
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION", "VIEW_PRESCRIPTION_HISTORY", "EXPORT_PRESCRIPTIONS", "VIEW_INVENTORY", "ORDER_SUPPLIES"]
+        },
+        {
+          "name": "Manager Team Member",
+          "role": "PHARMACY_MANAGER",
+          "groups": ["MANAGEMENT_TEAM"],
+          "expectedPermissions": ["VIEW_MEDICINE", "CREATE_MEDICINE", "VIEW_PRESCRIPTION", "APPROVE_PRESCRIPTION", "VIEW_REPORTS", "MANAGE_BUDGET"]
+        }
+      ]
+    },
+    {
+      "name": "Permission Override Tests",
+      "description": "Tests the permission override functionality",
+      "users": [
+        {
+          "name": "Restricted Pharmacist",
+          "role": "PHARMACIST",
+          "overrides": [
+            {
+              "permission": "VIEW_PRESCRIPTION",
+              "grant": false
+            }
+          ],
+          "expectedPermissions": ["VIEW_MEDICINE"],
+          "unexpectedPermissions": ["VIEW_PRESCRIPTION"]
+        },
+        {
+          "name": "Enhanced Pharmacist",
+          "role": "PHARMACIST",
+          "overrides": [
+            {
+              "permission": "CREATE_MEDICINE",
+              "grant": true
+            }
+          ],
+          "expectedPermissions": ["VIEW_MEDICINE", "VIEW_PRESCRIPTION", "CREATE_MEDICINE"]
+        },
+        {
+          "name": "Mixed Override User",
+          "role": "PHARMACIST",
+          "groups": ["INVENTORY_TEAM"],
+          "overrides": [
+            {
+              "permission": "VIEW_MEDICINE",
+              "grant": false
+            },
+            {
+              "permission": "APPROVE_PRESCRIPTION",
+              "grant": true
+            }
+          ],
+          "expectedPermissions": ["VIEW_PRESCRIPTION", "VIEW_INVENTORY", "ORDER_SUPPLIES", "APPROVE_PRESCRIPTION"],
+          "unexpectedPermissions": ["VIEW_MEDICINE"]
+        }
+      ]
+    },
+    {
+      "name": "Dynamic Access Control",
+      "description": "Tests dynamic access control based on resource ownership and other attributes",
+      "resources": [
+        {
+          "type": "PRESCRIPTION",
+          "id": 1,
+          "attributes": {
+            "createdById": 1,
+            "patientId": 101,
+            "status": "PENDING"
+          }
+        },
+        {
+          "type": "PRESCRIPTION",
+          "id": 2,
+          "attributes": {
+            "createdById": 2,
+            "patientId": 102,
+            "status": "APPROVED"
+          }
+        },
+        {
+          "type": "MEDICINE",
+          "id": 1,
+          "attributes": {
+            "controlled": true,
+            "requiresApproval": true
+          }
+        },
+        {
+          "type": "MEDICINE",
+          "id": 2,
+          "attributes": {
+            "controlled": false,
+            "requiresApproval": false
+          }
+        }
+      ],
+      "users": [
+        {
+          "id": 1,
+          "name": "Creator Pharmacist",
+          "role": "PHARMACIST",
+          "accessTests": [
+            {
+              "resource": {
+                "type": "PRESCRIPTION",
+                "id": 1
+              },
+              "operation": "VIEW",
+              "expected": true,
+              "reason": "Creator can view their own prescriptions"
+            },
+            {
+              "resource": {
+                "type": "PRESCRIPTION",
+                "id": 1
+              },
+              "operation": "UPDATE",
+              "expected": true,
+              "reason": "Creator can update their own pending prescriptions"
+            },
+            {
+              "resource": {
+                "type": "PRESCRIPTION",
+                "id": 2
+              },
+              "operation": "VIEW",
+              "expected": true,
+              "reason": "Pharmacists can view all prescriptions"
+            },
+            {
+              "resource": {
+                "type": "PRESCRIPTION",
+                "id": 2
+              },
+              "operation": "UPDATE",
+              "expected": false,
+              "reason": "Cannot update prescriptions created by others"
+            },
+            {
+              "resource": {
+                "type": "MEDICINE",
+                "id": 1
+              },
+              "operation": "DISPENSE",
+              "expected": false,
+              "reason": "Cannot dispense controlled medicines without approval"
+            },
+            {
+              "resource": {
+                "type": "MEDICINE",
+                "id": 2
+              },
+              "operation": "DISPENSE",
+              "expected": true,
+              "reason": "Can dispense non-controlled medicines"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "Manager",
+          "role": "PHARMACY_MANAGER",
+          "accessTests": [
+            {
+              "resource": {
+                "type": "PRESCRIPTION",
+                "id": 1
+              },
+              "operation": "APPROVE",
+              "expected": true,
+              "reason": "Managers can approve prescriptions"
+            },
+            {
+              "resource": {
+                "type": "PRESCRIPTION",
+                "id": 2
+              },
+              "operation": "APPROVE",
+              "expected": false,
+              "reason": "Cannot approve already approved prescriptions"
+            },
+            {
+              "resource": {
+                "type": "MEDICINE",
+                "id": 1
+              },
+              "operation": "DISPENSE",
+              "expected": true,
+              "reason": "Managers can dispense controlled medicines"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

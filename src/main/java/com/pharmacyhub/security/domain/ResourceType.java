@@ -13,5 +13,6 @@ public enum ResourceType {
     ROLE,
     GROUP,
     AUDIT_LOG,
-    SYSTEM_SETTING
+    SYSTEM_SETTING,
+    MEDICINE
 }
