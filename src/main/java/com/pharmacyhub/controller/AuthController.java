@@ -50,7 +50,7 @@ public class AuthController
     {
       return ResponseEntity.ok("User registered successfully. Please check your email for verification.");
     }
-    return new ResponseEntity<PHUserDTO>(userCreated, HttpStatus.CONFLICT);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists");
   }
 
   @GetMapping("/verify")

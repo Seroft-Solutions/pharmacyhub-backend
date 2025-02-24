@@ -3,6 +3,7 @@ package com.pharmacyhub.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacyhub.config.TestConfig;
 import com.pharmacyhub.dto.LoggedInUserDTO;
+import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.model.LoginRequest;
@@ -85,17 +86,19 @@ public class AuthControllerIntegrationTest {
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
 
-        // First registration
+        // First registration should succeed
         mockMvc.perform(post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("User registered successfully. Please check your email for verification."));
 
-        // Duplicate registration
+        // Duplicate registration should fail
         mockMvc.perform(post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDTO)))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andExpect(content().string("User with this email already exists"));
     }
 
     @Test
@@ -107,11 +110,15 @@ public class AuthControllerIntegrationTest {
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
         
-        userService.saveUser(userDTO);
+        // Save user and get token
+        PHUserDTO savedUser = userService.saveUser(userDTO);
+        assertNotNull(savedUser, "User should be saved successfully");
 
-        // Get verification token (in real scenario this would be sent via email)
-        User user = userService.getUserByEmailAddress(userDTO);
+        // Verify using token from database
+        User user = userRepository.findByEmailAddress("verify@example.com").orElse(null);
+        assertNotNull(user, "User should exist in database");
         String token = user.getVerificationToken();
+        assertNotNull(token, "Verification token should not be null");
 
         mockMvc.perform(get("/api/auth/verify")
                 .param("token", token))
@@ -136,8 +143,13 @@ public class AuthControllerIntegrationTest {
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
         
-        userService.saveUser(userDTO);
-        User user = userService.getUserByEmailAddress(userDTO);
+        // Save user
+        PHUserDTO savedUser = userService.saveUser(userDTO);
+        assertNotNull(savedUser, "User should be saved successfully");
+
+        // Get user and verify
+        User user = userRepository.findByEmailAddress("login@example.com").orElse(null);
+        assertNotNull(user, "User should exist in database");
         userService.verifyUser(user.getVerificationToken());
 
         // Attempt login
@@ -156,7 +168,7 @@ public class AuthControllerIntegrationTest {
             LoggedInUserDTO.class
         );
 
-        assertNotNull(response.getJwtToken());
+        assertNotNull(response.getJwtToken(), "JWT token should not be null");
     }
 
     @Test

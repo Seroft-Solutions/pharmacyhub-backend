@@ -43,13 +43,49 @@ public class UserService {
     }
 
     public PHUserDTO saveUser(UserDTO userDTO) {
-        // Implementation for saving user
-        return null; // Replace with actual implementation
+        // Check if user already exists
+        Optional<User> existingUser = userRepository.findByEmailAddress(userDTO.getEmailAddress());
+        if (existingUser.isPresent()) {
+            return null;
+        }
+
+        // Create new user
+        User user = new User();
+        user.setEmailAddress(userDTO.getEmailAddress());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setVerificationToken(java.util.UUID.randomUUID().toString());
+        user.setVerified(false);
+        user.setActive(true);
+        user.setRegistered(true);
+        user.setAccountNonLocked(true);
+        user.setOpenToConnect(true);
+
+        // Save user
+        user = userRepository.save(user);
+
+        // Convert to DTO and return
+        return UserDTO.builder()
+            .id(user.getId())
+            .emailAddress(user.getEmailAddress())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .openToConnect(user.isOpenToConnect())
+            .registered(user.isRegistered())
+            .build();
     }
 
     public boolean verifyUser(String token) {
-        // Implementation for verifying user
-        return false; // Replace with actual implementation
+        Optional<User> userOptional = userRepository.findByVerificationToken(token);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            user.setVerified(true);
+            user.setVerificationToken(null);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     public List<User> getUsers() {
