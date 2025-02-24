@@ -1,6 +1,7 @@
 package com.pharmacyhub.security.infrastructure;
 
 import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.constants.RoleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Repository
 public interface RolesRepository extends JpaRepository<Role, Long> {
-    Optional<Role> findByName(String name);
+    Optional<Role> findByName(RoleEnum name);
     
     List<Role> findBySystemTrue();
     
@@ -24,5 +25,5 @@ public interface RolesRepository extends JpaRepository<Role, Long> {
     @Query("SELECT DISTINCT r FROM Role r LEFT JOIN FETCH r.childRoles WHERE r.id = :roleId")
     Optional<Role> findByIdWithChildRoles(Long roleId);
     
-    boolean existsByNameAndIdNot(String name, Long id);
+    boolean existsByNameAndIdNot(RoleEnum name, Long id);
 }

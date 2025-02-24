@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   web:
@@ -25,18 +25,17 @@ spring:
             enable: true
 
 server:
-  port: 8080
+  port: 8081
 
 clientApp:
   name: PharmacyHub
 
 pharmacyhub:
   seeder:
-    engine: true
+    engine: false
   test:
     data:
       pharmacist: 1-10
-      pharmacy:
-        manager: 11-20
+      pharmacy-manager: 11-20
       proprietor: 21-30
       salesman: 31-40

@@ -1,6 +1,7 @@
 package com.pharmacyhub.security.service;
 
 import com.pharmacyhub.entity.User;
+import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.security.domain.Group;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.exception.RBACException;
@@ -19,14 +20,14 @@ public class UserRoleService {
     private final GroupRepository groupRepository;
 
     @Transactional(readOnly = true)
-    public boolean hasRole(Long userId, String roleName) {
+    public boolean hasRole(Long userId, RoleEnum roleName) {
         Role role = rolesRepository.findByName(roleName)
                                    .orElseThrow(() -> RBACException.entityNotFound("Role"));
         return hasRole(userId, role);
     }
 
     @Transactional(readOnly = true)
-    public boolean hasAnyRole(Long userId, String... roleNames) {
+    public boolean hasAnyRole(Long userId, RoleEnum... roleNames) {
         return Arrays.stream(roleNames)
             .anyMatch(roleName -> hasRole(userId, roleName));
     }

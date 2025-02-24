@@ -1,7 +1,6 @@
 package com.pharmacyhub.entity;
 
 import com.pharmacyhub.security.domain.Group;
-import com.pharmacyhub.security.domain.Role;
 import org.springframework.data.domain.Sort;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,9 +38,9 @@ public class User implements UserDetails {
     private boolean registered;
     private boolean openToConnect;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
-    private Role role;
+    private SystemRole systemRole;
 
     private String firstName;
     private String lastName;
@@ -58,16 +57,16 @@ public class User implements UserDetails {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @Builder.Default
-    private Set<Role> roles = new HashSet<>();
+    private Set<com.pharmacyhub.security.domain.Role> roles = new HashSet<>();
 
-    public void setRole(Role role) {
-        this.role = role;
-        if (role != null) {
-            this.roles.add(role);
-        }
+    public void setRole(com.pharmacyhub.security.domain.Role role) {
+        this.roles.add(role);
     }
 
-    public Role getRole() {
+    public com.pharmacyhub.security.domain.Role getRole() {
+        if (roles == null || roles.isEmpty()) {
+            return null;
+        }
         return roles.stream()
             .min((r1, r2) -> Integer.compare(r1.getPrecedence(), r2.getPrecedence()))
             .orElse(null);

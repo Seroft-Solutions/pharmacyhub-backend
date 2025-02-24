@@ -13,7 +13,7 @@ public class RoleSeeder {
     @Autowired
     private RoleRepository roleRepository;
 
-    private static final Map<String, Integer> ROLE_PRECEDENCE = Map.of(
+    private static final Map<RoleEnum, Integer> ROLE_PRECEDENCE = Map.of(
         RoleEnum.SUPER_ADMIN, 1,
         RoleEnum.ADMIN, 2,
         RoleEnum.PHARMACIST, 3,
@@ -23,7 +23,7 @@ public class RoleSeeder {
         RoleEnum.USER, 5
     );
 
-    private static final Map<String, String> ROLE_DESCRIPTIONS = Map.of(
+    private static final Map<RoleEnum, String> ROLE_DESCRIPTIONS = Map.of(
         RoleEnum.SUPER_ADMIN, "Super administrator with full system access",
         RoleEnum.ADMIN, "Administrator with system management capabilities",
         RoleEnum.PHARMACIST, "Licensed pharmacist user",
