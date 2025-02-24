@@ -24,7 +24,7 @@ public class OtpService
   @Autowired
   private EmailService emailService;
 
-  public Otp generateOtp(PHUserDTO userDTO)
+  public Otp generateOtp(UserDTO userDTO)
   {
     User user = userService.getUserByEmailAddress((UserDTO) userDTO);
     if (user != null)

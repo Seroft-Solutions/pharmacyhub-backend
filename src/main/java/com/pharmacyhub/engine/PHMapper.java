@@ -8,9 +8,9 @@ import com.pharmacyhub.entity.connections.*;
 import com.pharmacyhub.security.domain.Group;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.Role;
-import com.pharmacyhub.security.dto.GroupDTO;
-import com.pharmacyhub.security.dto.PermissionDTO;
-import com.pharmacyhub.security.dto.RoleDTO;
+import com.pharmacyhub.security.application.dto.GroupDTO;
+import com.pharmacyhub.security.application.dto.PermissionDTO;
+import com.pharmacyhub.security.application.dto.RoleDTO;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
@@ -101,7 +101,7 @@ public class PHMapper {
     }
 
     // New RBAC mapping methods
-    public Role getRole(RoleDTO roleDTO) {
+    public Role getRole(com.pharmacyhub.security.application.dto.RoleDTO roleDTO) {
         Role role = modelMapper.map(roleDTO, Role.class);
         
         if (roleDTO.getPermissionIds() != null) {
@@ -134,14 +134,14 @@ public class PHMapper {
 
         if (role.getChildRoles() != null) {
             dto.setChildRoleIds(role.getChildRoles().stream()
-                .map(Role::getId)
+                .map(r -> r.getId())
                 .collect(Collectors.toSet()));
         }
 
         return dto;
     }
 
-    public Permission getPermission(PermissionDTO permissionDTO) {
+    public Permission getPermission(com.pharmacyhub.security.application.dto.PermissionDTO permissionDTO) {
         return modelMapper.map(permissionDTO, Permission.class);
     }
 
@@ -149,7 +149,7 @@ public class PHMapper {
         return modelMapper.map(permission, PermissionDTO.class);
     }
 
-    public Group getGroup(GroupDTO groupDTO) {
+    public Group getGroup(com.pharmacyhub.security.application.dto.GroupDTO groupDTO) {
         Group group = modelMapper.map(groupDTO, Group.class);
         
         if (groupDTO.getRoleIds() != null) {
@@ -167,9 +167,10 @@ public class PHMapper {
         GroupDTO dto = modelMapper.map(group, GroupDTO.class);
         
         if (group.getRoles() != null) {
-            dto.setRoleIds(group.getRoles().stream()
-                .map(Role::getId)
-                .collect(Collectors.toSet()));
+            Set<Long> roleIds = group.getRoles().stream()
+                .map(role -> ((Role) role).getId())
+                .collect(Collectors.toSet());
+            dto.setRoleIds(roleIds);
         }
 
         return dto;

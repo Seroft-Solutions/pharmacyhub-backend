@@ -32,4 +32,8 @@ public class Group {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
 }

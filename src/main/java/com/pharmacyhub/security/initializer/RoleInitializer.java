@@ -10,29 +10,35 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
-public class RoleInitializer {
+public class RoleInitializer implements ApplicationListener<ContextRefreshedEvent> {
     private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
 
-    @PostConstruct
+    @Override
     @Transactional
-    public void init() {
-        if (rolesRepository.count() > 0) {
-            log.info("Roles already initialized");
-            return;
-        }
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        try {
+            if (rolesRepository.count() > 0) {
+                log.info("Roles already initialized");
+                return;
+            }
 
-        log.info("Initializing default roles and permissions");
-        initializePermissions();
-        initializeRoles();
-        initializeGroups();
+            log.info("Initializing default roles and permissions");
+            initializePermissions();
+            initializeRoles();
+            initializeGroups();
+        } catch (Exception e) {
+            log.error("Error initializing roles: ", e);
+        }
     }
 
     private void initializePermissions() {

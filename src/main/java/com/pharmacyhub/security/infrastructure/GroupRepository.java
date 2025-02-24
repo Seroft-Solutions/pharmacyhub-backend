@@ -9,11 +9,12 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface GroupRepository extends JpaRepository<Group, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long>, GroupRepositoryInterface {
+    @Override
     Optional<Group> findByName(String name);
-    
+
     @Query("SELECT DISTINCT g FROM Group g LEFT JOIN FETCH g.roles WHERE g.id IN :groupIds")
     Set<Group> findByIdInWithRoles(Set<Long> groupIds);
-    
+
     boolean existsByNameAndIdNot(String name, Long id);
 }

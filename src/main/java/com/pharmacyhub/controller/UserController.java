@@ -29,7 +29,7 @@ public class UserController
           value = APIConstants.API_VERSION_V1 + "/add-user",
           method = RequestMethod.POST
   )
-  public ResponseEntity<PHUserDTO> addUser(@RequestBody PHUserDTO user)
+  public ResponseEntity<PHUserDTO> addUser(@RequestBody UserDTO user)
   {
     PHUserDTO userCreated = userService.saveUser(user);
 
@@ -97,9 +97,9 @@ public class UserController
           value = APIConstants.API_VERSION_V1 + "/user-data",
           method = RequestMethod.GET
   )
-  public ResponseEntity<UserType> getUserType()
+  public ResponseEntity<UserType> getUserType(Long userId)
   {
-    UserType userType = userService.getUserType();
+    UserType userType = userService.getUserType(userId);
     if (userType != null) {
         return ResponseEntity.ok(userType);
     }

@@ -22,12 +22,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
+@Entity
+@Table(name = "pharmacists_connections")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "pharmacists_connections")
 public class PharmacistsConnections
 {
   @Id
@@ -56,4 +56,59 @@ public class PharmacistsConnections
   @JoinColumn(name = "pharmacist_id")
   private Pharmacist pharmacist;
 
+  public StateEnum getState() {
+    return state;
+  }
+
+  public void setState(StateEnum state) {
+    this.state = state;
+  }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Pharmacist getPharmacist() {
+        return pharmacist;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setPharmacist(Pharmacist pharmacist) {
+        this.pharmacist = pharmacist;
+    }
 }

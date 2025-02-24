@@ -1,15 +1,16 @@
 package com.pharmacyhub.security.initializer;
 
+import java.util.List;
+
 import com.pharmacyhub.security.service.RoleHierarchyService;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -59,17 +60,19 @@ public class RoleHierarchyInitializer implements ApplicationListener<ContextRefr
 
                 if (role1.getPrecedence() == role2.getPrecedence()) {
                     // Find the parent role (role with next higher precedence)
-                    roles.stream()
+                    List<Role> parentRoles = roles.stream()
                             .filter(r -> r.getPrecedence() < role1.getPrecedence())
-                            .max((r1, r2) -> Integer.compare(r1.getPrecedence(), r2.getPrecedence()))
-                            .ifPresent(parentRole -> {
-                                try {
-                                    roleHierarchyService.addChildRole(parentRole.getId(), role1.getId());
-                                    roleHierarchyService.addChildRole(parentRole.getId(), role2.getId());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
+                            .sorted((r1, r2) -> Integer.compare(r1.getPrecedence(), r2.getPrecedence()))
+                            .collect(Collectors.toList());
+                    if (!parentRoles.isEmpty()) {
+                        Role parentRole = parentRoles.get(parentRoles.size() - 1);
+                        try {
+                            roleHierarchyService.addChildRole(parentRole.getId(), role1.getId());
+                            roleHierarchyService.addChildRole(parentRole.getId(), role2.getId());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
         }

@@ -13,6 +13,7 @@ import java.util.Set;
 
 @Component
 public class PHPermissionEvaluator implements PermissionEvaluator {
+
     private final RBACService rbacService;
 
     public PHPermissionEvaluator(RBACService rbacService) {
@@ -20,30 +21,30 @@ public class PHPermissionEvaluator implements PermissionEvaluator {
     }
 
     @Override
-    public boolean hasPermission(Authentication auth, Object targetDomainObject, Object permission) {
-        if ((auth == null) || (targetDomainObject == null) || !(permission instanceof String)) {
+    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+        if ((authentication == null) || (targetDomainObject == null) || !(permission instanceof String)) {
             return false;
         }
 
-        String targetType = targetDomainObject.toString().toUpperCase();
+        String targetType = targetDomainObject.getClass().getSimpleName().toUpperCase();
         String permissionString = permission.toString();
 
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         User user = (User) userDetails;
 
         Set<Permission> effectivePermissions = rbacService.getUserEffectivePermissions(user.getId());
 
         return effectivePermissions.stream()
-            .anyMatch(p -> p.getResourceType().name().equals(targetType) &&
-                         p.getOperationType().name().equals(permissionString));
+                .anyMatch(p -> p.getResourceType().name().equals(targetType)
+                        && p.getOperationType().name().equals(permissionString));
     }
 
     @Override
-    public boolean hasPermission(Authentication auth, Serializable targetId, String targetType, Object permission) {
-        if ((auth == null) || (targetType == null) || !(permission instanceof String)) {
+    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+        if ((authentication == null) || (targetType == null) || !(permission instanceof String)) {
             return false;
         }
 
-        return hasPermission(auth, targetType, permission);
+        return hasPermission(authentication, targetId, targetType, permission);
     }
 }

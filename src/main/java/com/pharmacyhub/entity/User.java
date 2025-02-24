@@ -114,17 +114,17 @@ public class User implements UserDetails {
         
         // Add permission-based authorities
         roles.forEach(role -> 
-            role.getPermissions().forEach(permission ->
+            ((com.pharmacyhub.security.domain.Role) role).getPermissions().forEach(permission ->
                 authorities.add(new SimpleGrantedAuthority(permission.getName()))));
         
         // Add group-based authorities
         groups.forEach(group -> 
             group.getRoles().forEach(role -> {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-                role.getPermissions().forEach(permission ->
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + ((com.pharmacyhub.security.domain.Role) role).getName()));
+                ((com.pharmacyhub.security.domain.Role) role).getPermissions().forEach(permission ->
                     authorities.add(new SimpleGrantedAuthority(permission.getName())));
             }));
-            
+
         return authorities;
     }
 
@@ -154,5 +154,31 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return active;
+    }    
+    @Override
+    public String getPassword() { return password; }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRegistered(boolean registered) {
+        this.registered = registered;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }

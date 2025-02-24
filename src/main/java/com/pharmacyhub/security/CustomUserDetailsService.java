@@ -3,6 +3,7 @@ package com.pharmacyhub.security;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.security.domain.Permission;
+import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.service.RBACService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -41,14 +42,21 @@ public class CustomUserDetailsService implements UserDetailsService
                                                                       .collect(Collectors.toSet());
 
         // Add role-based authorities
-        user.getRoles().forEach(role ->
-                                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
+        user.getRoles().forEach(role -> {
+            Role typedRole = (Role) role;
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + typedRole.getName()));
+            typedRole.getPermissions().forEach(permission ->
+                authorities.add(new SimpleGrantedAuthority(permission.getName())));
+        });
 
         // Add group-based authorities
         user.getGroups().forEach(group ->
-                                         group.getRoles().forEach(role ->
-                                                                          authorities.add(new SimpleGrantedAuthority(
-                                                                                  "ROLE_" + role.getName()))));
+            group.getRoles().forEach(role -> {
+                Role typedRole = (Role) role;
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + typedRole.getName()));
+                typedRole.getPermissions().forEach(permission ->
+                    authorities.add(new SimpleGrantedAuthority(permission.getName())));
+            }));
 
         return user;
     }

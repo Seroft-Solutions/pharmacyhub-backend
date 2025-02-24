@@ -33,4 +33,8 @@ public class Permission {
 
     @Column(nullable = false)
     private boolean requiresApproval;
+
+    public String getName() {
+        return name;
+    }
 }

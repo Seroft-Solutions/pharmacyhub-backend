@@ -1,76 +1,37 @@
 package com.pharmacyhub.security.service;
 
 import com.pharmacyhub.entity.User;
-import com.pharmacyhub.constants.RoleEnum;
-import com.pharmacyhub.security.domain.Group;
+import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.security.domain.Role;
-import com.pharmacyhub.security.exception.RBACException;
-import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserRoleService {
     private final RolesRepository rolesRepository;
-    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public boolean hasRole(Long userId, RoleEnum roleName) {
+    public List<Role> getSystemRoles() {
+        return rolesRepository.findBySystemTrue();
+    }
+
+    public List<Role> getAssignableRoles(String roleName, Long userId) {
         Role role = rolesRepository.findByName(roleName)
-                                   .orElseThrow(() -> RBACException.entityNotFound("Role"));
-        return hasRole(userId, role);
-    }
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
 
-    @Transactional(readOnly = true)
-    public boolean hasAnyRole(Long userId, RoleEnum... roleNames) {
-        return Arrays.stream(roleNames)
-            .anyMatch(roleName -> hasRole(userId, roleName));
-    }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-    @Transactional(readOnly = true)
-    public boolean isInGroup(Long userId, String groupName) {
-        Group group = groupRepository.findByName(groupName)
-            .orElseThrow(() -> RBACException.entityNotFound("Group"));
-        return hasGroup(userId, group);
-    }
+        List<Role> userRoles = user.getRoles().stream().toList();
 
-    @Transactional(readOnly = true)
-    public boolean canAssignRole(User assignerUser, Role roleToAssign) {
-        // Get all roles of the assigner
-        Set<Role> assignerRoles = assignerUser.getRoles();
-
-        // Check if any of the assigner's roles have higher or equal precedence
-        return assignerRoles.stream()
-            .anyMatch(assignerRole -> assignerRole.getPrecedence() <= roleToAssign.getPrecedence());
-    }
-
-    @Transactional(readOnly = true)
-    public boolean canRemoveRole(User removerUser, Role roleToRemove) {
-        // Similar to assigning, but also prevent users from removing their own roles
-        if (removerUser.getRoles().contains(roleToRemove)) {
-            return false;
-        }
-
-        // Get all roles of the remover
-        Set<Role> removerRoles = removerUser.getRoles();
-
-        // Check if any of the remover's roles have higher or equal precedence
-        return removerRoles.stream()
-            .anyMatch(removerRole -> removerRole.getPrecedence() <= roleToRemove.getPrecedence());
-    }
-
-    private boolean hasRole(Long userId, Role role) {
-        // This would be implemented by checking the user's roles in the database
-        return false; // Placeholder implementation
-    }
-
-    private boolean hasGroup(Long userId, Group group) {
-        // This would be implemented by checking the user's groups in the database
-        return false; // Placeholder implementation
+        return rolesRepository.findByPrecedenceLessThanEqual(role.getPrecedence())
+                .stream()
+                .filter(r -> !userRoles.contains(r))
+                .collect(Collectors.toList());
     }
 }

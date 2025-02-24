@@ -49,4 +49,16 @@ public class Role {
         inverseJoinColumns = @JoinColumn(name = "child_role_id")
     )
     private Set<Role> childRoles;
+
+    public String getName() {
+        return name.toString();
+    }
+
+    public int getPrecedence() {
+        return precedence;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
 }
