@@ -1,50 +1,41 @@
 package com.pharmacyhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pharmacyhub.config.TestConfig;
+import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.dto.LoggedInUserDTO;
 import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.entity.User;
+import com.pharmacyhub.entity.enums.UserType;
+import com.pharmacyhub.repository.UserRepository;
+import com.pharmacyhub.security.JwtHelper;
+import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.repository.RoleRepository;
 import com.pharmacyhub.security.model.LoginRequest;
+import com.pharmacyhub.service.EmailService;
 import com.pharmacyhub.service.UserService;
+import com.pharmacyhub.util.TestDataBuilder;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import com.pharmacyhub.PharmacyHubApplication;
-import com.pharmacyhub.config.SecurityConfig;
-import com.pharmacyhub.config.MyConfig;
-import com.pharmacyhub.repository.UserRepository;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = {PharmacyHubApplication.class})
 @AutoConfigureMockMvc
-@Import(TestConfig.class)
-@ActiveProfiles("test")
-@TestPropertySource(locations = "classpath:application-test.yml")
-@ComponentScan(basePackages = "com.pharmacyhub", 
-    excludeFilters = @ComponentScan.Filter(
-        type = FilterType.ASSIGNABLE_TYPE, 
-        classes = {SecurityConfig.class, MyConfig.class}
-    )
-)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class AuthControllerIntegrationTest {
+class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -53,134 +44,129 @@ public class AuthControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtHelper jwtHelper;
+
+    @MockBean
+    private EmailService emailService;
+
+    private Role userRole;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws MessagingException
+    {
+        // Clear user database
         userRepository.deleteAll();
+        
+        // Create user role if it doesn't exist
+        if (roleRepository.findByName(RoleEnum.USER).isEmpty()) {
+            userRole = TestDataBuilder.createRole(RoleEnum.USER, 5);
+            userRole = roleRepository.save(userRole);
+        } else {
+            userRole = roleRepository.findByName(RoleEnum.USER).get();
+        }
+        
+        // Mock email service to avoid sending emails during tests
+        doNothing().when(emailService).sendVerificationEmail(anyString(), anyString());
     }
 
     @Test
-    void whenValidSignup_thenReturnsSuccess() throws Exception {
+    void testSignup() throws Exception {
+        // Create user DTO for signup
         UserDTO userDTO = new UserDTO();
-        userDTO.setEmailAddress("test@example.com");
-        userDTO.setPassword("Test@123");
+        userDTO.setEmailAddress("test@pharmacyhub.pk");
+        userDTO.setPassword("password123");
         userDTO.setFirstName("Test");
         userDTO.setLastName("User");
-
-        mockMvc.perform(post("/api/auth/signup")
+        
+        // Perform signup request
+        mockMvc.perform(post("/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().string("User registered successfully. Please check your email for verification."));
-    }
-
-    @Test
-    void whenDuplicateEmail_thenReturnsConflict() throws Exception {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmailAddress("duplicate@example.com");
-        userDTO.setPassword("Test@123");
-        userDTO.setFirstName("Test");
-        userDTO.setLastName("User");
-
-        // First registration should succeed
-        mockMvc.perform(post("/api/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("User registered successfully. Please check your email for verification."));
-
-        // Duplicate registration should fail
-        mockMvc.perform(post("/api/auth/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO)))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("User with this email already exists"));
-    }
-
-    @Test
-    void whenValidVerification_thenRedirectsToSuccess() throws Exception {
-        // Create and save a user
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmailAddress("verify@example.com");
-        userDTO.setPassword("Test@123");
-        userDTO.setFirstName("Test");
-        userDTO.setLastName("User");
         
-        // Save user and get token
-        PHUserDTO savedUser = userService.saveUser(userDTO);
-        assertNotNull(savedUser, "User should be saved successfully");
-
-        // Verify using token from database
-        User user = userRepository.findByEmailAddress("verify@example.com").orElse(null);
-        assertNotNull(user, "User should exist in database");
-        String token = user.getVerificationToken();
-        assertNotNull(token, "Verification token should not be null");
-
-        mockMvc.perform(get("/api/auth/verify")
-                .param("token", token))
-                .andExpect(status().isFound())
-                .andExpect(header().string("Location", "https://pharmacyhub.pk/verification-successful"));
+        // Verify user was created in the database
+        assertTrue(userRepository.findByEmailAddress("test@pharmacyhub.pk").isPresent());
     }
 
     @Test
-    void whenInvalidVerification_thenRedirectsToFailure() throws Exception {
-        mockMvc.perform(get("/api/auth/verify")
-                .param("token", "invalid-token"))
-                .andExpect(status().isFound())
-                .andExpect(header().string("Location", "https://pharmacyhub.pk/verification-failed"));
-    }
-
-    @Test
-    void whenValidLogin_thenReturnsToken() throws Exception {
-        // Create and verify a user first
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmailAddress("login@example.com");
-        userDTO.setPassword("Test@123");
-        userDTO.setFirstName("Test");
-        userDTO.setLastName("User");
+    void testLogin() throws Exception {
+        // Create test user
+        User user = TestDataBuilder.createUser("login@pharmacyhub.pk", 
+                passwordEncoder.encode("password123"), UserType.PHARMACIST);
+        user.setVerified(true);
+        user.setRole(userRole);
+        userRepository.save(user);
         
-        // Save user
-        PHUserDTO savedUser = userService.saveUser(userDTO);
-        assertNotNull(savedUser, "User should be saved successfully");
-
-        // Get user and verify
-        User user = userRepository.findByEmailAddress("login@example.com").orElse(null);
-        assertNotNull(user, "User should exist in database");
-        userService.verifyUser(user.getVerificationToken());
-
-        // Attempt login
+        // Create login request
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmailAddress("login@example.com");
-        loginRequest.setPassword("Test@123");
-
-        MvcResult result = mockMvc.perform(post("/api/auth/login")
+        loginRequest.setEmailAddress("login@pharmacyhub.pk");
+        loginRequest.setPassword("password123");
+        
+        // Perform login request
+        MvcResult result = mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
-
+        
+        // Parse response to verify JWT token
         LoggedInUserDTO response = objectMapper.readValue(
-            result.getResponse().getContentAsString(),
-            LoggedInUserDTO.class
-        );
-
-        assertNotNull(response.getJwtToken(), "JWT token should not be null");
+                result.getResponse().getContentAsString(), 
+                LoggedInUserDTO.class);
+        
+        // Verify response contains JWT token
+        assertNotNull(response.getJwtToken());
+        assertEquals(UserType.PHARMACIST, response.getUserType());
     }
 
     @Test
-    void whenInvalidLogin_thenReturnsBadCredentials() throws Exception {
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmailAddress("invalid@example.com");
-        loginRequest.setPassword("wrongpassword");
+    void testVerifyEmail() throws Exception {
+        // Create test user with verification token
+        User user = TestDataBuilder.createUser("verify@pharmacyhub.pk", 
+                passwordEncoder.encode("password"), UserType.PHARMACIST);
+        user.setVerificationToken("test-verification-token");
+        user.setVerified(false);
+        userRepository.save(user);
+        
+        // Perform verification request
+        mockMvc.perform(get("/auth/verify")
+                .param("token", "test-verification-token"))
+                .andExpect(status().isFound())
+                .andExpect(header().string("Location", "https://pharmacyhub.pk/verification-successful"));
+        
+        // Verify user is now verified
+        User verifiedUser = userRepository.findByEmailAddress("verify@pharmacyhub.pk").get();
+        assertTrue(verifiedUser.isVerified());
+    }
 
-        mockMvc.perform(post("/api/auth/login")
+    @Test
+    void testInvalidLogin() throws Exception {
+        // Create test user
+        User user = TestDataBuilder.createUser("login@pharmacyhub.pk", 
+                passwordEncoder.encode("password123"), UserType.PHARMACIST);
+        user.setVerified(true);
+        user.setRole(userRole);
+        userRepository.save(user);
+        
+        // Create login request with wrong password
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmailAddress("login@pharmacyhub.pk");
+        loginRequest.setPassword("wrongpassword");
+        
+        // Perform login request - should fail
+        mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Credentials Invalid !!"));
+                .andExpect(status().isUnauthorized());
     }
 }

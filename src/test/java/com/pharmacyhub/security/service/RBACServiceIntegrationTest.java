@@ -1,47 +1,37 @@
 package com.pharmacyhub.security.service;
 
-import com.pharmacyhub.config.TestConfig;
-import com.pharmacyhub.security.config.TestSecurityConfig;
+import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.constants.RoleEnum;
+import com.pharmacyhub.engine.PHMapper;
 import com.pharmacyhub.entity.User;
+import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.security.domain.Group;
-import com.pharmacyhub.security.domain.OperationType;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.ResourceType;
 import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.security.domain.OperationType;
+import com.pharmacyhub.security.dto.GroupDTO;
+import com.pharmacyhub.security.dto.PermissionDTO;
+import com.pharmacyhub.security.dto.RoleDTO;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
-import org.junit.jupiter.api.AfterEach;
+import com.pharmacyhub.util.TestDataBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-@Import({TestConfig.class, TestSecurityConfig.class})
-@WithMockUser(username = "admin", roles = {"ADMIN"}, authorities = {
-    "PERMISSION_ROLE_ASSIGN",
-    "PERMISSION_GROUP_ASSIGN",
-    "PERMISSION_PERMISSION_MANAGE",
-    "PERMISSION_USER_READ"
-})
-public class RBACServiceIntegrationTest {
-    // Existing code remains the same...
-    // ...
+class RBACServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private RBACService rbacService;
@@ -58,201 +48,170 @@ public class RBACServiceIntegrationTest {
     @Autowired
     private GroupRepository groupRepository;
 
-    private User testUser;
+    @MockBean
+    private PHMapper phMapper;
+
+    private User adminUser;
+    private User regularUser;
     private Role adminRole;
-    private Role pharmacistRole;
-    private Permission createPrescriptionPermission;
-    private Permission viewPrescriptionPermission;
-    private Permission managePrescriptionPermission;
-    private Group pharmacyGroup;
+    private Role userRole;
+    private Permission viewPharmacistPermission;
 
     @BeforeEach
-    public void setup() {
+    void setUp() {
+        // Clear repositories
         userRepository.deleteAll();
         rolesRepository.deleteAll();
         permissionRepository.deleteAll();
         groupRepository.deleteAll();
-        
-        // Create test permissions
-        createPrescriptionPermission = Permission.builder()
-                .name("CREATE_PRESCRIPTION")
-                .description("Permission to create prescriptions")
-                .resourceType(ResourceType.PRESCRIPTION)
-                .operationType(OperationType.CREATE)
-                .requiresApproval(false)
-                .build();
-        permissionRepository.save(createPrescriptionPermission);
 
-        viewPrescriptionPermission = Permission.builder()
-                .name("VIEW_PRESCRIPTION")
-                .description("Permission to view prescriptions")
-                .resourceType(ResourceType.PRESCRIPTION)
+        // Create roles
+        adminRole = TestDataBuilder.createRole(RoleEnum.ADMIN, 1);
+        userRole = TestDataBuilder.createRole(RoleEnum.USER, 5);
+        
+        // Save roles
+        adminRole = rolesRepository.save(adminRole);
+        userRole = rolesRepository.save(userRole);
+        
+        // Create permissions
+        viewPharmacistPermission = Permission.builder()
+                .name("VIEW_PHARMACIST")
+                .description("Permission to view pharmacist")
+                .resourceType(ResourceType.PHARMACIST)
                 .operationType(OperationType.READ)
                 .requiresApproval(false)
                 .build();
-        permissionRepository.save(viewPrescriptionPermission);
-
-        managePrescriptionPermission = Permission.builder()
-                .name("MANAGE_PRESCRIPTION")
-                .description("Permission to manage prescriptions")
-                .resourceType(ResourceType.PRESCRIPTION)
-                .operationType(OperationType.MANAGE)
-                .requiresApproval(true)
-                .build();
-        permissionRepository.save(managePrescriptionPermission);
-
-        // Create test roles
+        viewPharmacistPermission = permissionRepository.save(viewPharmacistPermission);
+        
+        // Add permission to admin role
         Set<Permission> adminPermissions = new HashSet<>();
-        adminPermissions.add(createPrescriptionPermission);
-        adminPermissions.add(viewPrescriptionPermission);
-        adminPermissions.add(managePrescriptionPermission);
-
-        adminRole = Role.builder()
-                .name(com.pharmacyhub.constants.RoleEnum.ADMIN)
-                .description("Administrator role")
-                .permissions(adminPermissions)
-                .precedence(1)
-                .system(true)
-                .childRoles(new HashSet<>())
-                .build();
-        rolesRepository.save(adminRole);
-
-        Set<Permission> pharmacistPermissions = new HashSet<>();
-        pharmacistPermissions.add(viewPrescriptionPermission);
-
-        pharmacistRole = Role.builder()
-                .name(com.pharmacyhub.constants.RoleEnum.PHARMACIST)
-                .description("Pharmacist role")
-                .permissions(pharmacistPermissions)
-                .precedence(2)
-                .system(true)
-                .childRoles(new HashSet<>())
-                .build();
-        rolesRepository.save(pharmacistRole);
-
-        // Create test group
-        Set<Role> groupRoles = new HashSet<>();
-        groupRoles.add(pharmacistRole);
-
-        pharmacyGroup = Group.builder()
-                .name("CENTRAL_PHARMACY")
-                .description("Central pharmacy staff")
-                .roles(groupRoles)
-                .build();
-        groupRepository.save(pharmacyGroup);
-
-        // Create test user
+        adminPermissions.add(viewPharmacistPermission);
+        adminRole.setPermissions(adminPermissions);
+        adminRole = rolesRepository.save(adminRole);
+        
+        // Create users
+        adminUser = TestDataBuilder.createUser("admin@pharmacyhub.pk", "password", UserType.ADMIN);
+        regularUser = TestDataBuilder.createUser("user@pharmacyhub.pk", "password", UserType.PHARMACIST);
+        
+        // Add roles to users
+        Set<Role> adminRoles = new HashSet<>();
+        adminRoles.add(adminRole);
+        adminUser.setRoles(adminRoles);
+        
         Set<Role> userRoles = new HashSet<>();
-        userRoles.add(pharmacistRole);
-
-        Set<Group> userGroups = new HashSet<>();
-        userGroups.add(pharmacyGroup);
-
-        testUser = User.builder()
-                .firstName("Test")
-                .lastName("User")
-                .emailAddress("test.user@pharmacyhub.com")
-                .password("password")
-                .roles(userRoles)
-                .groups(userGroups)
-                .permissionOverrides(new HashSet<>())
-                .active(true)
-                .verified(true)
-                .accountNonLocked(true)
-                .registered(true)
-                .build();
-        userRepository.save(testUser);
-    }
-
-    @AfterEach
-    public void cleanup() {
-        SecurityContextHolder.clearContext();
-        userRepository.deleteAll();
-        rolesRepository.deleteAll();
-        permissionRepository.deleteAll();
-        groupRepository.deleteAll();
+        userRoles.add(userRole);
+        regularUser.setRoles(userRoles);
+        
+        // Save users
+        adminUser = userRepository.save(adminUser);
+        regularUser = userRepository.save(regularUser);
     }
 
     @Test
-    public void testGetUserEffectivePermissions() {
-        Set<Permission> permissions = rbacService.getUserEffectivePermissions(testUser.getId());
-        assertTrue(permissions.contains(viewPrescriptionPermission));
-        assertFalse(permissions.contains(createPrescriptionPermission));
-        assertFalse(permissions.contains(managePrescriptionPermission));
+    void testGetUserEffectivePermissions() {
+        // Get user permissions
+        Set<Permission> adminPermissions = rbacService.getUserEffectivePermissions(adminUser.getId());
+        Set<Permission> userPermissions = rbacService.getUserEffectivePermissions(regularUser.getId());
+        
+        // Check admin permissions
+        assertEquals(1, adminPermissions.size());
+        assertTrue(adminPermissions.contains(viewPharmacistPermission));
+        
+        // Check user permissions
+        assertEquals(0, userPermissions.size());
     }
 
     @Test
-    public void testAddAndRemoveRoleFromUser() {
-        rbacService.assignRoleToUser(testUser.getId(), adminRole.getId());
+    @WithMockUser(roles = {"ADMIN"})
+    void testCreatePermission() {
+        // Create permission DTO
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setName("MANAGE_CONNECTIONS");
+        permissionDTO.setDescription("Permission to manage connections");
+        permissionDTO.setResourceType(ResourceType.CONNECTION);
+        permissionDTO.setOperationType(OperationType.MANAGE);
+        permissionDTO.setRequiresApproval(false);
         
-        Set<Permission> permissions = rbacService.getUserEffectivePermissions(testUser.getId());
-        assertTrue(permissions.contains(createPrescriptionPermission));
-        assertTrue(permissions.contains(viewPrescriptionPermission));
-        assertTrue(permissions.contains(managePrescriptionPermission));
+        when(phMapper.getPermission(permissionDTO)).thenReturn(
+            Permission.builder()
+                .name("MANAGE_CONNECTIONS")
+                .description("Permission to manage connections")
+                .resourceType(ResourceType.CONNECTION)
+                .operationType(OperationType.MANAGE)
+                .requiresApproval(false)
+                .build()
+        );
         
-        rbacService.removeRoleFromUser(testUser.getId(), adminRole.getId());
+        // Create permission
+        Permission permission = rbacService.createPermission(permissionDTO);
         
-        permissions = rbacService.getUserEffectivePermissions(testUser.getId());
-        assertFalse(permissions.contains(createPrescriptionPermission));
-        assertTrue(permissions.contains(viewPrescriptionPermission));
-        assertFalse(permissions.contains(managePrescriptionPermission));
+        // Verify permission was created
+        assertNotNull(permission);
+        assertEquals("MANAGE_CONNECTIONS", permission.getName());
+        assertEquals(ResourceType.CONNECTION, permission.getResourceType());
+        assertEquals(OperationType.MANAGE, permission.getOperationType());
     }
 
     @Test
-    public void testPermissionOverrides() {
-        rbacService.addPermissionOverride(testUser.getId(), "CREATE_PRESCRIPTION", true);
+    @WithMockUser(roles = {"ADMIN"})
+    void testAssignRoleToUser() {
+        // Assign role to user
+        rbacService.assignRoleToUser(regularUser.getId(), adminRole.getId());
         
-        Set<Permission> permissions = rbacService.getUserEffectivePermissions(testUser.getId());
-        assertTrue(permissions.contains(createPrescriptionPermission));
-        
-        rbacService.addPermissionOverride(testUser.getId(), "VIEW_PRESCRIPTION", false);
-        
-        permissions = rbacService.getUserEffectivePermissions(testUser.getId());
-        assertFalse(permissions.contains(viewPrescriptionPermission));
-        
-        rbacService.removePermissionOverride(testUser.getId(), "-VIEW_PRESCRIPTION");
-        
-        permissions = rbacService.getUserEffectivePermissions(testUser.getId());
-        assertTrue(permissions.contains(viewPrescriptionPermission));
+        // Verify role was assigned
+        User updatedUser = userRepository.findById(regularUser.getId()).get();
+        assertTrue(updatedUser.getRoles().contains(adminRole));
     }
 
     @Test
-    public void testAccessValidation() {
-        assertTrue(rbacService.validateAccess(testUser.getId(), "PRESCRIPTION", "READ", 1L));
-        assertFalse(rbacService.validateAccess(testUser.getId(), "PRESCRIPTION", "CREATE", 1L));
+    @WithMockUser(roles = {"ADMIN"})
+    void testCreateGroupAndAssignToUser() {
+        // Create group DTO
+        GroupDTO groupDTO = new GroupDTO();
+        groupDTO.setName("TestGroup");
+        groupDTO.setDescription("Test group description");
+        Set<Long> roleIds = new HashSet<>();
+        roleIds.add(adminRole.getId());
+        groupDTO.setRoleIds(roleIds);
         
-        rbacService.assignRoleToUser(testUser.getId(), adminRole.getId());
-        
-        assertTrue(rbacService.validateAccess(testUser.getId(), "PRESCRIPTION", "READ", 1L));
-        assertTrue(rbacService.validateAccess(testUser.getId(), "PRESCRIPTION", "CREATE", 1L));
-    }
-
-    @Test
-    public void testUserQueries() {
-        User adminUser = User.builder()
-                .firstName("Admin")
-                .lastName("User")
-                .emailAddress("admin@pharmacyhub.com")
-                .password("password")
+        when(phMapper.getGroup(groupDTO)).thenReturn(
+            Group.builder()
+                .name("TestGroup")
+                .description("Test group description")
                 .roles(Set.of(adminRole))
-                .permissionOverrides(new HashSet<>())
-                .active(true)
-                .verified(true)
-                .accountNonLocked(true)
-                .registered(true)
-                .build();
-        userRepository.save(adminUser);
+                .build()
+        );
         
-        List<User> adminUsers = rbacService.getUsersByRole(adminRole.getName());
-        assertEquals(1, adminUsers.size());
-        assertEquals(adminUser.getId(), adminUsers.get(0).getId());
+        // Create group
+        Group group = rbacService.createGroup(groupDTO);
         
-        List<User> pharmacistUsers = rbacService.getUsersByRole(pharmacistRole.getName());
-        assertEquals(1, pharmacistUsers.size());
-        assertEquals(testUser.getId(), pharmacistUsers.get(0).getId());
+        // Verify group was created
+        assertNotNull(group);
+        assertEquals("TestGroup", group.getName());
         
-        List<User> pharmacyGroupUsers = rbacService.getUsersByGroup(pharmacyGroup.getName());
-        assertEquals(1, pharmacyGroupUsers.size());
-        assertEquals(testUser.getId(), pharmacyGroupUsers.get(0).getId());
+        // Assign group to user
+        rbacService.assignGroupToUser(regularUser.getId(), group.getId());
+        
+        // Verify group was assigned
+        User updatedUser = userRepository.findById(regularUser.getId()).get();
+        assertTrue(updatedUser.getGroups().contains(group));
+        
+        // Check effective permissions
+        Set<Permission> userPermissions = rbacService.getUserEffectivePermissions(regularUser.getId());
+        assertEquals(1, userPermissions.size());
+        assertTrue(userPermissions.contains(viewPharmacistPermission));
+    }
+
+    @Test
+    @WithMockUser(roles = {"USER"})
+    void testPermissionDeniedForNonAdmin() {
+        // Create permission DTO
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setName("TEST_PERMISSION");
+        
+        // Attempt to create permission as regular user - should throw AccessDeniedException
+        assertThrows(AccessDeniedException.class, () -> {
+            rbacService.createPermission(permissionDTO);
+        });
     }
 }

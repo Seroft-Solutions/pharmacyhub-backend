@@ -5,10 +5,10 @@ import java.util.Set;
 
 import com.pharmacyhub.security.domain.OperationType;
 import com.pharmacyhub.security.domain.Role;
-import com.pharmacyhub.security.application.dto.GroupDTO;
-import com.pharmacyhub.security.application.dto.PermissionDTO;
-import com.pharmacyhub.security.application.dto.RoleDTO;
-import com.pharmacyhub.security.domain.exception.RBACException;
+import com.pharmacyhub.security.dto.GroupDTO;
+import com.pharmacyhub.security.dto.PermissionDTO;
+import com.pharmacyhub.security.dto.RoleDTO;
+import com.pharmacyhub.security.exception.RBACException;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
@@ -23,7 +23,7 @@ public class RBACValidationService {
  	private final PermissionRepository permissionRepository;
  	private final GroupRepository groupRepository;
 
- 	public void validateRoleCreation(com.pharmacyhub.security.application.dto.RoleDTO roleDTO) {
+ 	public void validateRoleCreation(com.pharmacyhub.security.dto.RoleDTO roleDTO) {
  		// Check for name uniqueness
  		try {
  			String roleName = roleDTO.getName();
@@ -49,7 +49,7 @@ public class RBACValidationService {
  		}
  	}
 
- 	public void validatePermissionCreation(com.pharmacyhub.security.application.dto.PermissionDTO permissionDTO) {
+ 	public void validatePermissionCreation(com.pharmacyhub.security.dto.PermissionDTO permissionDTO) {
  		// Check for name uniqueness
  		if (permissionRepository.findByName(permissionDTO.getName()).isPresent()) {
  			throw RBACException.invalidOperation("Permission name already exists");
@@ -59,7 +59,7 @@ public class RBACValidationService {
  		validateResourceOperationCombination(permissionDTO);
  	}
 
- 	public void validateGroupCreation(com.pharmacyhub.security.application.dto.GroupDTO groupDTO) {
+ 	public void validateGroupCreation(com.pharmacyhub.security.dto.GroupDTO groupDTO) {
  		// Check for name uniqueness
  		if (groupRepository.findByName(groupDTO.getName()).isPresent()) {
  			throw RBACException.invalidOperation("Group name already exists");
@@ -81,10 +81,8 @@ public class RBACValidationService {
  				throw RBACException.invalidRoleHierarchy();
  			}
 
- 			Role role = rolesRepository.findByIdWithChildRoles(roleId);
- 			if (role == null) {
- 				throw RBACException.entityNotFound("Role");
- 			}
+ 			Role role = rolesRepository.findById(roleId)
+ 			 .orElseThrow(() -> RBACException.entityNotFound("Role"));
 
  
 
@@ -97,7 +95,7 @@ public class RBACValidationService {
  		}
  	}
 
- 	private void validateResourceOperationCombination(com.pharmacyhub.security.application.dto.PermissionDTO permissionDTO) {
+ 	private void validateResourceOperationCombination(com.pharmacyhub.security.dto.PermissionDTO permissionDTO) {
  		// Add specific validation rules for resource and operation combinations
  		switch (permissionDTO.getResourceType()) {
  		case INVENTORY:
