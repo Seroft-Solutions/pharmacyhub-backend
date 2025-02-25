@@ -106,7 +106,7 @@ public class UserController
     return ResponseEntity.notFound().build();
   }
 
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("hasPermission(null, 'UPDATE_STATUS')")
   @RequestMapping(
           value = APIConstants.API_VERSION_V1 + "/toggle-user-status",
           method = RequestMethod.GET

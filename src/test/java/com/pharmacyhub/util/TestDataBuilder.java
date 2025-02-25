@@ -9,6 +9,7 @@ import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.domain.Permission;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -20,7 +21,14 @@ import java.util.Set;
 public class TestDataBuilder {
 
     public static User createUser(String email, String password, UserType userType) {
-        return User.builder()
+        Set<Role> roles = new HashSet<>();
+        Role userRole = createRole(RoleEnum.USER, 1);
+        Permission viewProfilePermission = createPermission("VIEW_PROFILE", "Can view profile");
+        Set<Permission> permissions = new HashSet<>();
+        permissions.add(viewProfilePermission);
+        userRole.setPermissions(permissions);
+        roles.add(userRole);
+        User user = User.builder()
                 .emailAddress(email)
                 .password(password) // Should be encoded in service tests
                 .firstName("Test")
@@ -30,8 +38,11 @@ public class TestDataBuilder {
                 .verified(true)
                 .tokenCreationDate(LocalDateTime.now())
                 .active(true)
+                .roles(roles)
                 .accountNonLocked(true)
                 .build();
+        
+        return user;
     }
     
     public static Pharmacist createPharmacist(User user) {
@@ -88,11 +99,15 @@ public class TestDataBuilder {
     }
     
     public static Role createRole(RoleEnum name, int precedence) {
+        Set<Permission> permissions = new HashSet<>();
+        permissions.add(createPermission("UPDATE_STATUS", "Can update user status"));
+        permissions.add(createPermission("VIEW_PROFILE", "Can view profile"));
+
         return Role.builder()
                 .name(name)
                 .precedence(precedence)
                 .description("Test role")
-                .permissions(new HashSet<>())
+                .permissions(permissions)
                 .childRoles(new HashSet<>())
                 .system(true)
                 .build();

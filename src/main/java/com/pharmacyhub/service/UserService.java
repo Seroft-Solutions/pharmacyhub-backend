@@ -12,7 +12,10 @@ import java.util.stream.Collectors;
 import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.dto.PHUserDTO;
 import java.util.Optional;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.pharmacyhub.entity.enums.UserType;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.pharmacyhub.dto.ChangePasswordDTO;
 
@@ -71,6 +74,7 @@ public class UserService {
             .emailAddress(user.getEmailAddress())
             .firstName(user.getFirstName())
             .lastName(user.getLastName())
+            .contactNumber(user.getContactNumber())
             .openToConnect(user.isOpenToConnect())
             .registered(user.isRegistered())
             .build();
@@ -117,31 +121,88 @@ public class UserService {
 
     public PHUserDTO changeUserPassword(ChangePasswordDTO changePasswordDTO) {
         // Implementation for changing user password
-        return null;
+        User currentUser = getLoggedInUser();
+        if (currentUser != null && passwordEncoder.matches(changePasswordDTO.getCurrentPassword(), currentUser.getPassword())) {
+            currentUser.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+            userRepository.save(currentUser);
+            return UserDTO.builder()
+                .id(currentUser.getId())
+                .emailAddress(currentUser.getEmailAddress())
+                .firstName(currentUser.getFirstName())
+                .lastName(currentUser.getLastName())
+                .contactNumber(currentUser.getContactNumber())
+                .openToConnect(currentUser.isOpenToConnect())
+                .registered(currentUser.isRegistered())
+                .build();
+        }
+        return null; 
     }
 
     public PHUserDTO editUserInformation(UserDTO userDTO) {
-        // Implementation for editing user information
-        return null;
+        User currentUser = getLoggedInUser();
+        if (currentUser != null) {
+            currentUser.setFirstName(userDTO.getFirstName());
+            currentUser.setLastName(userDTO.getLastName());
+            // Only update if provided
+            if (userDTO.getContactNumber() != null) {
+                currentUser.setContactNumber(userDTO.getContactNumber());
+            }
+            userRepository.save(currentUser);
+            return UserDTO.builder()
+                .id(currentUser.getId())
+                .emailAddress(currentUser.getEmailAddress())
+                .firstName(currentUser.getFirstName())
+                .lastName(currentUser.getLastName())
+                .contactNumber(currentUser.getContactNumber())
+                .openToConnect(currentUser.isOpenToConnect())
+                .registered(currentUser.isRegistered())
+                .build();
+        }
+        return null; 
     }
 
     public List<User> findAll() {
-        // Implementation for finding all users
         return userRepository.findAll();
     }
 
     public PHUserDTO getUserCompleteInformation() {
-        // Implementation for getting complete user information
+        User currentUser = getLoggedInUser();
+        if (currentUser != null) {
+            return UserDTO.builder()
+                .id(currentUser.getId())
+                .emailAddress(currentUser.getEmailAddress())
+                .firstName(currentUser.getFirstName())
+                .lastName(currentUser.getLastName())
+                .contactNumber(currentUser.getContactNumber())
+                .openToConnect(currentUser.isOpenToConnect())
+                .registered(currentUser.isRegistered())
+                .build();
+        }
         return null;
+ 
     }
 
     public boolean updateUserStatus() {
-        // Implementation for updating user status
+        User currentUser = getLoggedInUser();
+        if (currentUser != null) {
+            currentUser.setOpenToConnect(!currentUser.isOpenToConnect());
+            userRepository.save(currentUser);
+            return true;
+        }
         return false;
     }
 
     public User getLoggedInUser() {
-        // Implementation for getting logged in user
-        return null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        
+        Object principal = authentication.getPrincipal();
+        String email = (principal instanceof UserDetails) ? ((UserDetails) principal).getUsername() : 
+                      (principal instanceof User) ? ((User) principal).getEmailAddress() : principal.toString();
+        Optional<User> userOptional = userRepository.findByEmailAddress(email);
+ 
+        return userOptional.orElse(null);
     }
 }

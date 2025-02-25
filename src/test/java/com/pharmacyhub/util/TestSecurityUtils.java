@@ -3,9 +3,13 @@ package com.pharmacyhub.util;
 import com.pharmacyhub.entity.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import com.pharmacyhub.constants.RoleEnum;
+import com.pharmacyhub.security.domain.Role;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestSecurityUtils {
 
@@ -43,16 +47,25 @@ public class TestSecurityUtils {
     public static class WithMockUserSecurityContextFactory implements WithSecurityContextFactory<WithMockUserPrincipal> {
         @Override
         public SecurityContext createSecurityContext(WithMockUserPrincipal annotation) {
+            // Create a new security context
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             
+            // Create user with test role
+            Role userRole = TestDataBuilder.createRole(RoleEnum.USER, 1);
+            Set<Role> roles = new HashSet<>();
+            userRole.setPermissions(new HashSet<>()); // Ensure permissions are initialized
+            roles.add(userRole);
+
             User user = User.builder()
                     .id(annotation.id())
                     .emailAddress(annotation.email())
                     .firstName(annotation.firstName())
                     .lastName(annotation.lastName())
+                    .roles(roles)
                     .active(true)
                     .build();
-                    
+
+            // Set up authentication with user and authorities
             Authentication auth = createAuthentication(user);
             context.setAuthentication(auth);
             return context;

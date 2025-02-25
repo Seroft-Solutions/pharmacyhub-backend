@@ -21,6 +21,7 @@ public class UserDTO implements PHUserDTO
   private String lastName;
   private String emailAddress;
   private String password;
+  private String contactNumber;
   private String otpCode;
    @JsonIgnore
   private SystemRole role;
