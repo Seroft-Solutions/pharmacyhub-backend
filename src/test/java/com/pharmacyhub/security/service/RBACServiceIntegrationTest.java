@@ -143,7 +143,7 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
         );
         
         // Create permission
-        Permission permission = rbacService.createPermission(permissionDTO);
+        PermissionDTO permission = rbacService.createPermission(permissionDTO);
         
         // Verify permission was created
         assertNotNull(permission);
