@@ -1,6 +1,5 @@
-package com.pharmacy.hub.features.exam.domain.entity;
+package com.pharmacyhub.domain.entity;
 
-import com.pharmacy.hub.shared.domain.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,8 +18,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Exam extends BaseEntity
+public class Exam
 {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotBlank(message = "Title is required")
     @Column(nullable = false)
