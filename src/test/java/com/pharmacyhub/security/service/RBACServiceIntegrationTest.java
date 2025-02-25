@@ -108,6 +108,9 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
         regularUser = userRepository.save(regularUser);
     }
 
+    // Remove the tearDown() method since it's already defined in BaseIntegrationTest with public access
+    // The parent tearDown() method will be called automatically
+
     @Test
     void testGetUserEffectivePermissions() {
         // Get user permissions

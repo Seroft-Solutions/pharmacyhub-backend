@@ -54,6 +54,38 @@ public class Permission {
         return description != null ? description : "";
     }
     
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
+    public void setResourceType(ResourceType resourceType) {
+        this.resourceType = resourceType != null ? resourceType : ResourceType.USER;
+    }
+    
+    public void setOperationType(OperationType operationType) {
+        this.operationType = operationType != null ? operationType : OperationType.READ;
+    }
+    
+    public boolean isRequiresApproval() {
+        return requiresApproval;
+    }
+    
+    public void setRequiresApproval(boolean requiresApproval) {
+        this.requiresApproval = requiresApproval;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

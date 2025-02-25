@@ -1,6 +1,8 @@
 package com.pharmacyhub.entity;
 
 import com.pharmacyhub.security.domain.Group;
+import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.security.domain.Permission;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,19 +58,37 @@ public class User implements UserDetails {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @Builder.Default
-    private Set<com.pharmacyhub.security.domain.Role> roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 
-    public void setRole(com.pharmacyhub.security.domain.Role role) {
-        this.roles.add(role);
+    public void setRole(Role role) {
+        if (role != null) {
+            if (this.roles == null) {
+                this.roles = new HashSet<>();
+            }
+            this.roles.add(role);
+        }
     }
 
-    public com.pharmacyhub.security.domain.Role getRole() {
+    public Role getRole() {
         if (roles == null || roles.isEmpty()) {
             return null;
         }
         return roles.stream()
-            .min((r1, r2) -> Integer.compare(r1.getPrecedence(), r2.getPrecedence()))
+            .min((r1, r2) -> Integer.compare(
+                r1 != null ? r1.getPrecedence() : Integer.MAX_VALUE, 
+                r2 != null ? r2.getPrecedence() : Integer.MAX_VALUE))
             .orElse(null);
+    }
+    
+    public Set<Role> getRoles() {
+        if (roles == null) {
+            return new HashSet<>();
+        }
+        return roles;
+    }
+    
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles != null ? roles : new HashSet<>();
     }
     
     @ManyToMany(fetch = FetchType.EAGER)
@@ -80,6 +100,17 @@ public class User implements UserDetails {
     @Builder.Default
     private Set<Group> groups = new HashSet<>();
     
+    public Set<Group> getGroups() {
+        if (groups == null) {
+            return new HashSet<>();
+        }
+        return groups;
+    }
+    
+    public void setGroups(Set<Group> groups) {
+        this.groups = groups != null ? groups : new HashSet<>();
+    }
+    
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "user_permissions_override",
@@ -87,6 +118,17 @@ public class User implements UserDetails {
     )
     @Builder.Default
     private Set<String> permissionOverrides = new HashSet<>();
+    
+    public Set<String> getPermissionOverrides() {
+        if (permissionOverrides == null) {
+            return new HashSet<>();
+        }
+        return permissionOverrides;
+    }
+    
+    public void setPermissionOverrides(Set<String> permissionOverrides) {
+        this.permissionOverrides = permissionOverrides != null ? permissionOverrides : new HashSet<>();
+    }
     
     @Column(nullable = false)
     @Builder.Default
@@ -106,23 +148,57 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
         
-        // Add role-based authorities
-        authorities.addAll(roles.stream()
-            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
-            .collect(Collectors.toSet()));
-        
-        // Add permission-based authorities
-        roles.forEach(role -> 
-            ((com.pharmacyhub.security.domain.Role) role).getPermissions().forEach(permission ->
-                authorities.add(new SimpleGrantedAuthority(permission.getName()))));
+        // Add role-based authorities - handling null safety
+        if (roles != null) {
+            for (Role role : roles) {
+                if (role != null) {
+                    if (role.getName() != null && !role.getName().isEmpty()) {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                    } else if (role.getRoleEnum() != null) {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleEnum().toString()));
+                    }
+                    
+                    // Add permission-based authorities
+                    if (role.getPermissions() != null) {
+                        for (Permission permission : role.getPermissions()) {
+                            if (permission != null && permission.getName() != null) {
+                                authorities.add(new SimpleGrantedAuthority(permission.getName()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
         
         // Add group-based authorities
-        groups.forEach(group -> 
-            group.getRoles().forEach(role -> {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + ((com.pharmacyhub.security.domain.Role) role).getName()));
-                ((com.pharmacyhub.security.domain.Role) role).getPermissions().forEach(permission ->
-                    authorities.add(new SimpleGrantedAuthority(permission.getName())));
-            }));
+        if (groups != null) {
+            for (Group group : groups) {
+                if (group != null && group.getRoles() != null) {
+                    for (Role role : group.getRoles()) {
+                        if (role != null) {
+                            if (role.getName() != null && !role.getName().isEmpty()) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                            } else if (role.getRoleEnum() != null) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleEnum().toString()));
+                            }
+                            
+                            if (role.getPermissions() != null) {
+                                for (Permission permission : role.getPermissions()) {
+                                    if (permission != null && permission.getName() != null) {
+                                        authorities.add(new SimpleGrantedAuthority(permission.getName()));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Ensure we have at least one role based on user type
+        if (authorities.isEmpty() && userType != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userType.name()));
+        }
 
         return authorities;
     }
@@ -182,15 +258,15 @@ public class User implements UserDetails {
     }
     
     public String getFirstName() {
-        return firstName;
+        return firstName != null ? firstName : "";
     }
     
     public String getLastName() {
-        return lastName;
+        return lastName != null ? lastName : "";
     }
     
     public String getContactNumber() {
-        return contactNumber;
+        return contactNumber != null ? contactNumber : "";
     }
     
     public boolean isVerified() {

@@ -55,7 +55,7 @@ public class Role {
 
     // Override getName to always return the enum's string value, not null
     public String getName() {
-        return name != null ? name.toString() : null;
+        return name != null ? name.toString() : "";
     }
     
     // Add a method to get the RoleEnum directly
@@ -96,7 +96,7 @@ public class Role {
     }
     
     public void setPermissions(Set<Permission> permissions) {
-        this.permissions = permissions;
+        this.permissions = permissions != null ? permissions : new HashSet<>();
     }
     
     public Set<Role> getChildRoles() {
@@ -107,7 +107,7 @@ public class Role {
     }
     
     public void setChildRoles(Set<Role> childRoles) {
-        this.childRoles = childRoles;
+        this.childRoles = childRoles != null ? childRoles : new HashSet<>();
     }
     
     @Override

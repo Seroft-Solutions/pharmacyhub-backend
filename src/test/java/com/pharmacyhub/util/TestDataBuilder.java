@@ -24,11 +24,11 @@ public class TestDataBuilder {
     public static User createUser(String email, String password, UserType userType) {
         // Create user without roles (roles should be added separately using TestDatabaseSetup)
         User user = User.builder()
-                .emailAddress(email)
-                .password(password) // Should be encoded in service tests
+                .emailAddress(email != null ? email : "test@pharmacyhub.pk")
+                .password(password != null ? password : "password") // Should be encoded in service tests
                 .firstName("Test")
                 .lastName("User")
-                .userType(userType)
+                .userType(userType != null ? userType : UserType.PHARMACIST)
                 .registered(true)
                 .verified(true)
                 .tokenCreationDate(LocalDateTime.now())
@@ -49,6 +49,10 @@ public class TestDataBuilder {
     }
     
     public static Pharmacist createPharmacist(User user) {
+        if (user == null) {
+            user = createUser("pharmacist@pharmacyhub.pk", "password", UserType.PHARMACIST);
+        }
+        
         return Pharmacist.builder()
                 .categoryAvailable("Yes")
                 .licenseDuration("1 year")
@@ -63,6 +67,10 @@ public class TestDataBuilder {
     }
     
     public static Proprietor createProprietor(User user) {
+        if (user == null) {
+            user = createUser("proprietor@pharmacyhub.pk", "password", UserType.PROPRIETOR);
+        }
+        
         return Proprietor.builder()
                 .categoryRequired("Yes")
                 .licenseDuration("1 year")
@@ -76,6 +84,10 @@ public class TestDataBuilder {
     }
     
     public static PharmacyManager createPharmacyManager(User user) {
+        if (user == null) {
+            user = createUser("manager@pharmacyhub.pk", "password", UserType.PHARMACY_MANAGER);
+        }
+        
         return PharmacyManager.builder()
                 .contactNumber("03456142607")
                 .area("NFC")
@@ -89,6 +101,10 @@ public class TestDataBuilder {
     }
     
     public static Salesman createSalesman(User user) {
+        if (user == null) {
+            user = createUser("salesman@pharmacyhub.pk", "password", UserType.SALESMAN);
+        }
+        
         return Salesman.builder()
                 .contactNumber("03456142607")
                 .area("NFC")
@@ -145,8 +161,8 @@ public class TestDataBuilder {
     public static Permission createPermission(String name, String description, 
                                      ResourceType resourceType, OperationType operationType) {
         return Permission.builder()
-                .name(name)
-                .description(description)
+                .name(name != null ? name : "DEFAULT_PERMISSION")
+                .description(description != null ? description : "Default permission description")
                 .resourceType(resourceType != null ? resourceType : ResourceType.USER)
                 .operationType(operationType != null ? operationType : OperationType.READ)
                 .requiresApproval(false)

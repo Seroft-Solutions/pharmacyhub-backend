@@ -40,6 +40,10 @@ public class TestDatabaseSetup {
      */
     @Transactional
     public Role getOrCreateRole(RoleEnum roleEnum, int precedence) {
+        if (roleEnum == null) {
+            throw new IllegalArgumentException("Role enum cannot be null");
+        }
+        
         // First check the cache
         if (roleCache.containsKey(roleEnum)) {
             return roleCache.get(roleEnum);

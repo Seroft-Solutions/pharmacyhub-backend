@@ -27,19 +27,24 @@ public class TestSecurityUtils {
     /**
      * Set up security context with test user having the specified role
      */
-    public static void setupTestSecurityContext(RoleEnum role) {
-        User testUser = TestDataBuilder.createUser("test@pharmacyhub.pk", "password", mapRoleToUserType(role));
+    public static void setupTestSecurityContext(RoleEnum roleEnum) {
+        if (roleEnum == null) {
+            roleEnum = RoleEnum.USER;
+        }
         
-        Role userRole = TestDataBuilder.createRole(role, getDefaultPrecedence(role));
+        User testUser = TestDataBuilder.createUser("test@pharmacyhub.pk", "password", mapRoleToUserType(roleEnum));
+        
+        // Use TestDatabaseSetup.getOrCreateRole here if available, otherwise fallback to TestDataBuilder
+        Role userRole = TestDataBuilder.createRole(roleEnum, getDefaultPrecedence(roleEnum));
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
         testUser.setRoles(roles);
         
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toString()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + roleEnum.toString()));
         
         // Add special management permissions for ADMIN role
-        if (role == RoleEnum.ADMIN) {
+        if (roleEnum == RoleEnum.ADMIN) {
             authorities.add(new SimpleGrantedAuthority("PERMISSION_MANAGE"));
             authorities.add(new SimpleGrantedAuthority("ROLE_MANAGE"));
             authorities.add(new SimpleGrantedAuthority("GROUP_MANAGE"));
@@ -52,6 +57,7 @@ public class TestSecurityUtils {
         // Get authorities from permissions
         if (userRole.getPermissions() != null) {
             authorities.addAll(userRole.getPermissions().stream()
+                .filter(permission -> permission != null && permission.getName() != null)
                 .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                 .collect(Collectors.toList()));
         }
@@ -69,13 +75,22 @@ public class TestSecurityUtils {
      * Set up security context with the provided user
      */
     public static void setSecurityContext(User user) {
+        if (user == null) {
+            clearSecurityContext();
+            return;
+        }
+        
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         
         // Add role-based authorities
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             for (Role role : user.getRoles()) {
-                if (role != null && role.getName() != null) {
-                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                if (role != null) {
+                    if (role.getName() != null && !role.getName().isEmpty()) {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                    } else if (role.getRoleEnum() != null) {
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleEnum().toString()));
+                    }
                     
                     // Add special management permissions for ADMIN role
                     if (role.getRoleEnum() == RoleEnum.ADMIN) {
@@ -91,11 +106,18 @@ public class TestSecurityUtils {
                     // Add authorities from permissions
                     if (role.getPermissions() != null) {
                         authorities.addAll(role.getPermissions().stream()
+                            .filter(permission -> permission != null && permission.getName() != null)
                             .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                             .collect(Collectors.toList()));
                     }
                 }
             }
+        }
+        
+        // Ensure we have at least one role based on user type
+        if (authorities.isEmpty() && user.getUserType() != null) {
+            RoleEnum defaultRole = mapUserTypeToRole(user.getUserType());
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + defaultRole.toString()));
         }
         
         Authentication auth = new UsernamePasswordAuthenticationToken(
@@ -118,6 +140,10 @@ public class TestSecurityUtils {
      * Map role enum to user type
      */
     private static UserType mapRoleToUserType(RoleEnum role) {
+        if (role == null) {
+            return UserType.PHARMACIST;
+        }
+        
         switch (role) {
             case ADMIN:
                 return UserType.ADMIN;
@@ -137,9 +163,39 @@ public class TestSecurityUtils {
     }
     
     /**
+     * Map user type to role enum
+     */
+    private static RoleEnum mapUserTypeToRole(UserType userType) {
+        if (userType == null) {
+            return RoleEnum.USER;
+        }
+        
+        switch (userType) {
+            case ADMIN:
+                return RoleEnum.ADMIN;
+            case SUPER_ADMIN:
+                return RoleEnum.SUPER_ADMIN;
+            case PHARMACIST:
+                return RoleEnum.PHARMACIST;
+            case PHARMACY_MANAGER:
+                return RoleEnum.PHARMACY_MANAGER;
+            case PROPRIETOR:
+                return RoleEnum.PROPRIETOR;
+            case SALESMAN:
+                return RoleEnum.SALESMAN;
+            default:
+                return RoleEnum.USER;
+        }
+    }
+    
+    /**
      * Get default precedence for role
      */
     private static int getDefaultPrecedence(RoleEnum role) {
+        if (role == null) {
+            return 100; // Default to lowest precedence
+        }
+        
         switch (role) {
             case SUPER_ADMIN:
                 return 10;
@@ -175,7 +231,12 @@ public class TestSecurityUtils {
                 .userType(UserType.PHARMACIST)
                 .active(true)
                 .verified(true)
+                .registered(true)
+                .openToConnect(true)
+                .accountNonLocked(true)
                 .roles(new HashSet<>())
+                .groups(new HashSet<>())
+                .permissionOverrides(new HashSet<>())
                 .build();
                 
             // Add default role
@@ -191,6 +252,7 @@ public class TestSecurityUtils {
             // Add authorities from permissions
             if (role.getPermissions() != null) {
                 authorities.addAll(role.getPermissions().stream()
+                    .filter(permission -> permission != null && permission.getName() != null)
                     .map(permission -> new SimpleGrantedAuthority(permission.getName()))
                     .collect(Collectors.toList()));
             }

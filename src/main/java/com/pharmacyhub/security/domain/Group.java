@@ -35,11 +35,31 @@ public class Group {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
+    public String getName() {
+        return name != null ? name : "";
+    }
+    
+    public String getDescription() {
+        return description != null ? description : "";
+    }
+    
     public Set<Role> getRoles() {
         if (roles == null) {
             return new HashSet<>();
         }
         return roles;
+    }
+    
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles != null ? roles : new HashSet<>();
+    }
+    
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
     }
     
     @Override
