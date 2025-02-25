@@ -36,4 +36,7 @@ public class Option
     @NotNull(message = "IsCorrect flag is required")
     @Column(name = "is_correct")
     private Boolean isCorrect = false;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 }

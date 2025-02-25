@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface ExamRepository extends JpaRepository<Exam, Long>
 {
+    @Query("SELECT e FROM Exam e WHERE e.deleted = false")
+    List<Exam> findAllActive();
 
     @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.status = 'PUBLISHED'")
     List<Exam> findAllPublished();

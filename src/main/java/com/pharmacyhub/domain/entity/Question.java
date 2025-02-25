@@ -53,6 +53,9 @@ public class Question
     @Column(name = "question_type")
     private QuestionType type = QuestionType.MCQ;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     // Helper method to add option
     public void addOption(Option option)
     {

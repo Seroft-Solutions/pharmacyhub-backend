@@ -52,6 +52,9 @@ public class Exam
     @Column(nullable = false)
     private ExamStatus status = ExamStatus.DRAFT;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     // Helper method to add question
     public void addQuestion(Question question)
     {

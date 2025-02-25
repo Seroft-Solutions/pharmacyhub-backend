@@ -22,7 +22,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     @Transactional(readOnly = true)
     public List<Exam> getAllExams() {
-        return examRepository.findAll();
+        return examRepository.findAllActive();
     }
 
     @Override
@@ -69,6 +69,7 @@ public class ExamServiceImpl implements ExamService {
     public void deleteExam(Long id) {
         Exam exam = examRepository.findByIdAndNotDeleted(id)
                 .orElseThrow(() -> new EntityNotFoundException("Exam not found with id: " + id));
+        exam.setDeleted(true);
         examRepository.save(exam);
     }
 
