@@ -13,8 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,7 +30,7 @@ public class TestSecurityUtils {
     public static void setupTestSecurityContext(RoleEnum role) {
         User testUser = TestDataBuilder.createUser("test@pharmacyhub.pk", "password", mapRoleToUserType(role));
         
-        Role userRole = TestDataBuilder.createRole(role, 1);
+        Role userRole = TestDataBuilder.createRole(role, getDefaultPrecedence(role));
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
         testUser.setRoles(roles);
@@ -52,9 +50,11 @@ public class TestSecurityUtils {
         }
         
         // Get authorities from permissions
-        authorities.addAll(userRole.getPermissions().stream()
-            .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-            .collect(Collectors.toList()));
+        if (userRole.getPermissions() != null) {
+            authorities.addAll(userRole.getPermissions().stream()
+                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+                .collect(Collectors.toList()));
+        }
             
         Authentication auth = new UsernamePasswordAuthenticationToken(
             testUser, 
@@ -74,23 +74,27 @@ public class TestSecurityUtils {
         // Add role-based authorities
         if (user.getRoles() != null && !user.getRoles().isEmpty()) {
             for (Role role : user.getRoles()) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-                
-                // Add special management permissions for ADMIN role
-                if (role.getRoleEnum() == RoleEnum.ADMIN) {
-                    authorities.add(new SimpleGrantedAuthority("PERMISSION_MANAGE"));
-                    authorities.add(new SimpleGrantedAuthority("ROLE_MANAGE"));
-                    authorities.add(new SimpleGrantedAuthority("GROUP_MANAGE"));
-                    authorities.add(new SimpleGrantedAuthority("ROLE_ASSIGN"));
-                    authorities.add(new SimpleGrantedAuthority("GROUP_ASSIGN"));
-                    authorities.add(new SimpleGrantedAuthority("USER_READ"));
-                    authorities.add(new SimpleGrantedAuthority("GROUP_READ"));
+                if (role != null && role.getName() != null) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+                    
+                    // Add special management permissions for ADMIN role
+                    if (role.getRoleEnum() == RoleEnum.ADMIN) {
+                        authorities.add(new SimpleGrantedAuthority("PERMISSION_MANAGE"));
+                        authorities.add(new SimpleGrantedAuthority("ROLE_MANAGE"));
+                        authorities.add(new SimpleGrantedAuthority("GROUP_MANAGE"));
+                        authorities.add(new SimpleGrantedAuthority("ROLE_ASSIGN"));
+                        authorities.add(new SimpleGrantedAuthority("GROUP_ASSIGN"));
+                        authorities.add(new SimpleGrantedAuthority("USER_READ"));
+                        authorities.add(new SimpleGrantedAuthority("GROUP_READ"));
+                    }
+                    
+                    // Add authorities from permissions
+                    if (role.getPermissions() != null) {
+                        authorities.addAll(role.getPermissions().stream()
+                            .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+                            .collect(Collectors.toList()));
+                    }
                 }
-                
-                // Add authorities from permissions
-                authorities.addAll(role.getPermissions().stream()
-                    .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                    .collect(Collectors.toList()));
             }
         }
         
@@ -133,6 +137,30 @@ public class TestSecurityUtils {
     }
     
     /**
+     * Get default precedence for role
+     */
+    private static int getDefaultPrecedence(RoleEnum role) {
+        switch (role) {
+            case SUPER_ADMIN:
+                return 10;
+            case ADMIN:
+                return 20;
+            case PROPRIETOR:
+                return 40;
+            case PHARMACY_MANAGER:
+                return 60;
+            case PHARMACIST:
+                return 80;
+            case SALESMAN:
+                return 90;
+            case USER:
+                return 100;
+            default:
+                return 100;
+        }
+    }
+    
+    /**
      * Security context factory for @WithMockUserPrincipal annotation
      */
     public static class WithMockUserSecurityContextFactory implements WithSecurityContextFactory<WithMockUserPrincipal> {
@@ -151,7 +179,7 @@ public class TestSecurityUtils {
                 .build();
                 
             // Add default role
-            Role role = TestDataBuilder.createRole(RoleEnum.PHARMACIST, 1);
+            Role role = TestDataBuilder.createRole(RoleEnum.PHARMACIST, getDefaultPrecedence(RoleEnum.PHARMACIST));
             Set<Role> roles = new HashSet<>();
             roles.add(role);
             testUser.setRoles(roles);
@@ -161,9 +189,11 @@ public class TestSecurityUtils {
             authorities.add(new SimpleGrantedAuthority("ROLE_PHARMACIST"));
             
             // Add authorities from permissions
-            authorities.addAll(role.getPermissions().stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                .collect(Collectors.toList()));
+            if (role.getPermissions() != null) {
+                authorities.addAll(role.getPermissions().stream()
+                    .map(permission -> new SimpleGrantedAuthority(permission.getName()))
+                    .collect(Collectors.toList()));
+            }
                 
             // Create authentication
             Authentication auth = new UsernamePasswordAuthenticationToken(

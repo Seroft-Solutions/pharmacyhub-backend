@@ -2,6 +2,7 @@ package com.pharmacyhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.constants.StateEnum;
 import com.pharmacyhub.dto.PHUserConnectionDTO;
@@ -62,6 +63,9 @@ class PharmacistControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private PermissionRepository permissionRepository;
+    
+    @Autowired
+    private TestDatabaseSetup testDatabaseSetup;
 
     @Autowired
     private JwtHelper jwtHelper;
@@ -80,6 +84,8 @@ class PharmacistControllerIntegrationTest extends BaseIntegrationTest {
         pharmacistsConnectionsRepository.deleteAll();
         pharmacistRepository.deleteAll();
         userRepository.deleteAll();
+        testDatabaseSetup.clearAllRoles();
+        permissionRepository.deleteAll();
         
         // Create permissions
         createPharmacistPermission = Permission.builder()
@@ -109,14 +115,14 @@ class PharmacistControllerIntegrationTest extends BaseIntegrationTest {
                 .build();
         permissionRepository.save(manageConnectionsPermission);
         
-        // Create roles
-        adminRole = TestDataBuilder.createRole(RoleEnum.ADMIN, 1);
+        // Create roles using the test utility
+        adminRole = testDatabaseSetup.getOrCreateRole(RoleEnum.ADMIN, 1);
         Set<Permission> permissions = new HashSet<>();
         permissions.add(createPharmacistPermission);
         permissions.add(viewPharmacistPermission);
         permissions.add(manageConnectionsPermission);
         adminRole.setPermissions(permissions);
-        roleRepository.save(adminRole);
+        adminRole = roleRepository.save(adminRole);
         
         // Create test users
         testUser = TestDataBuilder.createUser("test@pharmacyhub.pk", "password", UserType.ADMIN);

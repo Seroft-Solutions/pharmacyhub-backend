@@ -1,6 +1,7 @@
 package com.pharmacyhub.service;
 
 import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.dto.UserDTO;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +41,9 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private TestDatabaseSetup testDatabaseSetup;
 
     @MockBean
     private EmailService emailService;
@@ -48,10 +54,10 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
     void setUp() throws Exception {
         // Clear data before each test
         userRepository.deleteAll();
+        testDatabaseSetup.clearAllRoles();
         
-        // Create user role
-        userRole = TestDataBuilder.createRole(RoleEnum.USER, 5);
-        userRole = roleRepository.save(userRole);
+        // Create user role using test utility
+        userRole = testDatabaseSetup.getOrCreateRole(RoleEnum.USER, 5);
         
         // Mock email service to avoid sending emails
         doNothing().when(emailService).sendVerificationEmail(anyString(), anyString());
@@ -93,7 +99,12 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
         // Create and save test user
         User user = TestDataBuilder.createUser("test@pharmacyhub.pk", 
                 passwordEncoder.encode("oldPassword"), UserType.PHARMACIST);
-        user.setRole(userRole);
+        
+        // Add role to user
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+        
         userRepository.save(user);
         
         // Create change password DTO
@@ -115,6 +126,12 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
         User user = TestDataBuilder.createUser("test@pharmacyhub.pk", "password", UserType.PHARMACIST);
         user.setVerificationToken("test-token");
         user.setVerified(false);
+        
+        // Add role to user
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+        
         userRepository.save(user);
         
         // Verify user
@@ -135,6 +152,12 @@ class UserServiceIntegrationTest extends BaseIntegrationTest {
         User user = TestDataBuilder.createUser("test@pharmacyhub.pk", 
                 passwordEncoder.encode("password"), UserType.PHARMACIST);
         user.setOpenToConnect(false);
+        
+        // Add role to user
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+        
         user = userRepository.save(user);
         
         // Set the user as the current authenticated user

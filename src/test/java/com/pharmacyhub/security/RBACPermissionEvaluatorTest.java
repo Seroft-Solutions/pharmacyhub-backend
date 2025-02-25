@@ -1,6 +1,7 @@
 package com.pharmacyhub.security;
 
 import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.enums.UserType;
@@ -45,6 +46,9 @@ class RBACPermissionEvaluatorTest extends BaseIntegrationTest {
 
     @Autowired
     private RBACService rbacService;
+    
+    @Autowired
+    private TestDatabaseSetup testDatabaseSetup;
 
     private User adminUser;
     private User pharmacistUser;
@@ -57,7 +61,7 @@ class RBACPermissionEvaluatorTest extends BaseIntegrationTest {
     void setUp() {
         // Clear repositories
         userRepository.deleteAll();
-        rolesRepository.deleteAll();
+        testDatabaseSetup.clearAllRoles();
         permissionRepository.deleteAll();
         
         // Create permissions
@@ -79,15 +83,15 @@ class RBACPermissionEvaluatorTest extends BaseIntegrationTest {
                 .build();
         manageConnectionsPermission = permissionRepository.save(manageConnectionsPermission);
         
-        // Create roles
-        adminRole = TestDataBuilder.createRole(RoleEnum.ADMIN, 1);
+        // Create roles using the test utility
+        adminRole = testDatabaseSetup.getOrCreateRole(RoleEnum.ADMIN, 1);
         Set<Permission> adminPermissions = new HashSet<>();
         adminPermissions.add(viewPharmacistPermission);
         adminPermissions.add(manageConnectionsPermission);
         adminRole.setPermissions(adminPermissions);
         adminRole = rolesRepository.save(adminRole);
         
-        pharmacistRole = TestDataBuilder.createRole(RoleEnum.PHARMACIST, 3);
+        pharmacistRole = testDatabaseSetup.getOrCreateRole(RoleEnum.PHARMACIST, 3);
         Set<Permission> pharmacistPermissions = new HashSet<>();
         pharmacistPermissions.add(viewPharmacistPermission);
         pharmacistRole.setPermissions(pharmacistPermissions);

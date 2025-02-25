@@ -34,17 +34,24 @@ public class Permission {
     @Column(nullable = false)
     @Builder.Default
     private boolean requiresApproval = false;
-
+    
+    // Ensure name is never null
     public String getName() {
-        return name;
+        return name != null ? name : "";
     }
     
+    // Ensure resourceType is never null
     public ResourceType getResourceType() {
         return resourceType != null ? resourceType : ResourceType.USER;
     }
     
+    // Ensure operationType is never null
     public OperationType getOperationType() {
         return operationType != null ? operationType : OperationType.READ;
+    }
+    
+    public String getDescription() {
+        return description != null ? description : "";
     }
     
     @Override
@@ -58,7 +65,11 @@ public class Permission {
             return id.equals(that.id);
         }
         
-        return name != null && name.equals(that.name);
+        if (name == null || that.name == null) {
+            return false;
+        }
+        
+        return name.equals(that.name);
     }
     
     @Override

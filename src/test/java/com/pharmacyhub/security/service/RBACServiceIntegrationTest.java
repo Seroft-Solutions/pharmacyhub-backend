@@ -1,6 +1,7 @@
 package com.pharmacyhub.security.service;
 
 import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.engine.PHMapper;
 import com.pharmacyhub.entity.User;
@@ -48,6 +49,9 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private GroupRepository groupRepository;
+    
+    @Autowired
+    private TestDatabaseSetup testDatabaseSetup;
 
     @MockBean
     private PHMapper phMapper;
@@ -62,17 +66,13 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
     void setUp() {
         // Clear repositories
         userRepository.deleteAll();
-        rolesRepository.deleteAll();
+        testDatabaseSetup.clearAllRoles();
         permissionRepository.deleteAll();
         groupRepository.deleteAll();
 
-        // Create roles
-        adminRole = TestDataBuilder.createRole(RoleEnum.ADMIN, 1);
-        userRole = TestDataBuilder.createRole(RoleEnum.USER, 5);
-        
-        // Save roles
-        adminRole = rolesRepository.save(adminRole);
-        userRole = rolesRepository.save(userRole);
+        // Create roles using the test utility
+        adminRole = testDatabaseSetup.getOrCreateRole(RoleEnum.ADMIN, 1);
+        userRole = testDatabaseSetup.getOrCreateRole(RoleEnum.USER, 5);
         
         // Create permissions
         viewPharmacistPermission = Permission.builder()

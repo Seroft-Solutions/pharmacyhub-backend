@@ -11,7 +11,6 @@ import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.ResourceType;
 import com.pharmacyhub.security.domain.OperationType;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -23,13 +22,7 @@ import java.util.Set;
 public class TestDataBuilder {
 
     public static User createUser(String email, String password, UserType userType) {
-        Set<Role> roles = new HashSet<>();
-        Role userRole = createRole(RoleEnum.USER, 1);
-        Permission viewProfilePermission = createPermission("VIEW_PROFILE", "Can view profile");
-        Set<Permission> permissions = new HashSet<>();
-        permissions.add(viewProfilePermission);
-        userRole.setPermissions(permissions);
-        roles.add(userRole);
+        // Create user without roles (roles should be added separately using TestDatabaseSetup)
         User user = User.builder()
                 .emailAddress(email)
                 .password(password) // Should be encoded in service tests
@@ -40,10 +33,18 @@ public class TestDataBuilder {
                 .verified(true)
                 .tokenCreationDate(LocalDateTime.now())
                 .active(true)
-                .roles(roles)
+                .roles(new HashSet<>())
+                .groups(new HashSet<>())
+                .permissionOverrides(new HashSet<>())
                 .accountNonLocked(true)
                 .build();
         
+        return user;
+    }
+    
+    public static User createUserWithRoles(String email, String password, UserType userType, Set<Role> roles) {
+        User user = createUser(email, password, userType);
+        user.setRoles(roles != null ? roles : new HashSet<>());
         return user;
     }
     
@@ -100,7 +101,15 @@ public class TestDataBuilder {
                 .build();
     }
     
+    /**
+     * This method is kept for backward compatibility but should be avoided in tests.
+     * Use TestDatabaseSetup.getOrCreateRole instead.
+     */
     public static Role createRole(RoleEnum name, int precedence) {
+        if (name == null) {
+            throw new IllegalArgumentException("Role name cannot be null");
+        }
+        
         Set<Permission> permissions = new HashSet<>();
         
         // Create basic permissions for this role
@@ -122,7 +131,7 @@ public class TestDataBuilder {
         return Role.builder()
                 .name(name)
                 .precedence(precedence)
-                .description("Test role")
+                .description("Test role for " + name.toString())
                 .permissions(permissions)
                 .childRoles(new HashSet<>())
                 .system(true)
@@ -130,11 +139,7 @@ public class TestDataBuilder {
     }
     
     public static Permission createPermission(String name, String description) {
-        return Permission.builder()
-                .name(name)
-                .description(description)
-                .requiresApproval(false)
-                .build();
+        return createPermission(name, description, ResourceType.USER, OperationType.READ);
     }
     
     public static Permission createPermission(String name, String description, 
@@ -142,8 +147,8 @@ public class TestDataBuilder {
         return Permission.builder()
                 .name(name)
                 .description(description)
-                .resourceType(resourceType)
-                .operationType(operationType)
+                .resourceType(resourceType != null ? resourceType : ResourceType.USER)
+                .operationType(operationType != null ? operationType : OperationType.READ)
                 .requiresApproval(false)
                 .build();
     }

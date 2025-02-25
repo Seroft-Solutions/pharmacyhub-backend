@@ -109,4 +109,26 @@ public class Role {
     public void setChildRoles(Set<Role> childRoles) {
         this.childRoles = childRoles;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        Role role = (Role) o;
+        
+        if (id != null && role.id != null) {
+            return id.equals(role.id);
+        }
+        
+        return name != null && name.equals(role.name);
+    }
+    
+    @Override
+    public int hashCode() {
+        if (id != null) {
+            return id.hashCode();
+        }
+        return name != null ? name.hashCode() : 0;
+    }
 }

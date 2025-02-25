@@ -1,6 +1,7 @@
 package com.pharmacyhub.security.service;
 
 import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.exception.RBACException;
@@ -23,6 +24,9 @@ class RoleHierarchyServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private RolesRepository rolesRepository;
+    
+    @Autowired
+    private TestDatabaseSetup testDatabaseSetup;
 
     private Role adminRole;
     private Role proprietorRole;
@@ -31,49 +35,14 @@ class RoleHierarchyServiceIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Clear repository
-        rolesRepository.deleteAll();
+        // Clear all roles first to avoid duplicates
+        testDatabaseSetup.clearAllRoles();
         
-        // Create roles with different precedence levels
-        adminRole = Role.builder()
-                .name(RoleEnum.ADMIN)
-                .description("Admin role")
-                .precedence(1)
-                .system(true)
-                .permissions(new HashSet<>())
-                .childRoles(new HashSet<>())
-                .build();
-        adminRole = rolesRepository.save(adminRole);
-        
-        proprietorRole = Role.builder()
-                .name(RoleEnum.PROPRIETOR)
-                .description("Proprietor role")
-                .precedence(2)
-                .system(true)
-                .permissions(new HashSet<>())
-                .childRoles(new HashSet<>())
-                .build();
-        proprietorRole = rolesRepository.save(proprietorRole);
-        
-        pharmacistRole = Role.builder()
-                .name(RoleEnum.PHARMACIST)
-                .description("Pharmacist role")
-                .precedence(3)
-                .system(true)
-                .permissions(new HashSet<>())
-                .childRoles(new HashSet<>())
-                .build();
-        pharmacistRole = rolesRepository.save(pharmacistRole);
-        
-        userRole = Role.builder()
-                .name(RoleEnum.USER)
-                .description("User role")
-                .precedence(5)
-                .system(true)
-                .permissions(new HashSet<>())
-                .childRoles(new HashSet<>())
-                .build();
-        userRole = rolesRepository.save(userRole);
+        // Create roles with the test utility to avoid duplicates
+        adminRole = testDatabaseSetup.getOrCreateRole(RoleEnum.ADMIN, 1);
+        proprietorRole = testDatabaseSetup.getOrCreateRole(RoleEnum.PROPRIETOR, 2);
+        pharmacistRole = testDatabaseSetup.getOrCreateRole(RoleEnum.PHARMACIST, 3);
+        userRole = testDatabaseSetup.getOrCreateRole(RoleEnum.USER, 5);
     }
 
     @Test

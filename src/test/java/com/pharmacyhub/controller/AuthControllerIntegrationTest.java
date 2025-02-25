@@ -2,6 +2,7 @@ package com.pharmacyhub.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pharmacyhub.config.BaseIntegrationTest;
+import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.dto.LoggedInUserDTO;
 import com.pharmacyhub.dto.PHUserDTO;
@@ -26,6 +27,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,6 +58,9 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private JwtHelper jwtHelper;
+    
+    @Autowired
+    private TestDatabaseSetup testDatabaseSetup;
 
     @MockBean
     private EmailService emailService;
@@ -61,18 +68,13 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
     private Role userRole;
 
     @BeforeEach
-    void setUp() throws MessagingException
-    {
-        // Clear user database
+    void setUp() throws MessagingException {
+        // Clear user database and roles
         userRepository.deleteAll();
+        testDatabaseSetup.clearAllRoles();
         
-        // Create user role if it doesn't exist
-        if (roleRepository.findByName(RoleEnum.USER).isEmpty()) {
-            userRole = TestDataBuilder.createRole(RoleEnum.USER, 5);
-            userRole = roleRepository.save(userRole);
-        } else {
-            userRole = roleRepository.findByName(RoleEnum.USER).get();
-        }
+        // Create user role using test utility
+        userRole = testDatabaseSetup.getOrCreateRole(RoleEnum.USER, 5);
         
         // Mock email service to avoid sending emails during tests
         doNothing().when(emailService).sendVerificationEmail(anyString(), anyString());
@@ -104,7 +106,12 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         User user = TestDataBuilder.createUser("login@pharmacyhub.pk", 
                 passwordEncoder.encode("password123"), UserType.PHARMACIST);
         user.setVerified(true);
-        user.setRole(userRole);
+        
+        // Add role to user
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+        
         userRepository.save(user);
         
         // Create login request
@@ -136,6 +143,12 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
                 passwordEncoder.encode("password"), UserType.PHARMACIST);
         user.setVerificationToken("test-verification-token");
         user.setVerified(false);
+        
+        // Add role to user
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+        
         userRepository.save(user);
         
         // Perform verification request
@@ -155,7 +168,12 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         User user = TestDataBuilder.createUser("login@pharmacyhub.pk", 
                 passwordEncoder.encode("password123"), UserType.PHARMACIST);
         user.setVerified(true);
-        user.setRole(userRole);
+        
+        // Add role to user
+        Set<Role> roles = new HashSet<>();
+        roles.add(userRole);
+        user.setRoles(roles);
+        
         userRepository.save(user);
         
         // Create login request with wrong password
