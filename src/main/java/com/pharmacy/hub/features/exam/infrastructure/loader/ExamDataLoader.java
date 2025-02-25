@@ -1,10 +1,10 @@
-package com.pharmacyhub.loader;
+package com.pharmacy.hub.features.exam.infrastructure.loader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pharmacyhub.domain.entity.Exam;
-import com.pharmacyhub.domain.entity.Option;
-import com.pharmacyhub.domain.entity.Question;
-import com.pharmacyhub.domain.repository.ExamRepository;
+import com.pharmacy.hub.features.exam.domain.entity.Exam;
+import com.pharmacy.hub.features.exam.domain.entity.Option;
+import com.pharmacy.hub.features.exam.domain.entity.Question;
+import com.pharmacy.hub.features.exam.domain.repository.ExamRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

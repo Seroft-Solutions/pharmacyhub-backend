@@ -1,7 +1,7 @@
-package com.pharmacyhub.service;
+package com.pharmacy.hub.features.exam.service;
 
-import com.pharmacyhub.domain.entity.Exam;
-import com.pharmacyhub.domain.repository.ExamRepository;
+import com.pharmacy.hub.features.exam.domain.entity.Exam;
+import com.pharmacy.hub.features.exam.domain.repository.ExamRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +69,7 @@ public class ExamServiceImpl implements ExamService {
     public void deleteExam(Long id) {
         Exam exam = examRepository.findByIdAndNotDeleted(id)
                 .orElseThrow(() -> new EntityNotFoundException("Exam not found with id: " + id));
+        exam.setDeleted(true);
         examRepository.save(exam);
     }
 

@@ -1,8 +1,8 @@
-package com.pharmacyhub.controller;
+package com.pharmacy.hub.features.exam.controller;
 
-import com.pharmacyhub.domain.entity.Exam;
-import com.pharmacyhub.dto.ExamDTO;
-import com.pharmacyhub.service.ExamService;
+import com.pharmacy.hub.features.exam.domain.entity.Exam;
+import com.pharmacy.hub.features.exam.dto.ExamDTO;
+import com.pharmacy.hub.features.exam.service.ExamService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

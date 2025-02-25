@@ -24,8 +24,8 @@ public class RBACController {
     }
 
     @PostMapping("/permissions")
-    @RequiresPermission(resource = ResourceType.PERMISSION, operation = OperationType.CREATE)
-    public ResponseEntity<PermissionDTO> createPermission(@RequestBody PermissionDTO permissionDTO) {
+    @RequiresPermission(resource = ResourceType.ROLE, operation = OperationType.CREATE)
+    public ResponseEntity<?> createPermission(@RequestBody PermissionDTO permissionDTO) {
         return ResponseEntity.ok(rbacService.createPermission(permissionDTO));
     }
 
@@ -50,8 +50,8 @@ public class RBACController {
     }
 
     @PostMapping("/users/{userId}/permissions")
-    @RequiresPermission(resource = ResourceType.PERMISSION, operation = OperationType.MANAGE)
-    public ResponseEntity<Void> addPermissionOverride(
+    @RequiresPermission(resource = ResourceType.ROLE, operation = OperationType.MANAGE)
+    public ResponseEntity<?> addPermissionOverride(
             @PathVariable Long userId,
             @RequestParam String permission,
             @RequestParam boolean grant) {

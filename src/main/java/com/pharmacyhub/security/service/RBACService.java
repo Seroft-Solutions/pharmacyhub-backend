@@ -204,7 +204,7 @@ public class RBACService extends PHEngine
 
     @PreAuthorize("hasPermission('PERMISSION', 'MANAGE')")
     @CacheEvict(value = {"userPermissions"}, allEntries = true)
-    public PermissionDTO createPermission(PermissionDTO permissionDTO)
+    public Permission createPermission(PermissionDTO permissionDTO)
     {
         validationService.validatePermissionCreation(permissionDTO);
         
@@ -217,7 +217,7 @@ public class RBACService extends PHEngine
             "SUCCESS"
         );
         
-        return phMapper.getPermissionDTO(permission);
+        return permission;
     }
 
     @PreAuthorize("hasPermission('GROUP', 'MANAGE')")

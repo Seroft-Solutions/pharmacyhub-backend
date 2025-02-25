@@ -1,6 +1,6 @@
-package com.pharmacyhub.domain.repository;
+package com.pharmacy.hub.features.exam.domain.repository;
 
-import com.pharmacyhub.domain.entity.Question;
+import com.pharmacy.hub.features.exam.domain.entity.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

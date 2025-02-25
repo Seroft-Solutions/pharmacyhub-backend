@@ -1,6 +1,6 @@
-package com.pharmacyhub.service;
+package com.pharmacy.hub.features.exam.service;
 
-import com.pharmacyhub.domain.entity.Exam;
+import com.pharmacy.hub.features.exam.domain.entity.Exam;
 import java.util.List;
 import java.util.Optional;
 
