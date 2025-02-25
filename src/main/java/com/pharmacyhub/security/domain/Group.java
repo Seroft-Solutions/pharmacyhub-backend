@@ -36,6 +36,31 @@ public class Group {
     private Set<Role> roles = new HashSet<>();
 
     public Set<Role> getRoles() {
+        if (roles == null) {
+            return new HashSet<>();
+        }
         return roles;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        Group that = (Group) o;
+        
+        if (id != null && that.id != null) {
+            return id.equals(that.id);
+        }
+        
+        return name != null && name.equals(that.name);
+    }
+    
+    @Override
+    public int hashCode() {
+        if (id != null) {
+            return id.hashCode();
+        }
+        return name != null ? name.hashCode() : 0;
     }
 }

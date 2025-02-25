@@ -32,9 +32,40 @@ public class Permission {
     private OperationType operationType;
 
     @Column(nullable = false)
-    private boolean requiresApproval;
+    @Builder.Default
+    private boolean requiresApproval = false;
 
     public String getName() {
         return name;
+    }
+    
+    public ResourceType getResourceType() {
+        return resourceType != null ? resourceType : ResourceType.USER;
+    }
+    
+    public OperationType getOperationType() {
+        return operationType != null ? operationType : OperationType.READ;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        
+        Permission that = (Permission) o;
+        
+        if (id != null && that.id != null) {
+            return id.equals(that.id);
+        }
+        
+        return name != null && name.equals(that.name);
+    }
+    
+    @Override
+    public int hashCode() {
+        if (id != null) {
+            return id.hashCode();
+        }
+        return name != null ? name.hashCode() : 0;
     }
 }

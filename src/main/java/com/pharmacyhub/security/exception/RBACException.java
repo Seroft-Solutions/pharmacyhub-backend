@@ -26,4 +26,12 @@ public class RBACException extends RuntimeException {
     public static RBACException invalidOperation(String message) {
         return new RBACException(message, "RBAC_004");
     }
+    
+    public static RBACException invalidData(String message) {
+        return new RBACException(message, "RBAC_005");
+    }
+    
+    public static RBACException alreadyExists(String message) {
+        return new RBACException(message, "RBAC_006");
+    }
 }

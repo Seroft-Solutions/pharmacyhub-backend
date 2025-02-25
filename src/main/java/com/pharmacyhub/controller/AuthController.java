@@ -89,7 +89,7 @@ public class AuthController
 
     LoggedInUserDTO loggedInUserDTO = LoggedInUserDTO.builder()
             .openToConnect(loggedInUser.isOpenToConnect())
-            .isRegistered(loggedInUser.isRegistered())
+            .registered(loggedInUser.isRegistered())  // Changed from isRegistered to registered
             .userType(loggedInUser.getUserType())
             .jwtToken(token)
             .build();

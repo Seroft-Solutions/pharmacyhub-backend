@@ -18,12 +18,13 @@ import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
 import com.pharmacyhub.util.TestDataBuilder;
+import com.pharmacyhub.util.TestSecurityUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -122,8 +123,10 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
     void testCreatePermission() {
+        // Setup security context with admin user
+        TestSecurityUtils.setupTestSecurityContext(RoleEnum.ADMIN);
+        
         // Create permission DTO
         PermissionDTO permissionDTO = new PermissionDTO();
         permissionDTO.setName("MANAGE_CONNECTIONS");
@@ -132,15 +135,16 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
         permissionDTO.setOperationType(OperationType.MANAGE);
         permissionDTO.setRequiresApproval(false);
         
-        when(phMapper.getPermission(permissionDTO)).thenReturn(
-            Permission.builder()
-                .name("MANAGE_CONNECTIONS")
-                .description("Permission to manage connections")
-                .resourceType(ResourceType.CONNECTION)
-                .operationType(OperationType.MANAGE)
-                .requiresApproval(false)
-                .build()
-        );
+        Permission managementPermission = Permission.builder()
+            .name("MANAGE_CONNECTIONS")
+            .description("Permission to manage connections")
+            .resourceType(ResourceType.CONNECTION)
+            .operationType(OperationType.MANAGE)
+            .requiresApproval(false)
+            .build();
+            
+        when(phMapper.getPermission(permissionDTO)).thenReturn(managementPermission);
+        when(phMapper.getPermissionDTO(managementPermission)).thenReturn(permissionDTO);
         
         // Create permission
         PermissionDTO permission = rbacService.createPermission(permissionDTO);
@@ -153,8 +157,10 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
     void testAssignRoleToUser() {
+        // Setup security context with admin user
+        TestSecurityUtils.setupTestSecurityContext(RoleEnum.ADMIN);
+        
         // Assign role to user
         rbacService.assignRoleToUser(regularUser.getId(), adminRole.getId());
         
@@ -164,8 +170,10 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"ADMIN"})
     void testCreateGroupAndAssignToUser() {
+        // Setup security context with admin user
+        TestSecurityUtils.setupTestSecurityContext(RoleEnum.ADMIN);
+        
         // Create group DTO
         GroupDTO groupDTO = new GroupDTO();
         groupDTO.setName("TestGroup");
@@ -174,27 +182,27 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
         roleIds.add(adminRole.getId());
         groupDTO.setRoleIds(roleIds);
         
-        when(phMapper.getGroup(groupDTO)).thenReturn(
-            Group.builder()
-                .name("TestGroup")
-                .description("Test group description")
-                .roles(Set.of(adminRole))
-                .build()
-        );
+        Group group = Group.builder()
+            .name("TestGroup")
+            .description("Test group description")
+            .roles(Set.of(adminRole))
+            .build();
+            
+        when(phMapper.getGroup(groupDTO)).thenReturn(group);
         
         // Create group
-        Group group = rbacService.createGroup(groupDTO);
+        Group createdGroup = rbacService.createGroup(groupDTO);
         
         // Verify group was created
-        assertNotNull(group);
-        assertEquals("TestGroup", group.getName());
+        assertNotNull(createdGroup);
+        assertEquals("TestGroup", createdGroup.getName());
         
         // Assign group to user
-        rbacService.assignGroupToUser(regularUser.getId(), group.getId());
+        rbacService.assignGroupToUser(regularUser.getId(), createdGroup.getId());
         
         // Verify group was assigned
         User updatedUser = userRepository.findById(regularUser.getId()).get();
-        assertTrue(updatedUser.getGroups().contains(group));
+        assertTrue(updatedUser.getGroups().contains(createdGroup));
         
         // Check effective permissions
         Set<Permission> userPermissions = rbacService.getUserEffectivePermissions(regularUser.getId());
@@ -203,8 +211,10 @@ class RBACServiceIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"USER"})
     void testPermissionDeniedForNonAdmin() {
+        // Setup security context with regular user
+        TestSecurityUtils.setupTestSecurityContext(RoleEnum.USER);
+        
         // Create permission DTO
         PermissionDTO permissionDTO = new PermissionDTO();
         permissionDTO.setName("TEST_PERMISSION");

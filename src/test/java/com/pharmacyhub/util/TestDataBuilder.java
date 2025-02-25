@@ -9,6 +9,8 @@ import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.domain.Permission;
+import com.pharmacyhub.security.domain.ResourceType;
+import com.pharmacyhub.security.domain.OperationType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
@@ -100,8 +102,22 @@ public class TestDataBuilder {
     
     public static Role createRole(RoleEnum name, int precedence) {
         Set<Permission> permissions = new HashSet<>();
-        permissions.add(createPermission("UPDATE_STATUS", "Can update user status"));
-        permissions.add(createPermission("VIEW_PROFILE", "Can view profile"));
+        
+        // Create basic permissions for this role
+        Permission updateStatusPermission = createPermission(
+            "UPDATE_STATUS", 
+            "Can update user status",
+            ResourceType.USER,
+            OperationType.UPDATE);
+        
+        Permission viewProfilePermission = createPermission(
+            "VIEW_PROFILE", 
+            "Can view profile",
+            ResourceType.USER,
+            OperationType.READ);
+            
+        permissions.add(updateStatusPermission);
+        permissions.add(viewProfilePermission);
 
         return Role.builder()
                 .name(name)
@@ -117,6 +133,17 @@ public class TestDataBuilder {
         return Permission.builder()
                 .name(name)
                 .description(description)
+                .requiresApproval(false)
+                .build();
+    }
+    
+    public static Permission createPermission(String name, String description, 
+                                     ResourceType resourceType, OperationType operationType) {
+        return Permission.builder()
+                .name(name)
+                .description(description)
+                .resourceType(resourceType)
+                .operationType(operationType)
                 .requiresApproval(false)
                 .build();
     }

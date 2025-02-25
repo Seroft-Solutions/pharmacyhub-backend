@@ -15,8 +15,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -24,7 +25,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "pharmacists_connections")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -56,6 +58,7 @@ public class PharmacistsConnections
   @JoinColumn(name = "pharmacist_id")
   private Pharmacist pharmacist;
 
+  // Explicitly declared getters and setters for important fields
   public StateEnum getState() {
     return state;
   }
@@ -64,51 +67,51 @@ public class PharmacistsConnections
     this.state = state;
   }
 
-    public Long getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public String getNotes() {
-        return notes;
-    }
+  public String getNotes() {
+    return notes;
+  }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
+  public Date getCreatedAt() {
+    return createdAt;
+  }
 
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
+  public Date getUpdatedAt() {
+    return updatedAt;
+  }
 
-    public User getUser() {
-        return user;
-    }
+  public User getUser() {
+    return user;
+  }
 
-    public Pharmacist getPharmacist() {
-        return pharmacist;
-    }
+  public Pharmacist getPharmacist() {
+    return pharmacist;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
+  public void setNotes(String notes) {
+    this.notes = notes;
+  }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
 
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+  public void setUpdatedAt(Date updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+  public void setUser(User user) {
+    this.user = user;
+  }
 
-    public void setPharmacist(Pharmacist pharmacist) {
-        this.pharmacist = pharmacist;
-    }
+  public void setPharmacist(Pharmacist pharmacist) {
+    this.pharmacist = pharmacist;
+  }
 }

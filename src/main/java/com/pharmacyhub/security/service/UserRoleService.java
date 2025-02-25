@@ -6,6 +6,7 @@ import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.pharmacyhub.constants.RoleEnum;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +22,10 @@ public class UserRoleService {
     }
 
     public List<Role> getAssignableRoles(String roleName, Long userId) {
-        Role role = rolesRepository.findByName(roleName)
+        // Convert the roleName string to RoleEnum
+        RoleEnum roleEnum = RoleEnum.fromString(roleName);
+        
+        Role role = rolesRepository.findByName(roleEnum)
                 .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
 
         User user = userRepository.findById(userId)

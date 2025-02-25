@@ -18,6 +18,7 @@ import com.pharmacyhub.entity.enums.UserType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.pharmacyhub.dto.ChangePasswordDTO;
+import com.pharmacyhub.constants.RoleEnum;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,10 @@ public class UserService {
     }
 
     public List<Role> getAssignableRoles(String roleName, Long userId) {
-        Role role = rolesRepository.findByName(roleName)
+        // Convert the roleName string to RoleEnum
+        RoleEnum roleEnum = RoleEnum.fromString(roleName);
+        
+        Role role = rolesRepository.findByName(roleEnum)
                 .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
 
         User user = userRepository.findById(userId)

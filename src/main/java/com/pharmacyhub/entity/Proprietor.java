@@ -12,13 +12,16 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -49,4 +52,21 @@ public class Proprietor
   @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;
+  
+  // Explicit getters and setters for entity relationships
+  public User getUser() {
+    return user;
+  }
+  
+  public void setUser(User user) {
+    this.user = user;
+  }
+  
+  public Long getId() {
+    return id;
+  }
+  
+  public void setId(Long id) {
+    this.id = id;
+  }
 }

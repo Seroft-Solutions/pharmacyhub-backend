@@ -20,6 +20,7 @@ import com.pharmacyhub.security.infrastructure.RolesRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -121,28 +122,34 @@ public class PHMapper
         return modelMapper.map(connections, ConnectionDisplayDTO.class);
     }
 
-    // New RBAC mapping methods
-    public Role getRole(com.pharmacyhub.security.dto.RoleDTO roleDTO)
+    // Improved RBAC mapping methods with explicit type casting
+    public Role getRole(RoleDTO roleDTO)
     {
+        if (roleDTO == null) {
+            return null;
+        }
+        
         Role role = modelMapper.map(roleDTO, Role.class);
 
-        if (roleDTO.getPermissionIds() != null)
+        if (roleDTO.getPermissionIds() != null && !roleDTO.getPermissionIds().isEmpty())
         {
-            Set<Permission> permissions = roleDTO.getPermissionIds().stream()
-                                                 .map(id -> permissionRepository.findById(id)
-                                                                                .orElseThrow(() -> new RuntimeException(
-                                                                                        "Permission not found")))
-                                                 .collect(Collectors.toSet());
+            Set<Permission> permissions = new HashSet<>();
+            for (Long id : roleDTO.getPermissionIds()) {
+                Permission permission = permissionRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Permission not found with id: " + id));
+                permissions.add(permission);
+            }
             role.setPermissions(permissions);
         }
 
-        if (roleDTO.getChildRoleIds() != null)
+        if (roleDTO.getChildRoleIds() != null && !roleDTO.getChildRoleIds().isEmpty())
         {
-            Set<Role> childRoles = roleDTO.getChildRoleIds().stream()
-                                          .map(id -> rolesRepository.findById(id)
-                                                                    .orElseThrow(() -> new RuntimeException(
-                                                                            "Role not found")))
-                                          .collect(Collectors.toSet());
+            Set<Role> childRoles = new HashSet<>();
+            for (Long id : roleDTO.getChildRoleIds()) {
+                Role childRole = rolesRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
+                childRoles.add(childRole);
+            }
             role.setChildRoles(childRoles);
         }
 
@@ -151,45 +158,66 @@ public class PHMapper
 
     public RoleDTO getRoleDTO(Role role)
     {
+        if (role == null) {
+            return null;
+        }
+        
         RoleDTO dto = modelMapper.map(role, RoleDTO.class);
+        
+        Set<Long> permissionIds = new HashSet<>();
+        Set<Long> childRoleIds = new HashSet<>();
 
-        if (role.getPermissions() != null)
+        if (role.getPermissions() != null && !role.getPermissions().isEmpty())
         {
-            dto.setPermissionIds(role.getPermissions().stream()
-                                     .map(Permission::getId)
-                                     .collect(Collectors.toSet()));
+            for (Permission permission : role.getPermissions()) {
+                permissionIds.add(permission.getId());
+            }
+            dto.setPermissionIds(permissionIds);
         }
 
-        if (role.getChildRoles() != null)
+        if (role.getChildRoles() != null && !role.getChildRoles().isEmpty())
         {
-            dto.setChildRoleIds(role.getChildRoles().stream()
-                                    .map(r -> r.getId())
-                                    .collect(Collectors.toSet()));
+            for (Role childRole : role.getChildRoles()) {
+                childRoleIds.add(childRole.getId());
+            }
+            dto.setChildRoleIds(childRoleIds);
         }
 
         return dto;
     }
 
-    public Permission getPermission(com.pharmacyhub.security.dto.PermissionDTO permissionDTO)
+    public Permission getPermission(PermissionDTO permissionDTO)
     {
+        if (permissionDTO == null) {
+            return null;
+        }
         return modelMapper.map(permissionDTO, Permission.class);
     }
 
     public PermissionDTO getPermissionDTO(Permission permission)
     {
+        if (permission == null) {
+            return null;
+        }
         return modelMapper.map(permission, PermissionDTO.class);
     }
 
-    public Group getGroup(com.pharmacyhub.security.dto.GroupDTO groupDTO)
+    public Group getGroup(GroupDTO groupDTO)
     {
+        if (groupDTO == null) {
+            return null;
+        }
+        
         Group group = modelMapper.map(groupDTO, Group.class);
 
-        if (groupDTO.getRoleIds() != null)
+        if (groupDTO.getRoleIds() != null && !groupDTO.getRoleIds().isEmpty())
         {
-            Set<Role> roles = groupDTO.getRoleIds().stream()
-                                      .map(id -> rolesRepository.findById(id)
-                                                                .orElseThrow(() -> new RuntimeException("Role not found")))
-                                      .collect(Collectors.toSet());
+            Set<Role> roles = new HashSet<>();
+            for (Long id : groupDTO.getRoleIds()) {
+                Role role = rolesRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
+                roles.add(role);
+            }
             group.setRoles(roles);
         }
 
@@ -198,13 +226,20 @@ public class PHMapper
 
     public GroupDTO getGroupDTO(Group group)
     {
+        if (group == null) {
+            return null;
+        }
+        
         GroupDTO dto = modelMapper.map(group, GroupDTO.class);
+        
+        Set<Long> roleIds = new HashSet<>();
 
-        if (group.getRoles() != null)
+        if (group.getRoles() != null && !group.getRoles().isEmpty())
         {
-            Set<Long> roleIds = group.getRoles().stream()
-                                     .map(role -> ((Role) role).getId())
-                                     .collect(Collectors.toSet());
+            for (Object roleObj : group.getRoles()) {
+                Role role = (Role) roleObj;
+                roleIds.add(role.getId());
+            }
             dto.setRoleIds(roleIds);
         }
 

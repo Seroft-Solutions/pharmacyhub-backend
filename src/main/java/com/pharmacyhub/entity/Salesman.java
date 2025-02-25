@@ -51,5 +51,21 @@ public class Salesman
   @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;
-
+  
+  // Explicit getters and setters for entity relationships
+  public User getUser() {
+    return user;
+  }
+  
+  public void setUser(User user) {
+    this.user = user;
+  }
+  
+  public Long getId() {
+    return id;
+  }
+  
+  public void setId(Long id) {
+    this.id = id;
+  }
 }

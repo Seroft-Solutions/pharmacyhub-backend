@@ -1,7 +1,6 @@
 package com.pharmacyhub.entity;
 
 import com.pharmacyhub.security.domain.Group;
-import org.springframework.data.domain.Sort;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -154,31 +153,47 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return active;
-    }    
+    }
+
     @Override
-    public String getPassword() { return password; }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public String getPassword() { 
+        return password; 
     }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    
+    // Explicitly adding these methods to ensure they're available
+    public boolean isOpenToConnect() {
+        return openToConnect;
     }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
+    
+    public boolean isRegistered() {
+        return registered;
     }
-
-    public void setPassword(String password) {
-        this.password = password;
+    
+    public UserType getUserType() {
+        return userType;
     }
-
-    public void setRegistered(boolean registered) {
-        this.registered = registered;
+    
+    public Long getId() {
+        return id;
     }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
+    
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+    
+    public String getFirstName() {
+        return firstName;
+    }
+    
+    public String getLastName() {
+        return lastName;
+    }
+    
+    public String getContactNumber() {
+        return contactNumber;
+    }
+    
+    public boolean isVerified() {
+        return verified;
     }
 }

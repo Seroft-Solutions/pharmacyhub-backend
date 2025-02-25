@@ -15,14 +15,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,5 +57,29 @@ public class ProprietorsConnections
   @ManyToOne
   @JoinColumn(name = "proprietor_id")
   private Proprietor proprietor;
-
+  
+  // Explicit getters and setters for relationship fields
+  public User getUser() {
+    return user;
+  }
+  
+  public void setUser(User user) {
+    this.user = user;
+  }
+  
+  public Proprietor getProprietor() {
+    return proprietor;
+  }
+  
+  public void setProprietor(Proprietor proprietor) {
+    this.proprietor = proprietor;
+  }
+  
+  public Long getId() {
+    return id;
+  }
+  
+  public StateEnum getState() {
+    return state;
+  }
 }

@@ -15,14 +15,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,5 +57,29 @@ public class PharmacyManagerConnections
   @ManyToOne
   @JoinColumn(name = "pharmacy_manager_id")
   private PharmacyManager pharmacyManager;
-
+  
+  // Explicit getters and setters for relationship fields
+  public User getUser() {
+    return user;
+  }
+  
+  public void setUser(User user) {
+    this.user = user;
+  }
+  
+  public PharmacyManager getPharmacyManager() {
+    return pharmacyManager;
+  }
+  
+  public void setPharmacyManager(PharmacyManager pharmacyManager) {
+    this.pharmacyManager = pharmacyManager;
+  }
+  
+  public Long getId() {
+    return id;
+  }
+  
+  public StateEnum getState() {
+    return state;
+  }
 }
