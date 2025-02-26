@@ -3,11 +3,11 @@ package com.pharmacyhub.controller;
 import com.pharmacyhub.dto.LoggedInUserDTO;
 import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
-import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.entity.User;
-import com.pharmacyhub.security.JwtHelper;
-import com.pharmacyhub.security.model.ErrorResponse;
+import com.pharmacyhub.security.domain.Permission;
+import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.model.LoginRequest;
+import com.pharmacyhub.security.service.AuthenticationService;
 import com.pharmacyhub.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,110 +15,113 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController
 {
-  @Autowired
-  private UserDetailsService userDetailsService;
-  @Autowired
-  private AuthenticationManager manager;
-  @Autowired
-  private JwtHelper helper;
-  @Autowired
-  private UserService userService;
+    @Autowired
+    private AuthenticationService authenticationService;
+    @Autowired
+    private UserService userService;
 
-  private Logger logger = LoggerFactory.getLogger(AuthController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-  @RequestMapping(
-          value = "/signup",
-          method = RequestMethod.POST
-  )
-  public ResponseEntity<?> addUser(@RequestBody UserDTO user)
-  {
-    PHUserDTO userCreated = userService.saveUser(user);
-
-    if (userCreated != null)
+    @RequestMapping(
+            value = "/signup",
+            method = RequestMethod.POST
+    )
+    public ResponseEntity<?> addUser(@RequestBody UserDTO user)
     {
-      return ResponseEntity.ok("User registered successfully. Please check your email for verification.");
+        PHUserDTO userCreated = userService.saveUser(user);
+
+        if (userCreated != null)
+        {
+            return ResponseEntity.ok("User registered successfully. Please check your email for verification.");
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists");
     }
-    return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists");
-  }
 
-  @GetMapping("/verify")
-  public ResponseEntity<String> verifyEmail(@RequestParam String token) {
-    boolean isVerified = userService.verifyUser(token);
-    if (isVerified) {
-      return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-successful").build();
-    } else {
-      return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-failed").build();
-    }
-  }
-
-
-  @RequestMapping(
-          value = "/test",
-          method = RequestMethod.GET
-  )
-  public ResponseEntity<List<User>> test()
-  {
-    return new ResponseEntity<>( userService.getUsers(),HttpStatus.OK);
-  }
-
-  @RequestMapping(
-          value = "/login",
-          method = RequestMethod.POST
-  )
-  public ResponseEntity<LoggedInUserDTO> login(@RequestBody LoginRequest request)
-  {
-    this.doAuthenticate(request.getUsername(), request.getPassword());
-
-    UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-    String token = this.helper.generateToken(userDetails);
-
-    User loggedInUser = (User) userDetails;
-    Role role = loggedInUser.getRole();
-
-    LoggedInUserDTO loggedInUserDTO = LoggedInUserDTO.builder()
-            .openToConnect(loggedInUser.isOpenToConnect())
-            .registered(loggedInUser.isRegistered())  // Changed from isRegistered to registered
-            .userType(loggedInUser.getUserType())
-            .jwtToken(token)
-            .build();
-
-
-    logger.info("JWT token is created for this email", userDetails.getUsername());
-    return new ResponseEntity<>(loggedInUserDTO, HttpStatus.OK);
-  }
-
-  private void doAuthenticate(String email, String password)
-  {
-    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, password);
-    try
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam String token)
     {
-      manager.authenticate(authentication);
+        boolean isVerified = userService.verifyUser(token);
+        if (isVerified)
+        {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                                 .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-successful")
+                                 .build();
+        }
+        else
+        {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                                 .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-failed")
+                                 .build();
+        }
     }
-    catch (BadCredentialsException e)
-    {
-      throw new BadCredentialsException("Invalid Username or Password  !!");
-    }
-  }
 
-  @ExceptionHandler(BadCredentialsException.class)
-  public ResponseEntity<?> exceptionHandler(BadCredentialsException e)
-  {
-    return ResponseEntity
-      .status(HttpStatus.UNAUTHORIZED)
-      .body(new ErrorResponse("Invalid credentials", e.getMessage()));
-  }
+
+    @RequestMapping(
+            value = "/test",
+            method = RequestMethod.GET
+    )
+    public ResponseEntity<List<User>> test()
+    {
+        return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request)
+    {
+        // Authenticate the user - this will throw exceptions if authentication fails
+        // or if account is not verified, which are handled by the global exception handler
+        User authenticatedUser = authenticationService.authenticateUser(request.getUsername(), request.getPassword());
+
+        // Generate JWT token
+        String token = authenticationService.generateToken(authenticatedUser);
+
+        // Get user roles
+        Set<Role> userRoles = authenticatedUser.getRoles();
+        List<String> roleNames = userRoles.stream()
+                                          .map(r -> r.getName())
+                                          .collect(Collectors.toList());
+
+        // Get user permissions
+        Set<String> permissionNames = new HashSet<>();
+        for (Role userRole : userRoles)
+        {
+            if (userRole.getPermissions() != null)
+            {
+                userRole.getPermissions().stream()
+                        .map(Permission::getName)
+                        .forEach(permissionNames::add);
+            }
+        }
+
+        // Create response DTO
+        LoggedInUserDTO response = LoggedInUserDTO.builder()
+                                                  .id(authenticatedUser.getId())
+                                                  .emailAddress(authenticatedUser.getEmailAddress())
+                                                  .firstName(authenticatedUser.getFirstName())
+                                                  .lastName(authenticatedUser.getLastName())
+                                                  .openToConnect(authenticatedUser.isOpenToConnect())
+                                                  .registered(authenticatedUser.isRegistered())
+                                                  .userType(authenticatedUser.getUserType())
+                                                  .jwtToken(token)
+                                                  .roles(roleNames)
+                                                  .permissions(new ArrayList<>(permissionNames))
+                                                  .build();
+
+        logger.info("Login successful for user: {}", authenticatedUser.getUsername());
+        return ResponseEntity.ok(response);
+    }
+
 
 }

@@ -95,6 +95,11 @@ public class JwtHelper
       // Add user profile info
       claims.put("firstName", user.getFirstName());
       claims.put("lastName", user.getLastName());
+      claims.put("emailAddress", user.getEmailAddress());
+      claims.put("contactNumber", user.getContactNumber());
+      claims.put("verified", user.isVerified());
+      claims.put("registered", user.isRegistered());
+      claims.put("openToConnect", user.isOpenToConnect());
       
       // Get roles and create a list of role names
       Set<Role> userRoles = rbacService.getUserRoles(user.getId());
@@ -136,10 +141,34 @@ public class JwtHelper
   }
 
   //validate token
-  public Boolean validateToken(String token, UserDetails userDetails)
-  {
-    final String username = getUsernameFromToken(token);
-    return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+  public Boolean validateToken(String token, UserDetails userDetails) {
+    try {
+      final String username = getUsernameFromToken(token);
+      
+      // Validate username and token expiration
+      if (!username.equals(userDetails.getUsername()) || isTokenExpired(token)) {
+        return false;
+      }
+      
+      // Additional checks for user status when userDetails is our User class
+      if (userDetails instanceof User) {
+        User user = (User) userDetails;
+        
+        // Check if user is enabled and account not locked
+        if (!user.isEnabled() || !user.isAccountNonLocked()) {
+          return false;
+        }
+        
+        // Check if user is verified (optional, depending on your requirements)
+        if (!user.isVerified()) {
+          return false;
+        }
+      }
+      
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
   
   /**
