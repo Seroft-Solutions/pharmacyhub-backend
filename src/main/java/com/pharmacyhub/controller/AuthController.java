@@ -6,6 +6,7 @@ import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.JwtHelper;
+import com.pharmacyhub.security.model.ErrorResponse;
 import com.pharmacyhub.security.model.LoginRequest;
 import com.pharmacyhub.service.UserService;
 import org.slf4j.Logger;
@@ -79,9 +80,9 @@ public class AuthController
   )
   public ResponseEntity<LoggedInUserDTO> login(@RequestBody LoginRequest request)
   {
-    this.doAuthenticate(request.getEmailAddress(), request.getPassword());
+    this.doAuthenticate(request.getUsername(), request.getPassword());
 
-    UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmailAddress());
+    UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
     String token = this.helper.generateToken(userDetails);
 
     User loggedInUser = (User) userDetails;
@@ -113,9 +114,11 @@ public class AuthController
   }
 
   @ExceptionHandler(BadCredentialsException.class)
-  public String exceptionHandler()
+  public ResponseEntity<?> exceptionHandler(BadCredentialsException e)
   {
-    return "Credentials Invalid !!";
+    return ResponseEntity
+      .status(HttpStatus.UNAUTHORIZED)
+      .body(new ErrorResponse("Invalid credentials", e.getMessage()));
   }
 
 }

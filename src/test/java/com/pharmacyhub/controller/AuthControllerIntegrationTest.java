@@ -5,7 +5,6 @@ import com.pharmacyhub.config.BaseIntegrationTest;
 import com.pharmacyhub.config.TestDatabaseSetup;
 import com.pharmacyhub.constants.RoleEnum;
 import com.pharmacyhub.dto.LoggedInUserDTO;
-import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.enums.UserType;
@@ -15,7 +14,6 @@ import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.repository.RoleRepository;
 import com.pharmacyhub.security.model.LoginRequest;
 import com.pharmacyhub.service.EmailService;
-import com.pharmacyhub.service.UserService;
 import com.pharmacyhub.util.TestDataBuilder;
 import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,7 +114,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         
         // Create login request
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmailAddress("login@pharmacyhub.pk");
+        loginRequest.setUsername("login@pharmacyhub.pk");
         loginRequest.setPassword("password123");
         
         // Perform login request
@@ -178,7 +176,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         
         // Create login request with wrong password
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmailAddress("login@pharmacyhub.pk");
+        loginRequest.setUsername("login@pharmacyhub.pk");
         loginRequest.setPassword("wrongpassword");
         
         // Perform login request - should fail
