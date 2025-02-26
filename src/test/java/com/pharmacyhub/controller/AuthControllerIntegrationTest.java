@@ -114,7 +114,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         
         // Create login request
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("login@pharmacyhub.pk");
+        loginRequest.setEmailAddress("login@pharmacyhub.pk");
         loginRequest.setPassword("password123");
         
         // Perform login request
@@ -176,7 +176,7 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         
         // Create login request with wrong password
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("login@pharmacyhub.pk");
+        loginRequest.setEmailAddress("login@pharmacyhub.pk");
         loginRequest.setPassword("wrongpassword");
         
         // Perform login request - should fail

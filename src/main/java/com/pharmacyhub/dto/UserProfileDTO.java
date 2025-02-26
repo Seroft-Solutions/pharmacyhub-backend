@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-/**
- * Data Transfer Object for user profile information
- * Includes comprehensive user data with roles and permissions
- */
 @Data
 @Builder
 @NoArgsConstructor

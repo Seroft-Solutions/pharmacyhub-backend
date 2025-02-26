@@ -159,10 +159,10 @@ public class JwtHelper
           return false;
         }
         
-        // Check if user is verified (optional, depending on your requirements)
-        if (!user.isVerified()) {
-          return false;
-        }
+        // TODO: Check if user is verified (optional, depending on your requirements)
+//        if (!user.isVerified()) {
+//          return false;
+//        }
       }
       
       return true;

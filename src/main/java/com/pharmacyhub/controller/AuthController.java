@@ -82,7 +82,7 @@ public class AuthController
     {
         // Authenticate the user - this will throw exceptions if authentication fails
         // or if account is not verified, which are handled by the global exception handler
-        User authenticatedUser = authenticationService.authenticateUser(request.getUsername(), request.getPassword());
+        User authenticatedUser = authenticationService.authenticateUser(request.getEmailAddress(), request.getPassword());
 
         // Generate JWT token
         String token = authenticationService.generateToken(authenticatedUser);
