@@ -1,19 +1,32 @@
 package com.pharmacyhub.security;
 
+import com.pharmacyhub.entity.User;
+import com.pharmacyhub.repository.UserRepository;
+import com.pharmacyhub.security.domain.Permission;
+import com.pharmacyhub.security.domain.Role;
+import com.pharmacyhub.security.service.RBACService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtHelper
 {
+
+  @Autowired
+  private UserRepository userRepository;
+  
+  @Autowired
+  private RBACService rbacService;
 
   //requirement :
   public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
@@ -40,7 +53,7 @@ public class JwtHelper
   }
 
   //for retrieveing any information from token we will need the secret key
-  private Claims getAllClaimsFromToken(String token)
+  protected Claims getAllClaimsFromToken(String token)
   {
     return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
   }
@@ -56,7 +69,57 @@ public class JwtHelper
   public String generateToken(UserDetails userDetails)
   {
     Map<String, Object> claims = new HashMap<>();
+    
+    // Add custom claims for roles and permissions
+    if (userDetails instanceof User) {
+        addRolesAndPermissionsToClaims(claims, (User) userDetails);
+    } else {
+        // Fallback for non-User implementations
+        User user = userRepository.findByEmailAddress(userDetails.getUsername())
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userDetails.getUsername()));
+        addRolesAndPermissionsToClaims(claims, user);
+    }
+    
     return doGenerateToken(claims, userDetails.getUsername());
+  }
+  
+  private void addRolesAndPermissionsToClaims(Map<String, Object> claims, User user) {
+      // Add user ID
+      claims.put("userId", user.getId());
+      
+      // Add user type
+      if (user.getUserType() != null) {
+          claims.put("userType", user.getUserType().name());
+      }
+      
+      // Add user profile info
+      claims.put("firstName", user.getFirstName());
+      claims.put("lastName", user.getLastName());
+      
+      // Get roles and create a list of role names
+      Set<Role> userRoles = rbacService.getUserRoles(user.getId());
+      List<String> roleNames = userRoles.stream()
+          .map(Role::getName)
+          .collect(Collectors.toList());
+      claims.put("roles", roleNames);
+      
+      // Get user permissions and create a list of permission names
+      Set<Permission> permissions = rbacService.getUserEffectivePermissions(user.getId());
+      List<String> permissionNames = permissions.stream()
+          .map(Permission::getName)
+          .collect(Collectors.toList());
+      claims.put("permissions", permissionNames);
+      
+      // Add Spring Security compatible authorities
+      Set<String> authorities = new HashSet<>();
+      
+      // Add role-based authorities (ROLE_XXX format for Spring Security)
+      roleNames.forEach(role -> authorities.add("ROLE_" + role));
+      
+      // Add permissions directly as authorities
+      authorities.addAll(permissionNames);
+      
+      claims.put("authorities", authorities);
   }
 
   //while creating the token -
@@ -78,6 +141,47 @@ public class JwtHelper
     final String username = getUsernameFromToken(token);
     return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
   }
-
-
+  
+  /**
+   * Extract user permissions from token
+   */
+  @SuppressWarnings("unchecked")
+  public List<String> getPermissionsFromToken(String token) {
+      final Claims claims = getAllClaimsFromToken(token);
+      return claims.get("permissions", List.class);
+  }
+  
+  /**
+   * Extract user roles from token
+   */
+  @SuppressWarnings("unchecked")
+  public List<String> getRolesFromToken(String token) {
+      final Claims claims = getAllClaimsFromToken(token);
+      return claims.get("roles", List.class);
+  }
+  
+  /**
+   * Extract user ID from token
+   */
+  public Long getUserIdFromToken(String token) {
+      final Claims claims = getAllClaimsFromToken(token);
+      return claims.get("userId", Long.class);
+  }
+  
+  /**
+   * Get all authorities from token (roles and permissions)
+   */
+  @SuppressWarnings("unchecked")
+  public List<SimpleGrantedAuthority> getAuthoritiesFromToken(String token) {
+      final Claims claims = getAllClaimsFromToken(token);
+      List<String> authorities = claims.get("authorities", List.class);
+      
+      if (authorities == null) {
+          return Collections.emptyList();
+      }
+      
+      return authorities.stream()
+          .map(SimpleGrantedAuthority::new)
+          .collect(Collectors.toList());
+  }
 }

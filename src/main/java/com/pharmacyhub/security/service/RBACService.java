@@ -17,6 +17,7 @@ import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Validate;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -400,6 +401,14 @@ public class RBACService extends PHEngine
     }
 
     /**
+     * Get all permissions available in the system
+     */
+    @PreAuthorize("hasPermission('PERMISSION', 'MANAGE')")
+    public List<Permission> getAllPermissions() {
+        return permissionRepository.findAll();
+    }
+
+    /**
      * Get all users with a specific role.
      */
     @PreAuthorize("hasPermission('USER', 'READ')")
@@ -416,7 +425,7 @@ public class RBACService extends PHEngine
     }
 
     /**
-     * Validate user access to a specific resource.
+     * Validate user access to a specific resource
      */
     public boolean validateAccess(Long userId, String resourceType, String operation, Long resourceId) {
         Set<Permission> permissions = getUserEffectivePermissions(userId);

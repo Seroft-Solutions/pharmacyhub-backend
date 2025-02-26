@@ -48,6 +48,7 @@ public class SecurityConfig {
                 }))
                 .authorizeRequests()
                 .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/health/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/pharmacist/**").hasRole("PHARMACIST")
