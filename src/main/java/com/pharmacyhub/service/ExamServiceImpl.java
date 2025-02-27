@@ -2,12 +2,14 @@ package com.pharmacyhub.service;
 
 import com.pharmacyhub.domain.entity.Exam;
 import com.pharmacyhub.domain.repository.ExamRepository;
+import com.pharmacyhub.dto.ExamDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -21,19 +23,19 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Exam> getAllExams() {
+    public List<Exam> findAllActive() {
         return examRepository.findAllActive();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Exam> getAllPublishedExams() {
+    public List<Exam> findAllPublished() {
         return examRepository.findAllPublished();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Exam> getExamById(Long id) {
+    public Optional<Exam> findById(Long id) {
         return examRepository.findByIdAndNotDeleted(id);
     }
 
@@ -75,7 +77,7 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Exam> getExamsByStatus(Exam.ExamStatus status) {
+    public List<Exam> findByStatus(Exam.ExamStatus status) {
         return examRepository.findByStatus(status);
     }
 

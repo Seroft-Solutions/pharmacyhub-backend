@@ -108,6 +108,7 @@ public class ExamPaperController {
         dto.setSuccessRatePercent(paper.getSuccessRatePercent());
         dto.setLastUpdatedDate(paper.getLastUpdatedDate().format(DateTimeFormatter.ISO_DATE));
         dto.setType(paper.getType().toString());
+        // Only take the ID of the exam entity to prevent recursion
         dto.setExamId(paper.getExam() != null ? paper.getExam().getId() : null);
         return dto;
     }
