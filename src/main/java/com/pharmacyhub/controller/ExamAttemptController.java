@@ -2,20 +2,22 @@ package com.pharmacyhub.controller;
 
 import com.pharmacyhub.domain.entity.ExamAttempt;
 import com.pharmacyhub.domain.entity.ExamResult;
+import com.pharmacyhub.domain.entity.FlaggedQuestion;
 import com.pharmacyhub.domain.entity.Question;
 import com.pharmacyhub.domain.entity.UserAnswer;
 import com.pharmacyhub.dto.ExamAttemptDTO;
 import com.pharmacyhub.dto.ExamResultDTO;
+import com.pharmacyhub.dto.FlaggedQuestionDTO;
 import com.pharmacyhub.dto.UserAnswerDTO;
 import com.pharmacyhub.service.ExamAttemptService;
 import com.pharmacyhub.service.ExamService;
 import com.pharmacyhub.service.QuestionService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -65,7 +67,7 @@ public class ExamAttemptController {
             @Valid @RequestBody List<UserAnswerDTO> userAnswerDTOs) {
         try {
             List<UserAnswer> userAnswers = userAnswerDTOs.stream()
-                    .map(dto -> convertToEntity(dto))
+                    .map(this::convertToEntity)
                     .collect(Collectors.toList());
             
             ExamResult result = examAttemptService.submitExam(id, userAnswers);
@@ -118,6 +120,52 @@ public class ExamAttemptController {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(attemptDTOs);
+    }
+    
+    // New endpoint for flagging a question
+    @PostMapping("/attempts/{attemptId}/flag/{questionId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ExamAttemptDTO> flagQuestion(
+            @PathVariable Long attemptId,
+            @PathVariable Long questionId) {
+        try {
+            ExamAttempt attempt = examAttemptService.flagQuestion(attemptId, questionId);
+            return ResponseEntity.ok(convertToDTO(attempt));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+    
+    // New endpoint for unflagging a question
+    @DeleteMapping("/attempts/{attemptId}/flag/{questionId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ExamAttemptDTO> unflagQuestion(
+            @PathVariable Long attemptId,
+            @PathVariable Long questionId) {
+        try {
+            ExamAttempt attempt = examAttemptService.unflagQuestion(attemptId, questionId);
+            return ResponseEntity.ok(convertToDTO(attempt));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
+    }
+    
+    // New endpoint for getting all flagged questions for an attempt
+    @GetMapping("/attempts/{attemptId}/flags")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<FlaggedQuestionDTO>> getFlaggedQuestions(
+            @PathVariable Long attemptId) {
+        try {
+            List<FlaggedQuestion> flaggedQuestions = examAttemptService.getFlaggedQuestions(attemptId);
+            List<FlaggedQuestionDTO> dtos = flaggedQuestions.stream()
+                    .map(fq -> new FlaggedQuestionDTO(fq.getAttempt().getId(), fq.getQuestion().getId()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
     
     private ExamAttemptDTO convertToDTO(ExamAttempt attempt) {

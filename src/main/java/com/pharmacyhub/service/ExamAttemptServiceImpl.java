@@ -5,6 +5,8 @@ import com.pharmacyhub.domain.repository.ExamAttemptRepository;
 import com.pharmacyhub.domain.repository.ExamRepository;
 import com.pharmacyhub.domain.repository.ExamResultRepository;
 import com.pharmacyhub.domain.repository.UserAnswerRepository;
+import com.pharmacyhub.domain.repository.FlaggedQuestionRepository;
+import com.pharmacyhub.domain.repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,16 +23,22 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     private final ExamRepository examRepository;
     private final UserAnswerRepository userAnswerRepository;
     private final ExamResultRepository examResultRepository;
+    private final FlaggedQuestionRepository flaggedQuestionRepository;
+    private final QuestionRepository questionRepository;
     
     public ExamAttemptServiceImpl(
             ExamAttemptRepository examAttemptRepository,
             ExamRepository examRepository,
             UserAnswerRepository userAnswerRepository,
-            ExamResultRepository examResultRepository) {
+            ExamResultRepository examResultRepository,
+            FlaggedQuestionRepository flaggedQuestionRepository,
+            QuestionRepository questionRepository) {
         this.examAttemptRepository = examAttemptRepository;
         this.examRepository = examRepository;
         this.userAnswerRepository = userAnswerRepository;
         this.examResultRepository = examResultRepository;
+        this.flaggedQuestionRepository = flaggedQuestionRepository;
+        this.questionRepository = questionRepository;
     }
     
     @Override
@@ -159,5 +167,58 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         result.setCompletedAt(LocalDateTime.now());
         
         return examResultRepository.save(result);
+    }
+    
+    @Override
+    public ExamAttempt flagQuestion(Long attemptId, Long questionId) {
+        ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
+                .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
+        
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
+        
+        // Check if question belongs to the exam
+        if (!question.getExam().getId().equals(attempt.getExam().getId())) {
+            throw new IllegalArgumentException("Question does not belong to this exam");
+        }
+        
+        // Check if question is already flagged
+        if (flaggedQuestionRepository.existsByAttemptIdAndQuestionId(attemptId, questionId)) {
+            // Already flagged, nothing to do
+            return attempt;
+        }
+        
+        // Create new flagged question
+        FlaggedQuestion flaggedQuestion = new FlaggedQuestion();
+        flaggedQuestion.setAttempt(attempt);
+        flaggedQuestion.setQuestion(question);
+        
+        flaggedQuestionRepository.save(flaggedQuestion);
+        
+        return attempt;
+    }
+    
+    @Override
+    public ExamAttempt unflagQuestion(Long attemptId, Long questionId) {
+        ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
+                .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
+        
+        flaggedQuestionRepository.findByAttemptIdAndQuestionId(attemptId, questionId)
+                .ifPresent(flaggedQuestion -> {
+                    flaggedQuestion.setDeleted(true);
+                    flaggedQuestionRepository.save(flaggedQuestion);
+                });
+        
+        return attempt;
+    }
+    
+    @Override
+    public List<FlaggedQuestion> getFlaggedQuestions(Long attemptId) {
+        // Check if attempt exists
+        if (!examAttemptRepository.existsById(attemptId)) {
+            throw new EntityNotFoundException("Exam attempt not found with id: " + attemptId);
+        }
+        
+        return flaggedQuestionRepository.findByAttemptId(attemptId);
     }
 }
