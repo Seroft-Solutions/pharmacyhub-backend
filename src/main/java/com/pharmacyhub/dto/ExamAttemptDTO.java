@@ -1,5 +1,6 @@
 package com.pharmacyhub.dto;
 
+import com.pharmacyhub.dto.UserAnswerDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,8 +12,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExamAttemptDTO {
-    
+public class ExamAttemptDTO
+{
+
     private Long id;
     private Long examId;
     private String userId;

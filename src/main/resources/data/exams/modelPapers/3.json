@@ -1,0 +1,1197 @@
+{
+  "title": "Model Paper 3",
+  "description": "This exam tests basic knowledge of pharmacology concepts",
+  "duration": 60,
+  "totalMarks": 20,
+  "passingMarks": 12,
+  "questions": [
+    {
+      "number": 1,
+      "question": "A patient with atrial fibrillation is started on warfarin therapy. After a week, the INR is found to be 1.3. What is the most appropriate next step?",
+      "options": {
+        "A": "Discontinue warfarin and start heparin",
+        "B": "Increase the dose of warfarin and recheck INR in 2 days",
+        "C": "Continue the same dose and recheck INR in 1 week",
+        "D": "Switch to direct oral anticoagulant (DOAC) immediately"
+      },
+      "answer": "B",
+      "explanation": "Warfarin has a delayed onset of action, and its effect is influenced by genetic factors, diet, and drug interactions. An INR of 1.3 is subtherapeutic, so increasing the dose and closely monitoring INR is appropriate. Immediate switching to DOACs (D) is not recommended without evaluating the patient's clinical status."
+    },
+    {
+      "number": 2,
+      "question": "A 67-year-old diabetic patient on metformin develops lactic acidosis. Which of the following is the most likely cause?",
+      "options": {
+        "A": "Renal impairment",
+        "B": "High carbohydrate diet",
+        "C": "Hypokalemia",
+        "D": "Hyperinsulinemia"
+      },
+      "answer": "A",
+      "explanation": "Metformin is excreted renally, and in patients with renal impairment, it accumulates, increasing the risk of lactic acidosis. Regular monitoring of renal function (eGFR) is essential to prevent complications."
+    },
+    {
+      "number": 3,
+      "question": "A patient with schizophrenia on clozapine therapy develops fever, sore throat, and fatigue. What is the most appropriate next step?",
+      "options": {
+        "A": "Increase clozapine dose",
+        "B": "Continue clozapine and prescribe antipyretics",
+        "C": "Check absolute neutrophil count (ANC) immediately",
+        "D": "Discontinue all medications"
+      },
+      "answer": "C",
+      "explanation": "Clozapine-induced agranulocytosis is a serious adverse effect that presents with fever and flu-like symptoms. Immediate ANC monitoring is crucial, and clozapine should be discontinued if neutropenia is confirmed."
+    },
+    {
+      "number": 4,
+      "question": "A patient with chronic heart failure (HFrEF) is on carvedilol, lisinopril, furosemide, and spironolactone. He presents with generalized weakness and ECG showing peaked T waves. Which medication is the most likely cause?",
+      "options": {
+        "A": "Furosemide",
+        "B": "Carvedilol",
+        "C": "Spironolactone",
+        "D": "Lisinopril"
+      },
+      "answer": "C",
+      "explanation": "Spironolactone is a potassium-sparing diuretic that can cause hyperkalemia, leading to ECG changes such as peaked T waves. Monitoring potassium levels is crucial in patients on RAAS inhibitors and potassium-sparing diuretics."
+    },
+    {
+      "number": 5,
+      "question": "A 54-year-old male with a history of peptic ulcer disease (PUD) and hypertension is prescribed naproxen for osteoarthritis pain. What is the best strategy to reduce gastrointestinal risk?",
+      "options": {
+        "A": "Prescribe naproxen with misoprostol",
+        "B": "Switch to aspirin instead of naproxen",
+        "C": "Add a proton pump inhibitor (PPI)",
+        "D": "Recommend taking naproxen with milk"
+      },
+      "answer": "C",
+      "explanation": "NSAIDs like naproxen increase the risk of gastric ulcers, especially in patients with a history of PUD. PPIs (e.g., omeprazole) are recommended for gastroprotection. Misoprostol (A) is also effective but has side effects like diarrhea and is contraindicated in pregnancy."
+    },
+    {
+      "number": 6,
+      "question": "Which type of niosomes are best suited for sustained drug release?",
+      "options": {
+        "A": "Small unilamellar vesicles (SUV)",
+        "B": "Multilamellar vesicles (MLV)",
+        "C": "Large unilamellar vesicles (LUV)",
+        "D": "Single-layered micelles"
+      },
+      "answer": "B",
+      "explanation": "Multilamellar vesicles (MLV) consist of multiple lipid bilayers, allowing gradual release of the drug over an extended period, making them ideal for sustained drug delivery. Small unilamellar vesicles (SUV) (A) and large unilamellar vesicles (LUV) (C) have only one lipid bilayer, leading to faster drug release. Single-layered micelles (D) are not used for sustained release, as they dissolve quickly in biological fluids."
+    },
+    {
+      "number": 7,
+      "question": "Which drug is preferred in the diagnosis of myasthenia gravis?",
+      "options": {
+        "A": "Pyridostigmine",
+        "B": "Edrophonium",
+        "C": "Neostigmine",
+        "D": "Atropine"
+      },
+      "answer": "B",
+      "explanation": "Edrophonium is a short-acting acetylcholinesterase inhibitor used in the Tensilon test to diagnose myasthenia gravis. It temporarily improves muscle strength in patients with the condition. Pyridostigmine and neostigmine are used for long-term management, while atropine is an anticholinergic and would worsen symptoms."
+    },
+    {
+      "number": 8,
+      "question": "Which of the following is NOT an effect of cholinergic agonists?",
+      "options": {
+        "A": "Increased salivation",
+        "B": "Bradycardia",
+        "C": "Pupil dilation",
+        "D": "Increased peristalsis"
+      },
+      "answer": "C",
+      "explanation": "Cholinergic agonists stimulate the parasympathetic nervous system, leading to pupil constriction (miosis), increased salivation, bradycardia, and increased peristalsis. Pupil dilation (mydriasis) is an effect of anticholinergic drugs such as atropine."
+    },
+    {
+      "number": 9,
+      "question": "Which drug is used in the treatment of Alzheimer's disease by inhibiting acetylcholinesterase?",
+      "options": {
+        "A": "Pralidoxime",
+        "B": "Donepezil",
+        "C": "Carbachol",
+        "D": "Ipratropium"
+      },
+      "answer": "B",
+      "explanation": "Donepezil is a centrally acting acetylcholinesterase inhibitor that increases acetylcholine levels in the brain, helping to improve memory and cognitive function in Alzheimer's disease. Pralidoxime is used to reverse organophosphate poisoning, carbachol is a cholinergic agonist for glaucoma, and ipratropium is an anticholinergic bronchodilator used for COPD and asthma."
+    },
+    {
+      "number": 10,
+      "question": "Which class of drugs is used for afterload reduction in heart failure?",
+      "options": {
+        "A": "Loop diuretics",
+        "B": "ACE inhibitors",
+        "C": "β-Blockers",
+        "D": "Digoxin"
+      },
+      "answer": "B",
+      "explanation": "ACE inhibitors (e.g., enalapril, lisinopril) reduce afterload by inhibiting the renin-angiotensin-aldosterone system (RAAS), leading to vasodilation and decreased vascular resistance. This improves cardiac output and is a cornerstone of heart failure therapy. Loop diuretics (A) primarily reduce preload, β-blockers (C) slow heart rate and reduce oxygen demand, while digoxin (D) improves contractility but does not significantly reduce afterload."
+    },
+    {
+      "number": 11,
+      "question": "What is the primary role of vasodilators such as hydralazine and isosorbide dinitrate in heart failure management?",
+      "options": {
+        "A": "Increasing cardiac contractility",
+        "B": "Reducing both preload and afterload",
+        "C": "Increasing heart rate",
+        "D": "Increasing sodium excretion"
+      },
+      "answer": "B",
+      "explanation": "Isosorbide dinitrate (a nitrate) primarily reduces preload by venodilation, while hydralazine primarily reduces afterload by arterial dilation. The combination improves symptoms and survival, particularly in Black patients with heart failure. Other options (A, C, D) do not specifically describe their role in heart failure therapy."
+    },
+    {
+      "number": 12,
+      "question": "Which drug is used in heart failure to reduce hospitalizations but does not provide mortality benefits?",
+      "options": {
+        "A": "Digoxin",
+        "B": "Sacubitril/valsartan",
+        "C": "Carvedilol",
+        "D": "Spironolactone"
+      },
+      "answer": "A",
+      "explanation": "Digoxin enhances cardiac contractility and helps control heart rate in atrial fibrillation but does not reduce mortality. Instead, it reduces hospitalizations in heart failure patients. Sacubitril/valsartan (B), carvedilol (C), and spironolactone (D) all reduce mortality in heart failure."
+    },
+    {
+      "number": 13,
+      "question": "Which hormone stimulates milk production in lactating women?",
+      "options": {
+        "A": "Oxytocin",
+        "B": "Vasopressin",
+        "C": "Prolactin",
+        "D": "ACTH"
+      },
+      "answer": "C",
+      "explanation": "Prolactin, secreted by the anterior pituitary gland, stimulates milk production in lactating women. Oxytocin (A) is responsible for milk ejection (let-down reflex), while vasopressin (B) regulates water balance, and ACTH (D) stimulates adrenal steroid production."
+    },
+    {
+      "number": 14,
+      "question": "Which type of insulin has the fastest onset of action?",
+      "options": {
+        "A": "Insulin glargine",
+        "B": "Insulin lispro",
+        "C": "NPH insulin",
+        "D": "Regular insulin"
+      },
+      "answer": "B",
+      "explanation": "Insulin lispro is a rapid-acting insulin with an onset of action within 15 minutes, making it the fastest among the options. Insulin glargine (A) is long-acting, NPH insulin (C) is intermediate-acting, and regular insulin (D) has a slower onset than lispro."
+    },
+    {
+      "number": 15,
+      "question": "What is a common side effect of SGLT2 inhibitors?",
+      "options": {
+        "A": "Hyperglycemia",
+        "B": "Urinary tract infections",
+        "C": "Weight gain",
+        "D": "Constipation"
+      },
+      "answer": "B",
+      "explanation": "SGLT2 inhibitors (e.g., empagliflozin, dapagliflozin) lower blood glucose by promoting glucose excretion in urine, which increases the risk of urinary tract infections (UTIs) and genital infections. They also cause weight loss rather than gain."
+    },
+    {
+      "number": 16,
+      "question": "Which ribosomal subunit do aminoglycosides bind to in order to inhibit bacterial protein synthesis?",
+      "options": {
+        "A": "50S",
+        "B": "30S",
+        "C": "40S",
+        "D": "60S"
+      },
+      "answer": "B",
+      "explanation": "Aminoglycosides (e.g., gentamicin, amikacin) bind to the 30S ribosomal subunit, leading to misreading of mRNA and inhibition of bacterial protein synthesis. Macrolides and chloramphenicol act on the 50S ribosomal subunit."
+    },
+    {
+      "number": 17,
+      "question": "What is the primary function of GLP-1 receptor agonists?",
+      "options": {
+        "A": "Increase glucose excretion via urine",
+        "B": "Delay gastric emptying and increase insulin secretion",
+        "C": "Stimulate β-cell growth",
+        "D": "Block glucose absorption in the intestine"
+      },
+      "answer": "B",
+      "explanation": "GLP-1 receptor agonists (e.g., liraglutide, semaglutide) enhance glucose-dependent insulin secretion, suppress glucagon release, and slow gastric emptying, leading to better postprandial glucose control and weight loss."
+    },
+    {
+      "number": 18,
+      "question": "Which bisphosphonate is administered intravenously once a year for osteoporosis treatment?",
+      "options": {
+        "A": "Risedronate",
+        "B": "Ibandronate",
+        "C": "Zoledronic acid",
+        "D": "Alendronate"
+      },
+      "answer": "C",
+      "explanation": "Zoledronic acid is a potent bisphosphonate given IV once yearly for osteoporosis due to its long duration of action. Other bisphosphonates like alendronate and risedronate are taken orally on a weekly or monthly basis."
+    },
+    {
+      "number": 19,
+      "question": "What is a major adverse effect of vancomycin?",
+      "options": {
+        "A": "QT prolongation",
+        "B": "Red man syndrome",
+        "C": "Hepatotoxicity",
+        "D": "Disulfiram-like reaction"
+      },
+      "answer": "B",
+      "explanation": "Red man syndrome is a histamine-mediated reaction caused by rapid IV infusion of vancomycin, leading to flushing, hypotension, and rash. Slowing the infusion rate and pre-treating with antihistamines can help prevent it."
+    },
+    {
+      "number": 20,
+      "question": "What is the primary adverse effect of carbapenems, particularly imipenem?",
+      "options": {
+        "A": "Nephrotoxicity",
+        "B": "CNS toxicity & seizures",
+        "C": "Ototoxicity",
+        "D": "Myelosuppression"
+      },
+      "answer": "B",
+      "explanation": "Imipenem, a broad-spectrum carbapenem antibiotic, has a high risk of CNS toxicity and seizures, especially in patients with renal impairment. Meropenem is preferred in seizure-prone patients due to a lower seizure risk."
+    },
+    {
+      "number": 21,
+      "question": "What is the main mechanism of action of trimethoprim?",
+      "options": {
+        "A": "Inhibition of dihydrofolate reductase",
+        "B": "Inhibition of DNA gyrase",
+        "C": "Inhibition of transpeptidation",
+        "D": "Disruption of cell membrane permeability"
+      },
+      "answer": "A",
+      "explanation": "Trimethoprim inhibits dihydrofolate reductase, blocking folic acid synthesis, which is essential for bacterial DNA replication. This synergizes with sulfamethoxazole, forming co-trimoxazole (TMP-SMX), effective against UTIs and pneumocystis pneumonia."
+    },
+    {
+      "number": 22,
+      "question": "Which antifungal class inhibits the enzyme β(1,3)-D-glucan synthase?",
+      "options": {
+        "A": "Azoles",
+        "B": "Echinocandins",
+        "C": "Polyenes",
+        "D": "Allylamines"
+      },
+      "answer": "B",
+      "explanation": "Echinocandins (e.g., caspofungin, micafungin) inhibit β(1,3)-D-glucan synthase, which disrupts fungal cell wall synthesis, making them effective against Candida and Aspergillus infections. Azoles inhibit ergosterol synthesis, and polyenes bind to ergosterol, disrupting fungal membranes."
+    },
+    {
+      "number": 23,
+      "question": "Which of the following is a neuraminidase inhibitor used to treat and prevent influenza A and B?",
+      "options": {
+        "A": "Amantadine",
+        "B": "Rimantadine",
+        "C": "Oseltamivir",
+        "D": "Acyclovir"
+      },
+      "answer": "C",
+      "explanation": "Oseltamivir is a neuraminidase inhibitor that prevents viral release from infected cells, making it effective against influenza A and B. Amantadine and rimantadine are M2 ion channel inhibitors that only target influenza A, while acyclovir is used for herpesviruses."
+    },
+    {
+      "number": 24,
+      "question": "Which drug is the first-line treatment for herpes simplex encephalitis?",
+      "options": {
+        "A": "Oseltamivir",
+        "B": "Acyclovir",
+        "C": "Zanamivir",
+        "D": "Foscarnet"
+      },
+      "answer": "B",
+      "explanation": "Acyclovir is a guanosine analog that inhibits viral DNA polymerase, making it the first-line drug for herpes simplex virus (HSV) encephalitis. Foscarnet is used in resistant cases. Oseltamivir and zanamivir are for influenza, not HSV."
+    },
+    {
+      "number": 25,
+      "question": "Which direct-acting antiviral (DAA) class for HCV inhibits NS5B polymerase?",
+      "options": {
+        "A": "Sofosbuvir",
+        "B": "Ledipasvir",
+        "C": "Ribavirin",
+        "D": "Grazoprevir"
+      },
+      "answer": "A",
+      "explanation": "Sofosbuvir is an NS5B polymerase inhibitor that prevents RNA replication in hepatitis C virus (HCV). Ledipasvir is an NS5A inhibitor, ribavirin is a general antiviral used as an adjunct, and grazoprevir is a protease inhibitor."
+    },
+    {
+      "number": 26,
+      "question": "Which immunosuppressant is associated with gingival hyperplasia and hirsutism?",
+      "options": {
+        "A": "Tacrolimus",
+        "B": "Cyclosporine",
+        "C": "Mycophenolate mofetil",
+        "D": "Sirolimus"
+      },
+      "answer": "B",
+      "explanation": "Cyclosporine, a calcineurin inhibitor, is linked to gingival hyperplasia and hirsutism. Tacrolimus, another calcineurin inhibitor, has a lower risk. Mycophenolate mofetil and sirolimus do not cause these side effects."
+    },
+    {
+      "number": 27,
+      "question": "Which of the following drugs is a second-generation H1 antagonist?",
+      "options": {
+        "A": "Chlorpheniramine",
+        "B": "Diphenhydramine",
+        "C": "Fexofenadine",
+        "D": "Promethazine"
+      },
+      "answer": "C",
+      "explanation": "Fexofenadine is a second-generation H1 receptor antagonist, used for allergic rhinitis with minimal sedation. Diphenhydramine, chlorpheniramine, and promethazine are first-generation antihistamines, causing more sedation due to CNS penetration."
+    },
+    {
+      "number": 28,
+      "question": "What is the main therapeutic use of low-dose aspirin?",
+      "options": {
+        "A": "Pain relief",
+        "B": "Prevention of cardiovascular events",
+        "C": "Treatment of fever",
+        "D": "Reduction of inflammation"
+      },
+      "answer": "B",
+      "explanation": "Low-dose aspirin (75-100 mg daily) irreversibly inhibits COX-1, reducing platelet aggregation, making it effective for stroke and myocardial infarction prevention. Higher doses are used for pain, fever, and inflammation."
+    },
+    {
+      "number": 29,
+      "question": "Which inhaled corticosteroid (ICS) is commonly used for chronic asthma management?",
+      "options": {
+        "A": "Tiotropium",
+        "B": "Montelukast",
+        "C": "Fluticasone",
+        "D": "Albuterol"
+      },
+      "answer": "C",
+      "explanation": "Fluticasone is an inhaled corticosteroid (ICS) used for long-term asthma control by reducing airway inflammation. Albuterol is a short-acting β2 agonist (SABA) for acute attacks, while tiotropium is for COPD, and montelukast is a leukotriene receptor antagonist (LTRA)."
+    },
+    {
+      "number": 30,
+      "question": "Which of the following is NOT a PDE-5 inhibitor used for erectile dysfunction?",
+      "options": {
+        "A": "Sildenafil",
+        "B": "Vardenafil",
+        "C": "Finasteride",
+        "D": "Tadalafil"
+      },
+      "answer": "C",
+      "explanation": "Finasteride is a 5-alpha reductase inhibitor used for benign prostatic hyperplasia (BPH) and androgenic alopecia, not erectile dysfunction. Sildenafil, vardenafil, and tadalafil are PDE-5 inhibitors that enhance nitric oxide signaling for erections."
+    },
+    {
+      "number": 31,
+      "question": "What is the incubation period for sterility testing as per USP guidelines?",
+      "options": {
+        "A": "2 days",
+        "B": "5 days",
+        "C": "7 days",
+        "D": "14 days"
+      },
+      "answer": "D",
+      "explanation": "According to USP guidelines, sterility testing requires an incubation period of 14 days to detect microbial contamination in sterile pharmaceutical products. This allows the growth of slow-growing microorganisms."
+    },
+    {
+      "number": 32,
+      "question": "The BET (Bacterial Endotoxin Test) is commonly performed using which method?",
+      "options": {
+        "A": "Kjeldahl method",
+        "B": "LAL test",
+        "C": "Karl Fischer titration",
+        "D": "Gravimetric method"
+      },
+      "answer": "B",
+      "explanation": "The Limulus Amebocyte Lysate (LAL) test is used to detect bacterial endotoxins in pharmaceutical products, particularly injectables and medical devices. It is derived from horseshoe crab blood."
+    },
+    {
+      "number": 33,
+      "question": "Which chemical reagent forms an orange-red precipitate with alkaloids?",
+      "options": {
+        "A": "Wagner’s reagent",
+        "B": "Mayer’s reagent",
+        "C": "Dragendorff’s reagent",
+        "D": "Hager’s reagent"
+      },
+      "answer": "C",
+      "explanation": "Dragendorff’s reagent is commonly used to detect alkaloids, forming an orange-red precipitate due to complex formation with bismuth iodide."
+    },
+    {
+      "number": 34,
+      "question": "Which analytical technique is commonly used to assay active ingredients in suppositories?",
+      "options": {
+        "A": "High-Performance Liquid Chromatography (HPLC)",
+        "B": "Karl Fischer titration",
+        "C": "Atomic absorption spectroscopy",
+        "D": "Fluorescence spectroscopy"
+      },
+      "answer": "A",
+      "explanation": "HPLC is widely used for quantitative analysis of active pharmaceutical ingredients (APIs) in suppositories, as it ensures accuracy and reproducibility."
+    },
+    {
+      "number": 35,
+      "question": "What is the primary purpose of adding humectants to cream formulations?",
+      "options": {
+        "A": "To increase viscosity",
+        "B": "To prevent microbial growth",
+        "C": "To enhance water retention",
+        "D": "To improve fragrance"
+      },
+      "answer": "C",
+      "explanation": "Humectants (e.g., glycerin, sorbitol, propylene glycol) attract moisture from the environment and retain it in the cream, preventing dryness and enhancing hydration."
+    },
+    {
+      "number": 36,
+      "question": "Which of the following is an example of an anhydrous absorption base?",
+      "options": {
+        "A": "White petrolatum",
+        "B": "Hydrophilic ointment",
+        "C": "Cold cream",
+        "D": "Anhydrous lanolin"
+      },
+      "answer": "D",
+      "explanation": "Anhydrous absorption bases (e.g., hydrous lanolin) can absorb water, forming w/o emulsions. White petrolatum is a hydrocarbon base, and cold cream and hydrophilic ointment are emulsion bases."
+    },
+    {
+      "number": 37,
+      "question": "Which of the following is the best method for incorporating heat-sensitive drugs into an ointment?",
+      "options": {
+        "A": "Trituration",
+        "B": "Fusion",
+        "C": "Levigation",
+        "D": "Emulsification"
+      },
+      "answer": "A",
+      "explanation": "Trituration involves gentle grinding and mixing at room temperature, preventing heat degradation of sensitive drugs. Fusion (B) requires heat, making it unsuitable for heat-sensitive substances."
+    },
+    {
+      "number": 38,
+      "question": "Which law states that the rate of heat transfer through a material is proportional to the negative gradient of temperatures and the area through which the heat flows?",
+      "options": {
+        "A": "Newton's Law of Cooling",
+        "B": "Fourier's Law of Heat Conduction",
+        "C": "Stefan-Boltzmann Law",
+        "D": "Fick's First Law"
+      },
+      "answer": "B",
+      "explanation": "Fourier’s law describes heat conduction, stating that heat flux is proportional to the temperature gradient and thermal conductivity of the material."
+    },
+    {
+      "number": 39,
+      "question": "Which of the following is the fastest drying method?",
+      "options": {
+        "A": "Tray drying",
+        "B": "Spray drying",
+        "C": "Freeze drying",
+        "D": "Vacuum drying"
+      },
+      "answer": "B",
+      "explanation": "Spray drying is the fastest drying method, producing fine, dry powders by rapidly evaporating solvent from atomized liquid droplets. It is widely used in pharmaceuticals and food industries."
+    },
+    {
+      "number": 40,
+      "question": "The angle of repose is used to assess which property of a powder?",
+      "options": {
+        "A": "Compressibility",
+        "B": "Flowability",
+        "C": "Solubility",
+        "D": "Density"
+      },
+      "answer": "B",
+      "explanation": "Angle of repose is the maximum angle at which a powder pile remains stable without collapsing. A smaller angle indicates better flowability, while a larger angle suggests poor flow properties."
+    },
+    {
+      "number": 41,
+      "question": "Which microencapsulation technique involves the separation of a polymer-rich phase from a polymer-poor phase to form a coating around the core material?",
+      "options": {
+        "A": "Solvent evaporation",
+        "B": "Coacervation",
+        "C": "Interfacial polymerization",
+        "D": "Spray drying"
+      },
+      "answer": "B",
+      "explanation": "Coacervation is a microencapsulation technique where a polymer-rich phase separates and surrounds the core material, forming a protective coating. It is commonly used for sustained-release formulations."
+    },
+    {
+      "number": 42,
+      "question": "Which of the following best describes a liposome?",
+      "options": {
+        "A": "A vesicle composed of non-ionic surfactants",
+        "B": "A spherical vesicle with at least one lipid bilayer encapsulating an aqueous core",
+        "C": "A solid lipid nanoparticle",
+        "D": "A polymeric micelle"
+      },
+      "answer": "B",
+      "explanation": "Liposomes are biodegradable and biocompatible vesicles made of phospholipid bilayers, used in drug delivery to improve solubility, bioavailability, and targeting of drugs."
+    },
+    {
+      "number": 43,
+      "question": "Surfactants increase solubility by:",
+      "options": {
+        "A": "Decreasing vapor pressure",
+        "B": "Reducing surface tension",
+        "C": "Increasing solute size",
+        "D": "Decreasing solvent viscosity"
+      },
+      "answer": "B",
+      "explanation": "Surfactants reduce interfacial tension, improving wetting and solubility. (A) Vapor pressure reduction does not significantly improve solubility. (C) Increasing solute size would decrease solubility. (D) Decreasing solvent viscosity does not significantly affect solubility."
+    },
+    {
+      "number": 44,
+      "question": "The coagulation of a colloid can be induced by:",
+      "options": {
+        "A": "Adding electrolytes",
+        "B": "Increasing temperature",
+        "C": "Increasing Brownian motion",
+        "D": "Increasing dispersion medium"
+      },
+      "answer": "A",
+      "explanation": "Electrolytes neutralize the surface charge of colloidal particles, causing coagulation or precipitation. (B) Increasing temperature may destabilize some colloids but does not directly induce coagulation. (C) Brownian motion increases stability rather than causing coagulation. (D) Increasing dispersion medium dilutes the colloid but does not lead to coagulation."
+    },
+    {
+      "number": 45,
+      "question": "Which of the following is NOT a commonly used suspending agent?",
+      "options": {
+        "A": "Magnesium stearate",
+        "B": "Hydroxypropyl methylcellulose (HPMC)",
+        "C": "Carbopol",
+        "D": "Xanthan gum"
+      },
+      "answer": "A",
+      "explanation": "Magnesium stearate is a lubricant used in tablets, not a suspending agent. (B) HPMC, (C) Carbopol, and (D) Xanthan gum are all viscosity enhancers and suspending agents used to maintain uniform dispersion."
+    },
+    {
+      "number": 46,
+      "question": "Which of the following methods is commonly used for preparing emulsions?",
+      "options": {
+        "A": "Trituration",
+        "B": "Dry gum method",
+        "C": "Sublimation",
+        "D": "Distillation"
+      },
+      "answer": "B",
+      "explanation": "The dry gum method (4:2:1 ratio of oil, water, emulsifier) is a common way to prepare primary emulsions. (A) Trituration is a method of grinding powders. (C) Sublimation is for drying substances by transitioning from solid to gas. (D) Distillation is used for separating liquids."
+    },
+    {
+      "number": 47,
+      "question": "Which of the following HLB values favors the formation of oil-in-water (O/W) emulsions?",
+      "options": {
+        "A": "3-6",
+        "B": "7-9",
+        "C": "10-18",
+        "D": "Above 20"
+      },
+      "answer": "C",
+      "explanation": "O/W emulsions require surfactants with an HLB of 10-18 to ensure oil dispersion in water. (A) 3-6 is for W/O emulsions, (B) 7-9 is borderline, and (D) HLB >20 is used for detergents or solubilizers."
+    },
+    {
+      "number": 48,
+      "question": "Dessication is the process of:",
+      "options": {
+        "A": "Removing water from a substance",
+        "B": "Increasing water content in a drug",
+        "C": "Mixing two immiscible phases",
+        "D": "Breaking down solid particles into smaller ones"
+      },
+      "answer": "A",
+      "explanation": "Dessication means drying or removing water. (B) Increasing water content is the opposite. (C) Mixing immiscible phases describes emulsification. (D) Breaking down solids refers to size reduction techniques."
+    },
+    {
+      "number": 49,
+      "question": "Which method is used to prevent caking in suspensions?",
+      "options": {
+        "A": "Decreasing viscosity",
+        "B": "Using deflocculating agents",
+        "C": "Using flocculating agents",
+        "D": "Increasing particle size"
+      },
+      "answer": "C",
+      "explanation": "Flocculating agents help form loosely bound aggregates, preventing hard cake formation. (A) Decreasing viscosity would worsen caking. (B) Deflocculating agents prevent aggregation, leading to caking. (D) Increasing particle size does not prevent caking."
+    },
+    {
+      "number": 50,
+      "question": "The ratio of oil, water, and emulsifier in the dry gum method is:",
+      "options": {
+        "A": "4:2:1",
+        "B": "3:2:1",
+        "C": "2:3:1",
+        "D": "1:2:1"
+      },
+      "answer": "A",
+      "explanation": "The dry gum method follows a 4 parts oil, 2 parts water, 1 part emulsifier ratio for primary emulsions. Other ratios are incorrect for this method."
+    },
+    {
+      "number": 51,
+      "question": "Which of the following preservatives is commonly used in emulsions?",
+      "options": {
+        "A": "Benzyl alcohol",
+        "B": "Methylparaben",
+        "C": "Propylparaben",
+        "D": "All of the above"
+      },
+      "answer": "D",
+      "explanation": "Benzyl alcohol, methylparaben, and propylparaben are all common preservatives in emulsions to prevent microbial contamination."
+    },
+    {
+      "number": 52,
+      "question": "Direct compression is suitable for drugs that:",
+      "options": {
+        "A": "Are sensitive to heat and moisture",
+        "B": "Have poor flow properties",
+        "C": "Require high doses",
+        "D": "Are highly potent"
+      },
+      "answer": "A",
+      "explanation": "Direct compression avoids heat and moisture, making it ideal for drugs that degrade under such conditions. (B) Poor flow properties require granulation. (C) High-dose drugs may not compress well. (D) Highly potent drugs require dilution and are often granulated."
+    },
+    {
+      "number": 53,
+      "question": "Which of the following is a commonly used disintegrant in tablet formulations?",
+      "options": {
+        "A": "Sodium starch glycolate",
+        "B": "Stearic acid",
+        "C": "Polyethylene glycol",
+        "D": "Calcium phosphate"
+      },
+      "answer": "A",
+      "explanation": "Sodium starch glycolate promotes rapid disintegration by absorbing water and swelling. (B) Stearic acid is a lubricant. (C) Polyethylene glycol is a binder. (D) Calcium phosphate is a filler."
+    },
+    {
+      "number": 54,
+      "question": "Which class of drugs has the highest bioavailability according to the Biopharmaceutics Classification System (BCS)?",
+      "options": {
+        "A": "Class I (High solubility, High permeability)",
+        "B": "Class II (Low solubility, High permeability)",
+        "C": "Class III (High solubility, Low permeability)",
+        "D": "Class IV (Low solubility, Low permeability)"
+      },
+      "answer": "A",
+      "explanation": "Class I drugs have both high solubility and high permeability, ensuring excellent bioavailability. (B) Class II drugs have low solubility, limiting absorption. (C) Class III drugs have low permeability, reducing bioavailability. (D) Class IV drugs have both poor solubility and permeability, making absorption minimal."
+    },
+    {
+      "number": 55,
+      "question": "What should be done if one or two tablets fail the Disintegration Test?",
+      "options": {
+        "A": "Repeat the test with 6 new tablets",
+        "B": "Repeat the test with 12 additional tablets",
+        "C": "Reject the batch immediately",
+        "D": "Increase the tablet coating thickness"
+      },
+      "answer": "B",
+      "explanation": "If 1 or 2 tablets fail, USP/BP guidelines require retesting with 12 additional tablets. The batch fails only if more than 2 of the total 18 tablets fail. (A) Testing with only 6 additional tablets is incorrect. (C) Immediate rejection is unnecessary before confirmation. (D) Increasing coating thickness is not a valid corrective measure."
+    },
+    {
+      "number": 56,
+      "question": "What is the maximum disintegration time for an uncoated tablet as per USP/BP?",
+      "options": {
+        "A": "5 minutes",
+        "B": "10 minutes",
+        "C": "15 minutes",
+        "D": "30 minutes"
+      },
+      "answer": "C",
+      "explanation": "Uncoated tablets must disintegrate within 15 minutes per USP/BP guidelines. (A) 5 minutes and (B) 10 minutes are too short. (D) 30 minutes applies to certain coated tablets."
+    },
+    {
+      "number": 57,
+      "question": "Which USP apparatus is commonly used for dissolution testing of tablets?",
+      "options": {
+        "A": "USP Apparatus 1 (Basket Type)",
+        "B": "USP Apparatus 2 (Paddle Type)",
+        "C": "USP Apparatus 3 (Reciprocating Cylinder)",
+        "D": "Both A and B"
+      },
+      "answer": "D",
+      "explanation": "USP Apparatus 1 (Basket Type) and USP Apparatus 2 (Paddle Type) are widely used for dissolution testing. (C) Reciprocating Cylinder is used for extended-release formulations."
+    },
+    {
+      "number": 58,
+      "question": "Which of the following excipients can be used as a rate-controlling agent in sustained-release tablets?",
+      "options": {
+        "A": "Lactose",
+        "B": "Ethylcellulose",
+        "C": "Talc",
+        "D": "Mannitol"
+      },
+      "answer": "B",
+      "explanation": "Ethylcellulose is a hydrophobic polymer used to control drug release. (A) Lactose is a filler. (C) Talc is a lubricant. (D) Mannitol is a diluent or sweetener."
+    },
+    {
+      "number": 59,
+      "question": "The peripheral compartment in a two-compartment model consists of:",
+      "options": {
+        "A": "Highly perfused tissues like liver and kidney",
+        "B": "Poorly perfused tissues like fat and muscle",
+        "C": "The central nervous system",
+        "D": "The bloodstream only"
+      },
+      "answer": "B",
+      "explanation": "The peripheral compartment includes poorly perfused tissues where drug distribution is slower. (A) Liver and kidney belong to the central compartment. (C) CNS is not a distinct compartment. (D) Bloodstream is the central compartment."
+    },
+    {
+      "number": 60,
+      "question": "What is bioavailability?",
+      "options": {
+        "A": "The extent and rate of drug absorption",
+        "B": "The total drug elimination rate",
+        "C": "The total volume of distribution",
+        "D": "The plasma half-life of the drug"
+      },
+      "answer": "A",
+      "explanation": "Bioavailability measures how much of the drug reaches systemic circulation. (B) Elimination rate and (C) Volume of distribution describe different pharmacokinetic properties. (D) Half-life does not define bioavailability."
+    },
+    {
+      "number": 61,
+      "question": "Which pharmacokinetic parameter determines the extent of drug distribution in the body?",
+      "options": {
+        "A": "Clearance",
+        "B": "Volume of distribution (Vd)",
+        "C": "Half-life",
+        "D": "Bioavailability"
+      },
+      "answer": "B",
+      "explanation": "Vd indicates how extensively a drug distributes in body tissues. (A) Clearance refers to elimination. (C) Half-life is time for plasma concentration to reduce by half. (D) Bioavailability refers to absorption."
+    },
+    {
+      "number": 62,
+      "question": "The half-life of a drug is mainly determined by:",
+      "options": {
+        "A": "Clearance and volume of distribution",
+        "B": "Plasma protein binding",
+        "C": "First-pass metabolism",
+        "D": "Bioavailability"
+      },
+      "answer": "A",
+      "explanation": "Half-life (t½) = (0.693 × Vd) / Clearance. (B) Plasma protein binding affects drug distribution but not directly half-life. (C) First-pass metabolism affects bioavailability. (D) Bioavailability does not impact elimination rate."
+    },
+    {
+      "number": 63,
+      "question": "How many milliliters of a 10% solution are needed to obtain 5 g of the drug?",
+      "options": {
+        "A": "10 mg",
+        "B": "20 mg",
+        "C": "15 mg",
+        "D": "5 mg"
+      },
+      "answer": "B",
+      "explanation": "A 1:1000 solution means 1 g (1000 mg) of epinephrine in 1000 mL of solution. Thus, 20 mL contains 20 mg of epinephrine."
+    },
+    {
+      "number": 65,
+      "question": "A pharmacist is asked to prepare 200 mL of a 1:1000 solution. How much drug (g) is required?",
+      "options": {
+        "A": "0.2 g",
+        "B": "0.5 g",
+        "C": "1 g",
+        "D": "2 g"
+      },
+      "answer": "A",
+      "explanation": "1:1000 means 1 g per 1000 mL. Using proportion: (B) 0.5 g would be needed for 500 mL. (C) 1 g for 1000 mL. (D) 2 g for 2000 mL."
+    },
+    {
+      "number": 66,
+      "question": "Which of the following substances is not effectively removed by activated charcoal?",
+      "options": {
+        "A": "Acetaminophen",
+        "B": "Lithium",
+        "C": "Aspirin",
+        "D": "Phenobarbital"
+      },
+      "answer": "B",
+      "explanation": "Activated charcoal is ineffective for lithium, as it does not bind well to small, polar molecules. (A) Acetaminophen, (C) Aspirin, and (D) Phenobarbital are effectively adsorbed by activated charcoal."
+    },
+    {
+      "number": 67,
+      "question": "Which of the following toxins causes QRS prolongation on ECG?",
+      "options": {
+        "A": "Beta-blockers",
+        "B": "Organophosphates",
+        "C": "Tricyclic antidepressants (TCAs)",
+        "D": "Benzodiazepines"
+      },
+      "answer": "C",
+      "explanation": "TCAs (e.g., amitriptyline) cause sodium channel blockade, leading to QRS prolongation. (A) Beta-blockers cause bradycardia, (B) Organophosphates lead to cholinergic toxicity, and (D) Benzodiazepines do not significantly affect QRS duration."
+    },
+    {
+      "number": 68,
+      "question": "Absolute bioavailability is calculated using:",
+      "options": {
+        "A": "AUC(oral) / AUC(IV)",
+        "B": "AUC(IV) / AUC(oral)",
+        "C": "Cmax / Tmax",
+        "D": "Clearance × Half-life"
+      },
+      "answer": "A",
+      "explanation": "Absolute bioavailability is the fraction of the administered drug reaching systemic circulation. (B) AUC(IV) / AUC(oral) is incorrect, (C) Cmax / Tmax describes drug absorption rate, and (D) Clearance × Half-life does not determine bioavailability."
+    },
+    {
+      "number": 69,
+      "question": "A bioequivalence study must demonstrate that the test product and reference product have similar:",
+      "options": {
+        "A": "Chemical structures",
+        "B": "Manufacturing processes",
+        "C": "Pharmacokinetic profiles",
+        "D": "Tablet colors"
+      },
+      "answer": "C",
+      "explanation": "Bioequivalence ensures that two drugs have similar absorption, distribution, metabolism, and elimination (PK profiles). (A) Chemical structures may differ in generics, (B) Manufacturing processes do not define bioequivalence, and (D) Tablet color is irrelevant to drug effect."
+    },
+    {
+      "number": 70,
+      "question": "A patient presents with severe bradycardia and hypotension after an overdose of metoprolol. What is the best initial treatment?",
+      "options": {
+        "A": "Glucagon",
+        "B": "Digoxin immune Fab",
+        "C": "Sodium bicarbonate",
+        "D": "Naloxone"
+      },
+      "answer": "A",
+      "explanation": "Glucagon increases cAMP, bypassing beta-blockade to restore heart rate and contractility. (B) Digoxin immune Fab is used for digoxin toxicity, (C) Sodium bicarbonate is used for TCA overdose, and (D) Naloxone reverses opioid overdose."
+    },
+    {
+      "number": 71,
+      "question": "Which of the following is NOT a transdermal drug delivery system?",
+      "options": {
+        "A": "Nitroglycerin patch",
+        "B": "Nicotine patch",
+        "C": "Clonidine patch",
+        "D": "Enteric-coated tablet"
+      },
+      "answer": "D",
+      "explanation": "Transdermal systems deliver drugs through the skin into systemic circulation. (A) Nitroglycerin, (B) Nicotine, and (C) Clonidine patches are transdermal, while (D) Enteric-coated tablets are oral formulations."
+    },
+    {
+      "number": 72,
+      "question": "Which of the following dosage forms is a dispersion of solid drug particles in a liquid medium?",
+      "options": {
+        "A": "Solution",
+        "B": "Suspension",
+        "C": "Tablet",
+        "D": "Capsule"
+      },
+      "answer": "B",
+      "explanation": "Suspensions contain insoluble solid drug particles dispersed in a liquid, requiring shaking before use. (A) Solutions contain dissolved drugs, (C) Tablets and (D) Capsules are solid dosage forms."
+    },
+    {
+      "number": 73,
+      "question": "Aconitum is primarily used as a:",
+      "options": {
+        "A": "Diuretic",
+        "B": "Analgesic and sedative",
+        "C": "Stimulant",
+        "D": "Antipyretic"
+      },
+      "answer": "B",
+      "explanation": "Aconitum (Aconite) has toxic alkaloids with analgesic and sedative properties. (A) It is not a diuretic, (C) It does not stimulate the CNS, and (D) It does not act as an antipyretic."
+    },
+    {
+      "number": 74,
+      "question": "Reserpine is used in modern medicine as a:",
+      "options": {
+        "A": "Diuretic",
+        "B": "Sedative and antihypertensive",
+        "C": "Stimulant",
+        "D": "Antibiotic"
+      },
+      "answer": "B",
+      "explanation": "Reserpine depletes catecholamines, leading to sedation and blood pressure reduction. (A) It is not a diuretic, (C) It does not stimulate the CNS, and (D) It has no antibiotic properties."
+    },
+    {
+      "number": 75,
+      "question": "The two main alkaloids found in Catharanthus roseus are:",
+      "options": {
+        "A": "Reserpine and Atropine",
+        "B": "Vincristine and Vinblastine",
+        "C": "Morphine and Codeine",
+        "D": "Quinine and Cinchonine"
+      },
+      "answer": "B",
+      "explanation": "Vincristine and Vinblastine, found in Catharanthus roseus (Madagascar periwinkle), are used in cancer chemotherapy. Other alkaloids listed belong to different plants."
+    },
+    {
+      "number": 76,
+      "question": "Which of the following alkaloids is NOT found in Papaver somniferum?",
+      "options": {
+        "A": "Morphine",
+        "B": "Codeine",
+        "C": "Thebaine",
+        "D": "Ephedrine"
+      },
+      "answer": "D",
+      "explanation": "Ephedrine comes from Ephedra species, not Papaver somniferum. (A) Morphine, (B) Codeine, and (C) Thebaine are opioids derived from opium poppy."
+    },
+    {
+      "number": 77,
+      "question": "Which of the following is the primary active glycoside found in Digitalis purpurea?",
+      "options": {
+        "A": "Digoxin",
+        "B": "Strophanthidin",
+        "C": "Quercetin",
+        "D": "Reserpine"
+      },
+      "answer": "A",
+      "explanation": "Digoxin is a cardiac glycoside used to treat heart failure and atrial fibrillation. (B) Strophanthidin is found in Strophanthus species, (C) Quercetin is a flavonoid, and (D) Reserpine is an alkaloid."
+    },
+    {
+      "number": 78,
+      "question": "Cascara belongs to which class of glycosides?",
+      "options": {
+        "A": "Saponin glycosides",
+        "B": "Anthraquinone glycosides",
+        "C": "Aldehyde glycosides",
+        "D": "Isothiocyanate glycosides"
+      },
+      "answer": "B",
+      "explanation": "Cascara contains anthraquinone glycosides, which have laxative effects. (A) Saponin glycosides have detergent properties, (C) Aldehyde glycosides are uncommon, and (D) Isothiocyanate glycosides are found in mustard seeds."
+    },
+    {
+      "number": 79,
+      "question": "Which enzyme catalyzes the first step in glycolysis?",
+      "options": {
+        "A": "Hexokinase",
+        "B": "Phosphofructokinase",
+        "C": "Pyruvate kinase",
+        "D": "Glucose-6-phosphatase"
+      },
+      "answer": "A",
+      "explanation": "Hexokinase phosphorylates glucose to glucose-6-phosphate, the first step in glycolysis. (B) Phosphofructokinase regulates glycolysis, (C) Pyruvate kinase catalyzes the last step, and (D) Glucose-6-phosphatase is involved in gluconeogenesis."
+    },
+    {
+      "number": 80,
+      "question": "Which of the following has a tetrahedral geometry?",
+      "options": {
+        "A": "Methane",
+        "B": "Ammonia",
+        "C": "Water",
+        "D": "Carbon dioxide"
+      },
+      "answer": "A",
+      "explanation": "Methane (CH₄) has a tetrahedral geometry due to four equivalent bond angles of 109.5° around the central carbon. (B) Ammonia (NH₃) is trigonal pyramidal, (C) Water (H₂O) is bent, and (D) Carbon dioxide (CO₂) is linear."
+    },
+    {
+      "number": 81,
+      "question": "Infrared (IR) Spectroscopy is used for:",
+      "options": {
+        "A": "Identifying functional groups in molecules",
+        "B": "Determining atomic structure",
+        "C": "Quantifying metal ions",
+        "D": "Analyzing fluorescence properties"
+      },
+      "answer": "A",
+      "explanation": "IR spectroscopy detects molecular vibrations, allowing identification of functional groups. (B) Atomic structure is analyzed using X-ray crystallography, (C) Metal ions are quantified using atomic absorption spectroscopy, and (D) Fluorescence spectroscopy analyzes excited states of molecules."
+    },
+    {
+      "number": 82,
+      "question": "UV/Visible Spectroscopy is based on:",
+      "options": {
+        "A": "Absorption of electromagnetic radiation",
+        "B": "Emission of radiation by excited atoms",
+        "C": "Molecular vibrations",
+        "D": "Nuclear spin transitions"
+      },
+      "answer": "A",
+      "explanation": "UV/Vis spectroscopy is based on absorption of light by electrons, leading to electronic transitions. (B) Emission spectroscopy measures emitted light, (C) Molecular vibrations are studied in IR spectroscopy, and (D) NMR spectroscopy studies nuclear spin transitions."
+    },
+    {
+      "number": 83,
+      "question": "Which law governs the relationship between absorbance and concentration in UV/Visible spectroscopy?",
+      "options": {
+        "A": "Beer-Lambert’s Law",
+        "B": "Faraday’s Law",
+        "C": "Charles’s Law",
+        "D": "Dalton’s Law"
+      },
+      "answer": "A",
+      "explanation": "Beer-Lambert's Law states that absorbance is directly proportional to concentration and path length. (B) Faraday’s Law relates to electrolysis, (C) Charles’s Law describes gas expansion with temperature, and (D) Dalton’s Law applies to partial pressures of gases."
+    },
+    {
+      "number": 84,
+      "question": "Which technique is best suited for studying the photostability of pharmaceuticals?",
+      "options": {
+        "A": "UV/Vis Spectroscopy",
+        "B": "Atomic Absorption Spectroscopy",
+        "C": "Mass Spectrometry",
+        "D": "NMR Spectroscopy"
+      },
+      "answer": "A",
+      "explanation": "UV/Vis spectroscopy evaluates drug degradation due to light exposure, determining photostability. (B) Atomic absorption spectroscopy quantifies metal ions, (C) Mass spectrometry identifies molecular structures, and (D) NMR analyzes chemical environments."
+    },
+    {
+      "number": 85,
+      "question": "What is the principle of column chromatography?",
+      "options": {
+        "A": "Partition",
+        "B": "Adsorption",
+        "C": "Ion exchange",
+        "D": "Gel filtration"
+      },
+      "answer": "B",
+      "explanation": "Column chromatography relies on the adsorption of analytes onto a stationary phase, leading to their separation based on affinity. (A) Partition chromatography separates based on solubility differences, (C) Ion exchange chromatography separates charged species, and (D) Gel filtration chromatography separates based on molecular size."
+    },
+    {
+      "number": 86,
+      "question": "In Thin Layer Chromatography (TLC), the stationary phase is typically:",
+      "options": {
+        "A": "Liquid",
+        "B": "Gas",
+        "C": "Solid",
+        "D": "Supercritical fluid"
+      },
+      "answer": "C",
+      "explanation": "TLC uses a solid stationary phase (e.g., silica gel or alumina) coated on a plate. (A) Liquid stationary phases are used in liquid chromatography, (B) Gases serve as the mobile phase in gas chromatography, and (D) Supercritical fluids are used in supercritical fluid chromatography."
+    },
+    {
+      "number": 87,
+      "question": "HPLC is widely used for the separation of:",
+      "options": {
+        "A": "Volatile compounds",
+        "B": "Non-volatile compounds",
+        "C": "Gaseous compounds",
+        "D": "Inorganic ions"
+      },
+      "answer": "B",
+      "explanation": "HPLC (High-Performance Liquid Chromatography) is ideal for non-volatile, thermally unstable compounds. (A) Volatile compounds are analyzed using Gas Chromatography (GC), (C) Gaseous compounds require gas-phase techniques, and (D) Inorganic ions are separated using ion chromatography."
+    },
+    {
+      "number": 88,
+      "question": "In mass spectrometry, the molecular ion peak represents:",
+      "options": {
+        "A": "The most abundant fragment",
+        "B": "The intact molecule with one electron removed",
+        "C": "The heaviest isotope of the molecule",
+        "D": "The base peak"
+      },
+      "answer": "B",
+      "explanation": "The molecular ion (M⁺) peak represents the original molecule minus one electron. (A) The most abundant fragment is the base peak, (C) The heaviest isotope peak represents isotopic distribution, and (D) The base peak is the most intense peak, not necessarily the molecular ion."
+    },
+    {
+      "number": 89,
+      "question": "Gas chromatography is most suitable for analyzing:",
+      "options": {
+        "A": "Volatile organic compounds",
+        "B": "Large proteins",
+        "C": "Polymers",
+        "D": "Inorganic metals"
+      },
+      "answer": "A",
+      "explanation": "Gas chromatography (GC) separates volatile compounds based on boiling points and polarity. (B) Large proteins are analyzed using electrophoresis, (C) Polymers require gel permeation chromatography, and (D) Inorganic metals require atomic absorption spectroscopy."
+    },
+    {
+      "number": 90,
+      "question": "What is the primary use of NMR spectroscopy?",
+      "options": {
+        "A": "Determining molecular weight",
+        "B": "Identifying functional groups",
+        "C": "Analyzing molecular structure",
+        "D": "Measuring atomic emission"
+      },
+      "answer": "C",
+      "explanation": "NMR (Nuclear Magnetic Resonance) determines molecular structure based on hydrogen/carbon environments. (A) Molecular weight is determined using mass spectrometry, (B) Functional groups are identified by IR spectroscopy, and (D) Atomic emission measures light from excited atoms."
+    },
+    {
+      "number": 91,
+      "question": "Polarography is a type of electrochemical analysis based on:",
+      "options": {
+        "A": "Conductance measurements",
+        "B": "Measurement of current as a function of applied voltage",
+        "C": "Absorption of light",
+        "D": "Measurement of resistance"
+      },
+      "answer": "B",
+      "explanation": "Polarography measures current variations as voltage is applied to an electrolytic solution. (A) Conductance measurements are used in conductometry, (C) Absorption of light is related to spectroscopy, and (D) Resistance measurement is part of ohmmeter applications."
+    },
+    {
+      "number": 92,
+      "question": "In non-aqueous titration, perchloric acid is often used as a titrant for:",
+      "options": {
+        "A": "Weak bases",
+        "B": "Weak acids",
+        "C": "Strong acids",
+        "D": "Redox-active compounds"
+      },
+      "answer": "A",
+      "explanation": "Perchloric acid (HClO₄) is a strong acid that is used in non-aqueous titrations to titrate weak bases. (B) Weak acids require a strong base for titration, (C) Strong acids do not need non-aqueous titration, and (D) Redox-active compounds are analyzed using redox titration, not acid-base titration."
+    },
+    {
+      "number": 93,
+      "question": "Which section describes the prohibition of import, manufacture, and sale of drugs under the Drug Act 1976?",
+      "options": {
+        "A": "Section 21",
+        "B": "Section 22",
+        "C": "Section 23",
+        "D": "Section 24"
+      },
+      "answer": "C",
+      "explanation": "Section 23 of the Drug Act 1976 prohibits the import, manufacture, and sale of spurious, misbranded, and substandard drugs. (A) Section 21 and (B) Section 22 deal with licensing and regulations, while (D) Section 24 deals with Advertisement ."
+    },
+    {
+      "number": 94,
+      "question": "\"Spurious drug\" means a drug that:",
+      "options": {
+        "A": "Purports to be a drug but does not contain the active ingredient",
+        "B": "Purports to be the product of a manufacturer, place, or country of which it is not truly a product",
+        "C": "Is imported or exported for sale under a particular name while actually being another drug",
+        "D": "All of the above"
+      },
+      "answer": "D",
+      "explanation": "A spurious drug includes those that lack the claimed active ingredient, falsely claim a different origin, or are misrepresented for sale. Each statement (A, B, and C) contributes to the legal definition of a spurious drug."
+    },
+    {
+      "number": 95,
+      "question": "Under which section is the Drug Court established in the Drug Act 1976?",
+      "options": {
+        "A": "Section 31",
+        "B": "Section 32",
+        "C": "Section 33",
+        "D": "Section 34"
+      },
+      "answer": "A",
+      "explanation": "Section 31 of the Drug Act 1976 establishes Drug Courts"
+    },
+    {
+      "number": 96,
+      "question": "A Drug Court shall have all the powers conferred by the Code of Criminal Procedure, ___________, on a Court of Session exercising original jurisdiction.",
+      "options": {
+        "A": "1898 (Act V of 1898)",
+        "B": "1998 (Act V of 1998)",
+        "C": "1898 (Act VI of 1898)",
+        "D": "1998 (Act VI of 1998)"
+      },
+      "answer": "A",
+      "explanation": "The Code of Criminal Procedure, 1898 (Act V of 1898), grants Drug Courts the same powers as a Court of Session. (B) 1998 (Act V of 1998) and (D) 1998 (Act VI of 1998) are incorrect references, and (C) Act VI does not apply to this provision."
+    },
+    {
+      "number": 97,
+      "question": "\"Biologicals\" means biological drugs as defined in which schedule?",
+      "options": {
+        "A": "Schedule-1",
+        "B": "Schedule-2",
+        "C": "Schedule-3",
+        "D": "Schedule-4"
+      },
+      "answer": "A",
+      "explanation": "Schedule-1 of the Drug Act 1976 defines biologicals, including vaccines, sera, biotechnology-based drugs."
+    },
+    {
+      "number": 98,
+      "question": "Under Punjab Drug Rules, a Government Analyst shall conduct a test and analysis of a drug sample and furnish a report in which form?",
+      "options": {
+        "A": "Form 4",
+        "B": "Form 5",
+        "C": "Form 6",
+        "D": "Form 7"
+      },
+      "answer": "D",
+      "explanation": "Form 7 is designated for Government Analysts to report drug test results. (A) Form 4, (B) Form 5, and (C) Form 6 are used for different purposes under Punjab Drug Rules."
+    },
+    {
+      "number": 99,
+      "question": "Under Punjab Drug Rules, the licensing authority shall issue a pharmacy license in which form?",
+      "options": {
+        "A": "Form 8",
+        "B": "Form 9",
+        "C": "Form 10",
+        "D": "Form 11"
+      },
+      "answer": "B",
+      "explanation": "Form 9 is used for issuing pharmacy licenses under Punjab Drug Rules. (A) Form 8, (C) Form 10, and (D) Form 11 are used for different purposes."
+    },
+    {
+      "number": 100,
+      "question": "Under Punjab Drug Rules, a person who is registered under which section of the Pharmacy Act 1967 (XI of 1967) shall personally supervise the sale of drugs?",
+      "options": {
+        "A": "23(1)(a)",
+        "B": "24(1)(a)",
+        "C": "23(2)(a)",
+        "D": "24(2)(a)"
+      },
+      "answer": "B",
+      "explanation": "Section 24(1)(a) of the Pharmacy Act 1967 mandates that a registered pharmacist must personally supervise drug sales. (A) Section 23(1)(a), (C) Section 23(2)(a), and (D) Section 24(2)(a) are incorrect."
+    }
+  ]
+}

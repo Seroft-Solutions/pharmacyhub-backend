@@ -12,6 +12,8 @@ import com.pharmacyhub.service.ExamService;
 import com.pharmacyhub.service.QuestionService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +26,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/exams")
+@RequestMapping("/api/v1/exams")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ExamAttemptController {
     
     private final ExamAttemptService examAttemptService;
@@ -41,8 +44,11 @@ public class ExamAttemptController {
     }
     
     @PostMapping("/{id}/start")
-    public ResponseEntity<ExamAttemptDTO> startExam(@PathVariable Long id, @RequestParam String userId) {
+    @PreAuthorize("isAuthenticated() and @examAccessEvaluator.canAccessExam(authentication, #id)")
+    public ResponseEntity<ExamAttemptDTO> startExam(@PathVariable Long id) {
         try {
+            // Get user ID from authentication context
+            String userId = SecurityContextHolder.getContext().getAuthentication().getName();
             ExamAttempt attempt = examAttemptService.startExam(id, userId);
             return new ResponseEntity<>(convertToDTO(attempt), HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
@@ -53,6 +59,7 @@ public class ExamAttemptController {
     }
     
     @PostMapping("/attempts/{id}/submit")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExamResultDTO> submitExam(
             @PathVariable Long id,
             @Valid @RequestBody List<UserAnswerDTO> userAnswerDTOs) {
@@ -70,7 +77,20 @@ public class ExamAttemptController {
         }
     }
     
+    @GetMapping("/attempts/user")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ExamAttemptDTO>> getMyAttempts() {
+        // Get user ID from authentication context
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<ExamAttempt> attempts = examAttemptService.getAttemptsByUserId(userId);
+        List<ExamAttemptDTO> attemptDTOs = attempts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(attemptDTOs);
+    }
+    
     @GetMapping("/attempts/user/{userId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
     public ResponseEntity<List<ExamAttemptDTO>> getAttemptsByUserId(@PathVariable String userId) {
         List<ExamAttempt> attempts = examAttemptService.getAttemptsByUserId(userId);
         List<ExamAttemptDTO> attemptDTOs = attempts.stream()
@@ -80,6 +100,7 @@ public class ExamAttemptController {
     }
     
     @GetMapping("/attempts/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ExamAttemptDTO> getAttemptById(@PathVariable Long id) {
         return examAttemptService.getAttemptById(id)
                 .map(attempt -> ResponseEntity.ok(convertToDTO(attempt)))
@@ -87,9 +108,11 @@ public class ExamAttemptController {
     }
     
     @GetMapping("/{examId}/attempts")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ExamAttemptDTO>> getAttemptsByExamIdAndUserId(
-            @PathVariable Long examId,
-            @RequestParam String userId) {
+            @PathVariable Long examId) {
+        // Get user ID from authentication context
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ExamAttempt> attempts = examAttemptService.getAttemptsByExamIdAndUserId(examId, userId);
         List<ExamAttemptDTO> attemptDTOs = attempts.stream()
                 .map(this::convertToDTO)
@@ -107,7 +130,7 @@ public class ExamAttemptController {
         dto.setStartTime(attempt.getStartTime().format(formatter));
         dto.setStatus(attempt.getStatus().toString());
         
-        List<UserAnswerDTO> answerDTOs = attempt.getAnswers().stream()
+        dto.setAnswers(attempt.getAnswers().stream()
                 .map(answer -> {
                     UserAnswerDTO answerDTO = new UserAnswerDTO();
                     answerDTO.setQuestionId(answer.getQuestion().getId());
@@ -115,9 +138,7 @@ public class ExamAttemptController {
                     answerDTO.setTimeSpent(answer.getTimeSpent());
                     return answerDTO;
                 })
-                .collect(Collectors.toList());
-        
-        dto.setAnswers(answerDTOs);
+                .collect(Collectors.toList()));
         
         return dto;
     }

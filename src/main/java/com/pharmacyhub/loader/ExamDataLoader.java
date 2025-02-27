@@ -28,7 +28,7 @@ public class ExamDataLoader
     private final ExamRepository examRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${app.exam.data-location:classpath:data/exams/*.json}")
+    @Value("${app.exam.data-location:classpath:data/exams/modelPapers/*.json}")
     private String examDataLocation;
 
     @PostConstruct
@@ -62,7 +62,7 @@ public class ExamDataLoader
             exam.setDuration((Integer) examData.get("duration"));
             exam.setTotalMarks((Integer) examData.get("totalMarks"));
             exam.setPassingMarks((Integer) examData.get("passingMarks"));
-            exam.setStatus(Exam.ExamStatus.DRAFT);
+            exam.setStatus(Exam.ExamStatus.PUBLISHED);
 
             List<Map<String, Object>> questionsData = (List<Map<String, Object>>) examData.get("questions");
             for (Map<String, Object> questionData : questionsData)
@@ -90,9 +90,9 @@ public class ExamDataLoader
     private Question createQuestion(Map<String, Object> questionData)
     {
         Question question = new Question();
-        question.setQuestionText((String) questionData.get("text"));
+        question.setQuestionText((String) questionData.get("question"));
         question.setQuestionNumber((Integer) questionData.get("number"));
-        question.setCorrectAnswer((String) questionData.get("correctAnswer"));
+        question.setCorrectAnswer((String) questionData.get("answer"));
         question.setExplanation((String) questionData.get("explanation"));
         question.setMarks((Integer) questionData.getOrDefault("marks", 1));
         question.setType(Question.QuestionType.MCQ);

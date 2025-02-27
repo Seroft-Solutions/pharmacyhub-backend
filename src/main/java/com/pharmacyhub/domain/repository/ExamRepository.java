@@ -23,6 +23,9 @@ public interface ExamRepository extends JpaRepository<Exam, Long>
     @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.status = :status")
     List<Exam> findByStatus(Exam.ExamStatus status);
 
+    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.id = :id AND e.status = :status")
+    Optional<Exam> findByIdAndStatus(Long id, Exam.ExamStatus status);
+
     @Query("SELECT COUNT(e) > 0 FROM Exam e WHERE e.title = :title AND e.deleted = false")
     boolean existsByTitle(String title);
 }
