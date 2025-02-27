@@ -5,6 +5,8 @@ import com.pharmacyhub.dto.ExamDTO;
 import com.pharmacyhub.service.ExamService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/exams")
+@RequestMapping("/api/v1/exams")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class ExamController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
 
     private final ExamService examService;
 
@@ -27,9 +32,20 @@ public class ExamController {
         return ResponseEntity.ok(examService.getAllExams());
     }
 
+    /**
+     * Get published exams - publicly accessible without authentication
+     */
     @GetMapping("/published")
     public ResponseEntity<List<Exam>> getAllPublishedExams() {
-        return ResponseEntity.ok(examService.getAllPublishedExams());
+        logger.info("Fetching all published exams");
+        try {
+            List<Exam> publishedExams = examService.getAllPublishedExams();
+            logger.info("Successfully fetched {} published exams", publishedExams.size());
+            return ResponseEntity.ok(publishedExams);
+        } catch (Exception e) {
+            logger.error("Error fetching published exams: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @GetMapping("/{id}")
