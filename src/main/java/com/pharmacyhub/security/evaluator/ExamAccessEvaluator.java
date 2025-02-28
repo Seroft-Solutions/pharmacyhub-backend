@@ -35,8 +35,8 @@ public class ExamAccessEvaluator {
     /**
      * Determines if the authenticated user can access the specified exam.
      * Access is granted if:
-     * 1. The user has an ADMIN or INSTRUCTOR role (already handled in the @PreAuthorize check)
-     * 2. The exam is published (simplified policy to allow all authenticated users to access published exams)
+     * 1. The user has an ADMIN or INSTRUCTOR role
+     * 2. The exam exists (simplified policy to allow all authenticated users to access any exam)
      *
      * @param authentication The current authentication context
      * @param examId The ID of the exam to check access for
@@ -48,8 +48,7 @@ public class ExamAccessEvaluator {
             return false;
         }
         
-        // If user has ADMIN or INSTRUCTOR role, they automatically have access (handled in @PreAuthorize)
-        // This is a fallback check
+        // If user has ADMIN or INSTRUCTOR role, they automatically have access
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         if (authorities.stream().anyMatch(a -> 
                 a.getAuthority().equals("ROLE_ADMIN") || 
@@ -62,17 +61,16 @@ public class ExamAccessEvaluator {
         String userId = authentication.getName();
         logger.debug("Checking if user {} can access exam {}", userId, examId);
         
-        // Check if the exam exists and is published
-        boolean isExamPublished = examRepository.findByIdAndStatus(examId, 
-                com.pharmacyhub.domain.entity.Exam.ExamStatus.PUBLISHED).isPresent();
+        // Check if the exam exists (we're simplifying by allowing access to any exam that exists)
+        boolean examExists = examRepository.existsById(examId);
         
-        if (!isExamPublished) {
-            logger.debug("Exam {} is not published or doesn't exist, denying access", examId);
+        if (!examExists) {
+            logger.debug("Exam {} doesn't exist, denying access", examId);
             return false;
         }
         
-        // Allow all authenticated users to access published exams
-        logger.debug("Exam {} is published, granting access to user {}", examId, userId);
+        // Allow all authenticated users to access any exam that exists
+        logger.debug("Exam {} exists, granting access to user {}", examId, userId);
         return true;
     }
 }
