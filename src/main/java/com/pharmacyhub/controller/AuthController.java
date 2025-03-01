@@ -1,14 +1,21 @@
 package com.pharmacyhub.controller;
 
-import com.pharmacyhub.dto.LoggedInUserDTO;
+import com.pharmacyhub.controller.base.BaseController;
 import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
+import com.pharmacyhub.dto.request.LoginRequestDTO;
+import com.pharmacyhub.dto.request.UserCreateRequestDTO;
+import com.pharmacyhub.dto.response.ApiResponse;
+import com.pharmacyhub.dto.response.ApiError;
+import com.pharmacyhub.dto.response.AuthResponseDTO;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.Role;
-import com.pharmacyhub.security.model.LoginRequest;
 import com.pharmacyhub.security.service.AuthenticationService;
 import com.pharmacyhub.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +32,8 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController
+@Tag(name = "Authentication", description = "API endpoints for authentication and user management")
+public class AuthController extends BaseController
 {
     @Autowired
     private AuthenticationService authenticationService;
@@ -34,54 +42,58 @@ public class AuthController
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    @RequestMapping(
-            value = "/signup",
-            method = RequestMethod.POST
-    )
-    public ResponseEntity<?> addUser(@RequestBody UserDTO user)
-    {
-        PHUserDTO userCreated = userService.saveUser(user);
+    @PostMapping("/signup")
+    @Operation(summary = "Register a new user")
+    public ResponseEntity<ApiResponse<String>> signup(@Valid @RequestBody UserCreateRequestDTO request) {
+        // Convert request to entity
+        UserDTO userDTO = mapToEntity(request, UserDTO.class);
+        PHUserDTO createdUser = userService.saveUser(userDTO);
 
-        if (userCreated != null)
-        {
-            return ResponseEntity.ok("User registered successfully. Please check your email for verification.");
+        if (createdUser != null) {
+            return successResponse("User registered successfully. Please check your email for verification.");
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("User with this email already exists");
+        
+        return errorResponse(HttpStatus.CONFLICT, "User with this email already exists");
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyEmail(@RequestParam String token)
-    {
+    @Operation(summary = "Verify user email with token")
+    public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestParam String token) {
         boolean isVerified = userService.verifyUser(token);
-        if (isVerified)
-        {
+        
+        if (isVerified) {
+            ApiResponse<String> response = ApiResponse.<String>builder()
+                    .status(HttpStatus.FOUND.value())
+                    .data("Email verification successful")
+                    .build();
+            
             return ResponseEntity.status(HttpStatus.FOUND)
-                                 .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-successful")
-                                 .build();
-        }
-        else
-        {
+                    .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-successful")
+                    .body(response);
+        } else {
+            ApiResponse<String> response = ApiResponse.<String>builder()
+                    .status(HttpStatus.FOUND.value())
+                    .error(new ApiError(HttpStatus.BAD_REQUEST.value(), "Email verification failed"))
+                    .build();
+            
             return ResponseEntity.status(HttpStatus.FOUND)
-                                 .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-failed")
-                                 .build();
+                    .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-failed")
+                    .body(response);
         }
     }
 
 
-    @RequestMapping(
-            value = "/test",
-            method = RequestMethod.GET
-    )
-    public ResponseEntity<List<User>> test()
-    {
-        return new ResponseEntity<>(userService.getUsers(), HttpStatus.OK);
+    @GetMapping("/test")
+    @Operation(summary = "Test endpoint to get all users")
+    public ResponseEntity<ApiResponse<List<User>>> test() {
+        List<User> users = userService.findAll();
+        return successResponse(users);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request)
-    {
-        // Authenticate the user - this will throw exceptions if authentication fails
-        // or if account is not verified, which are handled by the global exception handler
+    @Operation(summary = "Authenticate user and generate JWT token")
+    public ResponseEntity<ApiResponse<AuthResponseDTO>> login(@Valid @RequestBody LoginRequestDTO request) {
+        // Authenticate the user
         User authenticatedUser = authenticationService.authenticateUser(request.getEmailAddress(), request.getPassword());
 
         // Generate JWT token
@@ -90,15 +102,13 @@ public class AuthController
         // Get user roles
         Set<Role> userRoles = authenticatedUser.getRoles();
         List<String> roleNames = userRoles.stream()
-                                          .map(r -> r.getName())
+                                          .map(Role::getName)
                                           .collect(Collectors.toList());
 
         // Get user permissions
         Set<String> permissionNames = new HashSet<>();
-        for (Role userRole : userRoles)
-        {
-            if (userRole.getPermissions() != null)
-            {
+        for (Role userRole : userRoles) {
+            if (userRole.getPermissions() != null) {
                 userRole.getPermissions().stream()
                         .map(Permission::getName)
                         .forEach(permissionNames::add);
@@ -106,21 +116,21 @@ public class AuthController
         }
 
         // Create response DTO
-        LoggedInUserDTO response = LoggedInUserDTO.builder()
-                                                  .id(authenticatedUser.getId())
-                                                  .emailAddress(authenticatedUser.getEmailAddress())
-                                                  .firstName(authenticatedUser.getFirstName())
-                                                  .lastName(authenticatedUser.getLastName())
-                                                  .openToConnect(authenticatedUser.isOpenToConnect())
-                                                  .registered(authenticatedUser.isRegistered())
-                                                  .userType(authenticatedUser.getUserType())
-                                                  .jwtToken(token)
-                                                  .roles(roleNames)
-                                                  .permissions(new ArrayList<>(permissionNames))
-                                                  .build();
+        AuthResponseDTO response = AuthResponseDTO.builder()
+                .id(authenticatedUser.getId())
+                .emailAddress(authenticatedUser.getEmailAddress())
+                .firstName(authenticatedUser.getFirstName())
+                .lastName(authenticatedUser.getLastName())
+                .openToConnect(authenticatedUser.isOpenToConnect())
+                .registered(authenticatedUser.isRegistered())
+                .userType(authenticatedUser.getUserType())
+                .jwtToken(token)
+                .roles(roleNames)
+                .permissions(new ArrayList<>(permissionNames))
+                .build();
 
         logger.info("Login successful for user: {}", authenticatedUser.getUsername());
-        return ResponseEntity.ok(response);
+        return successResponse(response);
     }
 
 

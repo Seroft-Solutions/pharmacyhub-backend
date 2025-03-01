@@ -13,11 +13,10 @@ public class PharmacyManagerDTO implements PHUserDTO
 {
   private Long id;
   private String contactNumber;
-  private String area;
+  private String pharmacyName;
   private String city;
+  private String location;
   private String experience;
-  private String previousPharmacyName;
-  private String currentJobStatus;
-  private String shiftTime;
+  private String universityName;
+  private String batch;
 }
-

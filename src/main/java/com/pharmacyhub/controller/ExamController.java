@@ -1,10 +1,16 @@
 package com.pharmacyhub.controller;
 
+import com.pharmacyhub.controller.base.BaseController;
 import com.pharmacyhub.domain.entity.Exam;
 import com.pharmacyhub.domain.entity.Option;
 import com.pharmacyhub.domain.entity.Question;
-import com.pharmacyhub.dto.ExamDTO;
+import com.pharmacyhub.dto.request.ExamRequestDTO;
+import com.pharmacyhub.dto.response.ApiResponse;
+import com.pharmacyhub.dto.response.ApiError;
+import com.pharmacyhub.dto.response.ExamResponseDTO;
 import com.pharmacyhub.service.ExamService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -16,12 +22,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/exams")
 @CrossOrigin(origins = "*", maxAge = 3600)
-public class ExamController {
+@Tag(name = "Exams", description = "API endpoints for exam management")
+public class ExamController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
 
@@ -33,12 +39,11 @@ public class ExamController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
-    public ResponseEntity<List<ExamDTO>> getAllExams() {
+    @Operation(summary = "Get all exams - Admin/Instructor only")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getAllExams() {
         List<Exam> exams = examService.findAllActive();
-        List<ExamDTO> examDTOs = exams.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(examDTOs);
+        List<ExamResponseDTO> examResponseDTOs = mapToDTO(exams, ExamResponseDTO.class);
+        return successResponse(examResponseDTOs);
     }
 
     /**
@@ -46,15 +51,14 @@ public class ExamController {
      */
     @GetMapping("/published")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<List<ExamDTO>> getAllPublishedExams() {
+    @Operation(summary = "Get all published exams - Public access")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getAllPublishedExams() {
         logger.info("Fetching all published exams");
         try {
             List<Exam> publishedExams = examService.findAllPublished();
-            List<ExamDTO> examDTOs = publishedExams.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-            logger.info("Successfully fetched {} published exams", examDTOs.size());
-            return ResponseEntity.ok(examDTOs);
+            List<ExamResponseDTO> examResponseDTOs = mapToDTO(publishedExams, ExamResponseDTO.class);
+            logger.info("Successfully fetched {} published exams", examResponseDTOs.size());
+            return successResponse(examResponseDTOs);
         } catch (Exception e) {
             logger.error("Error fetching published exams: {}", e.getMessage(), e);
             throw e;
@@ -63,19 +67,25 @@ public class ExamController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR') or @examAccessEvaluator.canAccessExam(authentication, #id)")
-    public ResponseEntity<ExamDTO> getExamById(@PathVariable Long id) {
+    @Operation(summary = "Get exam by ID")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> getExamById(@PathVariable Long id) {
         return examService.findById(id)
-                .map(exam -> ResponseEntity.ok(convertToDTO(exam)))
+                .map(exam -> {
+                    ExamResponseDTO examResponseDTO = mapToDTO(exam, ExamResponseDTO.class);
+                    return successResponse(examResponseDTO);
+                })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not found"));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
-    public ResponseEntity<ExamDTO> createExam(@Valid @RequestBody ExamDTO examDTO) {
+    @Operation(summary = "Create a new exam")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> createExam(@Valid @RequestBody ExamRequestDTO requestDTO) {
         try {
-            Exam exam = convertToEntity(examDTO);
+            Exam exam = mapToEntity(requestDTO, Exam.class);
             Exam createdExam = examService.createExam(exam);
-            return new ResponseEntity<>(convertToDTO(createdExam), HttpStatus.CREATED);
+            ExamResponseDTO responseDTO = mapToDTO(createdExam, ExamResponseDTO.class);
+            return createdResponse(responseDTO);
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -83,11 +93,15 @@ public class ExamController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
-    public ResponseEntity<ExamDTO> updateExam(@PathVariable Long id, @Valid @RequestBody ExamDTO examDTO) {
+    @Operation(summary = "Update an existing exam")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> updateExam(
+            @PathVariable Long id, 
+            @Valid @RequestBody ExamRequestDTO requestDTO) {
         try {
-            Exam exam = convertToEntity(examDTO);
+            Exam exam = mapToEntity(requestDTO, Exam.class);
             Exam updatedExam = examService.updateExam(id, exam);
-            return ResponseEntity.ok(convertToDTO(updatedExam));
+            ExamResponseDTO responseDTO = mapToDTO(updatedExam, ExamResponseDTO.class);
+            return successResponse(responseDTO);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -97,10 +111,11 @@ public class ExamController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteExam(@PathVariable Long id) {
+    @Operation(summary = "Delete an exam (Admin only)")
+    public ResponseEntity<ApiResponse<Void>> deleteExam(@PathVariable Long id) {
         try {
             examService.deleteExam(id);
-            return ResponseEntity.noContent().build();
+            return noContentResponse();
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
@@ -108,20 +123,21 @@ public class ExamController {
 
     @GetMapping("/status/{status}")
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
-    public ResponseEntity<List<ExamDTO>> getExamsByStatus(@PathVariable Exam.ExamStatus status) {
+    @Operation(summary = "Get exams by status")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getExamsByStatus(@PathVariable Exam.ExamStatus status) {
         List<Exam> exams = examService.findByStatus(status);
-        List<ExamDTO> examDTOs = exams.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(examDTOs);
+        List<ExamResponseDTO> examResponseDTOs = mapToDTO(exams, ExamResponseDTO.class);
+        return successResponse(examResponseDTOs);
     }
 
     @PostMapping("/{id}/publish")
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
-    public ResponseEntity<ExamDTO> publishExam(@PathVariable Long id) {
+    @Operation(summary = "Publish an exam")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> publishExam(@PathVariable Long id) {
         try {
             Exam publishedExam = examService.publishExam(id);
-            return ResponseEntity.ok(convertToDTO(publishedExam));
+            ExamResponseDTO responseDTO = mapToDTO(publishedExam, ExamResponseDTO.class);
+            return successResponse(responseDTO);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (IllegalStateException e) {
@@ -131,103 +147,16 @@ public class ExamController {
 
     @PostMapping("/{id}/archive")
     @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
-    public ResponseEntity<ExamDTO> archiveExam(@PathVariable Long id) {
+    @Operation(summary = "Archive an exam")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> archiveExam(@PathVariable Long id) {
         try {
             Exam archivedExam = examService.archiveExam(id);
-            return ResponseEntity.ok(convertToDTO(archivedExam));
+            ExamResponseDTO responseDTO = mapToDTO(archivedExam, ExamResponseDTO.class);
+            return successResponse(responseDTO);
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         }
     }
     
-    /**
-     * Convert Exam entity to ExamDTO
-     * This moves the conversion logic from the entity to the controller
-     * to avoid recursion issues during serialization
-     */
-    private ExamDTO convertToDTO(Exam exam) {
-        ExamDTO dto = new ExamDTO();
-        dto.setId(exam.getId());
-        dto.setTitle(exam.getTitle());
-        dto.setDescription(exam.getDescription());
-        dto.setDuration(exam.getDuration());
-        dto.setTotalMarks(exam.getTotalMarks());
-        dto.setPassingMarks(exam.getPassingMarks());
-        dto.setStatus(exam.getStatus());
-        
-        // Convert questions
-        if (exam.getQuestions() != null) {
-            exam.getQuestions().forEach(question -> {
-                ExamDTO.QuestionDTO questionDTO = new ExamDTO.QuestionDTO();
-                questionDTO.setId(question.getId());
-                questionDTO.setQuestionNumber(question.getQuestionNumber());
-                questionDTO.setQuestionText(question.getQuestionText());
-                questionDTO.setCorrectAnswer(question.getCorrectAnswer());
-                questionDTO.setExplanation(question.getExplanation());
-                questionDTO.setMarks(question.getMarks());
-                
-                // Convert options
-                if (question.getOptions() != null) {
-                    question.getOptions().forEach(option -> {
-                        ExamDTO.OptionDTO optionDTO = new ExamDTO.OptionDTO();
-                        optionDTO.setId(option.getId());
-                        optionDTO.setOptionKey(option.getLabel());
-                        optionDTO.setOptionText(option.getText());
-                        optionDTO.setIsCorrect(option.getIsCorrect());
-                        questionDTO.getOptions().add(optionDTO);
-                    });
-                }
-                
-                dto.getQuestions().add(questionDTO);
-            });
-        }
-        
-        return dto;
-    }
-    
-    /**
-     * Convert ExamDTO to Exam entity
-     */
-    private Exam convertToEntity(ExamDTO dto) {
-        Exam exam = new Exam();
-        exam.setId(dto.getId());
-        exam.setTitle(dto.getTitle());
-        exam.setDescription(dto.getDescription());
-        exam.setDuration(dto.getDuration());
-        exam.setTotalMarks(dto.getTotalMarks());
-        exam.setPassingMarks(dto.getPassingMarks());
-        exam.setStatus(dto.getStatus());
-        
-        // Handle questions if they exist
-        if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
-            for (ExamDTO.QuestionDTO questionDTO : dto.getQuestions()) {
-                Question question = new Question();
-                question.setQuestionNumber(questionDTO.getQuestionNumber());
-                question.setQuestionText(questionDTO.getQuestionText());
-                question.setCorrectAnswer(questionDTO.getCorrectAnswer());
-                question.setExplanation(questionDTO.getExplanation());
-                question.setMarks(questionDTO.getMarks());
-                
-                // Link question to exam
-                question.setExam(exam);
-                exam.addQuestion(question);
-                
-                // Handle options
-                if (questionDTO.getOptions() != null && !questionDTO.getOptions().isEmpty()) {
-                    for (ExamDTO.OptionDTO optionDTO : questionDTO.getOptions()) {
-                        Option option = new Option();
-                        option.setLabel(optionDTO.getOptionKey());
-                        option.setText(optionDTO.getOptionText());
-                        option.setIsCorrect(optionDTO.getIsCorrect());
-                        
-                        // Link option to question
-                        option.setQuestion(question);
-                        question.addOption(option);
-                    }
-                }
-            }
-        }
-        
-        return exam;
-    }
+
 }

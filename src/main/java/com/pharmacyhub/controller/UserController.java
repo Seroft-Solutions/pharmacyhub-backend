@@ -32,12 +32,10 @@ public class UserController
   public ResponseEntity<PHUserDTO> addUser(@RequestBody UserDTO user)
   {
     PHUserDTO userCreated = userService.saveUser(user);
-
-    if (userCreated != null)
-    {
-      return new ResponseEntity<PHUserDTO>(userCreated, HttpStatus.OK);
+    if (userCreated != null) {
+        return ResponseEntity.ok(userCreated);
     }
-    return new ResponseEntity<PHUserDTO>(userCreated, HttpStatus.CONFLICT);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -71,15 +69,13 @@ public class UserController
           value = APIConstants.API_VERSION_V1 + "/change-user-password",
           method = RequestMethod.PUT
   )
-  public ResponseEntity changeUserPassword(@RequestBody ChangePasswordDTO changePasswordDTO)
+  public ResponseEntity<PHUserDTO> changeUserPassword(@RequestBody ChangePasswordDTO changePasswordDTO)
   {
-    PHUserDTO user = userService.changeUserPassword(changePasswordDTO);
-
-    if (user != null)
-    {
-      return new ResponseEntity<>(HttpStatus.OK);
+    PHUserDTO updatedUser = userService.changeUserPassword(changePasswordDTO);
+    if (updatedUser != null) {
+      return ResponseEntity.ok(updatedUser);
     }
-    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return ResponseEntity.notFound().build();
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -87,9 +83,13 @@ public class UserController
           value = APIConstants.API_VERSION_V1 + "/update-user-info",
           method = RequestMethod.PUT
   )
-  public ResponseEntity updateUserInfo(@RequestBody UserDTO phUserDTO)
+  public ResponseEntity<PHUserDTO> updateUserInfo(@RequestBody UserDTO phUserDTO)
   {
-    return new ResponseEntity<PHUserDTO>(userService.editUserInformation(phUserDTO), HttpStatus.OK);
+    PHUserDTO updatedUser = userService.editUserInformation(phUserDTO);
+    if (updatedUser != null) {
+      return ResponseEntity.ok(updatedUser);
+    }
+    return ResponseEntity.notFound().build();
   }
 
   @PreAuthorize("isAuthenticated()")
