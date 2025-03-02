@@ -8,6 +8,8 @@ import com.pharmacyhub.dto.request.UserCreateRequestDTO;
 import com.pharmacyhub.dto.response.ApiResponse;
 import com.pharmacyhub.dto.response.ApiError;
 import com.pharmacyhub.dto.response.AuthResponseDTO;
+import com.pharmacyhub.dto.response.TokensDTO;
+import com.pharmacyhub.dto.response.UserResponseDTO;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.Role;
@@ -24,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -115,18 +118,29 @@ public class AuthController extends BaseController
             }
         }
 
-        // Create response DTO
-        AuthResponseDTO response = AuthResponseDTO.builder()
-                .id(authenticatedUser.getId())
-                .emailAddress(authenticatedUser.getEmailAddress())
+        // Create user response DTO
+        UserResponseDTO userResponse = UserResponseDTO.builder()
+                .id(authenticatedUser.getId().toString())
+                .email(authenticatedUser.getEmailAddress())
                 .firstName(authenticatedUser.getFirstName())
                 .lastName(authenticatedUser.getLastName())
-                .openToConnect(authenticatedUser.isOpenToConnect())
-                .registered(authenticatedUser.isRegistered())
-                .userType(authenticatedUser.getUserType())
-                .jwtToken(token)
+                .active(authenticatedUser.isEnabled())
+                .createdAt(LocalDateTime.now().toString())
+                .updatedAt(LocalDateTime.now().toString())
                 .roles(roleNames)
-                .permissions(new ArrayList<>(permissionNames))
+                .build();
+
+        // Create tokens DTO
+        TokensDTO tokens = TokensDTO.builder()
+                .accessToken(token)
+                .tokenType("Bearer")
+                .expiresIn(5 * 60 * 60) // 5 hours expiry (matching JWT_TOKEN_VALIDITY)
+                .build();
+
+        // Create response DTO
+        AuthResponseDTO response = AuthResponseDTO.builder()
+                .user(userResponse)
+                .tokens(tokens)
                 .build();
 
         logger.info("Login successful for user: {}", authenticatedUser.getUsername());
