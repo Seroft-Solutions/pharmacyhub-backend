@@ -4,23 +4,38 @@ import com.pharmacyhub.domain.entity.FlaggedQuestion;
 import com.pharmacyhub.domain.entity.ExamAttempt;
 import com.pharmacyhub.domain.entity.ExamResult;
 import com.pharmacyhub.domain.entity.UserAnswer;
+import com.pharmacyhub.dto.ExamResultDTO;
+import com.pharmacyhub.dto.response.ExamAttemptResponseDTO;
+import com.pharmacyhub.dto.response.FlaggedQuestionResponseDTO;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ExamAttemptService {
     
-    List<ExamAttempt> getAttemptsByUserId(String userId);
+    List<ExamAttemptResponseDTO> getAttemptsByUserId(String userId);
     
-    List<ExamAttempt> getAttemptsByExamIdAndUserId(Long examId, String userId);
+    List<ExamAttemptResponseDTO> getAttemptsByExamAndUserId(Long examId, String userId);
     
-    Optional<ExamAttempt> getAttemptById(Long id);
+    ExamAttemptResponseDTO getAttemptById(Long id);
     
-    ExamAttempt startExam(Long examId, String userId);
+    ExamAttemptResponseDTO startExam(Long examId, String userId);
     
-    ExamAttempt saveUserAnswer(Long attemptId, UserAnswer userAnswer);
+    void saveAnswer(Long attemptId, Long questionId, String selectedOptionId, Integer timeSpent);
     
-    ExamResult submitExam(Long attemptId, List<UserAnswer> userAnswers);
+    /**
+     * Submit an exam and calculate the result
+     * @param attemptId the exam attempt ID
+     * @return the calculated exam result
+     */
+    ExamResultDTO submitExamAttempt(Long attemptId);
+    
+    /**
+     * Get the result for a completed exam
+     * @param attemptId the exam attempt ID
+     * @return the exam result
+     */
+    ExamResultDTO getExamResult(Long attemptId);
     
     /**
      * Flag a question for review later
@@ -41,7 +56,7 @@ public interface ExamAttemptService {
     /**
      * Get all flagged questions for an attempt
      * @param attemptId the exam attempt ID
-     * @return a list of flagged questions
+     * @return a list of flagged questions DTOs
      */
-    List<FlaggedQuestion> getFlaggedQuestions(Long attemptId);
+    List<FlaggedQuestionResponseDTO> getFlaggedQuestions(Long attemptId);
 }

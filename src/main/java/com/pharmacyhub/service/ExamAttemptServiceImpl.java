@@ -7,17 +7,27 @@ import com.pharmacyhub.domain.repository.ExamResultRepository;
 import com.pharmacyhub.domain.repository.UserAnswerRepository;
 import com.pharmacyhub.domain.repository.FlaggedQuestionRepository;
 import com.pharmacyhub.domain.repository.QuestionRepository;
+import com.pharmacyhub.dto.ExamResultDTO;
+import com.pharmacyhub.dto.response.ExamAttemptResponseDTO;
+import com.pharmacyhub.dto.response.FlaggedQuestionResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class ExamAttemptServiceImpl implements ExamAttemptService {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ExamAttemptServiceImpl.class);
     
     private final ExamAttemptRepository examAttemptRepository;
     private final ExamRepository examRepository;
@@ -43,24 +53,32 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     
     @Override
     @Transactional(readOnly = true)
-    public List<ExamAttempt> getAttemptsByUserId(String userId) {
-        return examAttemptRepository.findByUserId(userId);
+    public List<ExamAttemptResponseDTO> getAttemptsByUserId(String userId) {
+        List<ExamAttempt> attempts = examAttemptRepository.findByUserId(userId);
+        return attempts.stream()
+                .map(this::mapToExamAttemptResponseDTO)
+                .collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<ExamAttempt> getAttemptsByExamIdAndUserId(Long examId, String userId) {
-        return examAttemptRepository.findByExamIdAndUserId(examId, userId);
+    public List<ExamAttemptResponseDTO> getAttemptsByExamAndUserId(Long examId, String userId) {
+        List<ExamAttempt> attempts = examAttemptRepository.findByExamIdAndUserId(examId, userId);
+        return attempts.stream()
+                .map(this::mapToExamAttemptResponseDTO)
+                .collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
-    public Optional<ExamAttempt> getAttemptById(Long id) {
-        return examAttemptRepository.findByIdAndNotDeleted(id);
+    public ExamAttemptResponseDTO getAttemptById(Long id) {
+        ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(id)
+                .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + id));
+        return mapToExamAttemptResponseDTO(attempt);
     }
     
     @Override
-    public ExamAttempt startExam(Long examId, String userId) {
+    public ExamAttemptResponseDTO startExam(Long examId, String userId) {
         Exam exam = examRepository.findByIdAndNotDeleted(examId)
                 .orElseThrow(() -> new EntityNotFoundException("Exam not found with id: " + examId));
         
@@ -74,11 +92,12 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         attempt.setStartTime(LocalDateTime.now());
         attempt.setStatus(ExamAttempt.AttemptStatus.IN_PROGRESS);
         
-        return examAttemptRepository.save(attempt);
+        ExamAttempt savedAttempt = examAttemptRepository.save(attempt);
+        return mapToExamAttemptResponseDTO(savedAttempt);
     }
     
     @Override
-    public ExamAttempt saveUserAnswer(Long attemptId, UserAnswer userAnswer) {
+    public void saveAnswer(Long attemptId, Long questionId, String selectedOptionId, Integer timeSpent) {
         ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
                 .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
         
@@ -86,27 +105,35 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             throw new IllegalStateException("Cannot save answer for an exam that is not in progress");
         }
         
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
+        
         // Check if an answer for this question already exists
         Optional<UserAnswer> existingAnswer = userAnswerRepository.findByAttemptIdAndQuestionId(
-                attemptId, userAnswer.getQuestion().getId());
+                attemptId, questionId);
         
         if (existingAnswer.isPresent()) {
             // Update existing answer
             UserAnswer answer = existingAnswer.get();
-            answer.setSelectedOptionId(userAnswer.getSelectedOptionId());
-            answer.setTimeSpent(userAnswer.getTimeSpent());
+            answer.setSelectedOptionId(selectedOptionId);
+            answer.setTimeSpent(timeSpent);
             userAnswerRepository.save(answer);
         } else {
             // Save new answer
-            userAnswer.setAttempt(attempt);
-            attempt.addAnswer(userAnswer);
+            UserAnswer newAnswer = new UserAnswer();
+            newAnswer.setAttempt(attempt);
+            newAnswer.setQuestion(question);
+            newAnswer.setSelectedOptionId(selectedOptionId);
+            newAnswer.setTimeSpent(timeSpent);
+            userAnswerRepository.save(newAnswer);
+            attempt.getAnswers().add(newAnswer);
         }
         
-        return examAttemptRepository.save(attempt);
+        examAttemptRepository.save(attempt);
     }
     
     @Override
-    public ExamResult submitExam(Long attemptId, List<UserAnswer> userAnswers) {
+    public ExamResultDTO submitExamAttempt(Long attemptId) {
         ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
                 .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
         
@@ -114,59 +141,31 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
             throw new IllegalStateException("Cannot submit an exam that is not in progress");
         }
         
-        Exam exam = attempt.getExam();
-        
-        // Save each user answer
-        for (UserAnswer answer : userAnswers) {
-            answer.setAttempt(attempt);
-            userAnswerRepository.save(answer);
-        }
-        
         // Update attempt status
         attempt.setStatus(ExamAttempt.AttemptStatus.COMPLETED);
         attempt.setEndTime(LocalDateTime.now());
         examAttemptRepository.save(attempt);
         
-        // Calculate results
-        List<Question> questions = exam.getQuestions();
-        int totalQuestions = questions.size();
-        int totalAnswered = userAnswers.size();
-        int correctCount = 0;
-        int totalTimeSpent = 0;
+        // Calculate and save result
+        ExamResult result = calculateExamResult(attempt);
         
-        for (UserAnswer answer : userAnswers) {
-            Question question = questions.stream()
-                    .filter(q -> q.getId().equals(answer.getQuestion().getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new EntityNotFoundException("Question not found in exam"));
-            
-            totalTimeSpent += answer.getTimeSpent();
-            
-            if (question.getCorrectAnswer().equals(answer.getSelectedOptionId())) {
-                correctCount++;
-            }
+        // Map to DTO
+        return mapToExamResultDTO(result, attempt);
+    }
+    
+    @Override
+    public ExamResultDTO getExamResult(Long attemptId) {
+        ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
+                .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
+        
+        if (attempt.getStatus() != ExamAttempt.AttemptStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot get result for an exam that is not completed");
         }
         
-        int incorrectCount = totalAnswered - correctCount;
-        int unansweredCount = totalQuestions - totalAnswered;
+        ExamResult result = examResultRepository.findByAttemptId(attemptId)
+                .orElseThrow(() -> new EntityNotFoundException("Exam result not found for attempt id: " + attemptId));
         
-        // Calculate score as a percentage
-        double score = (double) correctCount / totalQuestions * 100;
-        boolean isPassed = score >= exam.getPassingMarks();
-        
-        // Create and save result
-        ExamResult result = new ExamResult();
-        result.setAttempt(attempt);
-        result.setScore(score);
-        result.setTotalQuestions(totalQuestions);
-        result.setCorrectAnswers(correctCount);
-        result.setIncorrectAnswers(incorrectCount);
-        result.setUnanswered(unansweredCount);
-        result.setTimeSpent(totalTimeSpent);
-        result.setIsPassed(isPassed);
-        result.setCompletedAt(LocalDateTime.now());
-        
-        return examResultRepository.save(result);
+        return mapToExamResultDTO(result, attempt);
     }
     
     @Override
@@ -203,7 +202,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
                 .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
         
-        flaggedQuestionRepository.findByAttemptIdAndQuestionId(attemptId, questionId)
+        flaggedQuestionRepository.findByAttemptIdAndQuestionIdAndDeletedFalse(attemptId, questionId)
                 .ifPresent(flaggedQuestion -> {
                     flaggedQuestion.setDeleted(true);
                     flaggedQuestionRepository.save(flaggedQuestion);
@@ -213,12 +212,180 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
     }
     
     @Override
-    public List<FlaggedQuestion> getFlaggedQuestions(Long attemptId) {
+    public List<FlaggedQuestionResponseDTO> getFlaggedQuestions(Long attemptId) {
         // Check if attempt exists
         if (!examAttemptRepository.existsById(attemptId)) {
             throw new EntityNotFoundException("Exam attempt not found with id: " + attemptId);
         }
         
-        return flaggedQuestionRepository.findByAttemptId(attemptId);
+        List<FlaggedQuestion> flaggedQuestions = flaggedQuestionRepository.findByAttemptIdAndDeletedFalse(attemptId);
+        
+        return flaggedQuestions.stream()
+                .map(this::mapToFlaggedQuestionResponseDTO)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Calculate exam result based on user answers
+     */
+    private ExamResult calculateExamResult(ExamAttempt attempt) {
+        Exam exam = attempt.getExam();
+        List<Question> questions = questionRepository.findByExamId(exam.getId());
+        List<UserAnswer> userAnswers = userAnswerRepository.findByAttemptId(attempt.getId());
+        
+        int totalQuestions = questions.size();
+        int correctCount = 0;
+        int totalTimeSpent = 0;
+        
+        // Map of questionId to Question for quick lookup
+        Map<Long, Question> questionMap = questions.stream()
+                .collect(Collectors.toMap(Question::getId, q -> q));
+        
+        // Map of questionId to UserAnswer for quick lookup
+        Map<Long, UserAnswer> answerMap = userAnswers.stream()
+                .collect(Collectors.toMap(
+                        answer -> answer.getQuestion().getId(),
+                        answer -> answer,
+                        (a1, a2) -> a1 // Keep first in case of duplicate (should not happen)
+                ));
+        
+        // Calculate scores
+        List<ExamResultDTO.QuestionResultDTO> questionResults = new ArrayList<>();
+        
+        for (Question question : questions) {
+            UserAnswer userAnswer = answerMap.get(question.getId());
+            boolean isCorrect = false;
+            String userAnswerId = null;
+            int timeSpent = 0;
+            
+            if (userAnswer != null) {
+                userAnswerId = userAnswer.getSelectedOptionId();
+                timeSpent = userAnswer.getTimeSpent();
+                totalTimeSpent += timeSpent;
+                
+                // Check if answer is correct
+                isCorrect = userAnswerId != null && userAnswerId.equals(question.getCorrectAnswer());
+                if (isCorrect) {
+                    correctCount++;
+                }
+            }
+        }
+        
+        int totalAnswered = userAnswers.size();
+        int incorrectCount = totalAnswered - correctCount;
+        int unansweredCount = totalQuestions - totalAnswered;
+        
+        // Calculate score as a percentage
+        double score = (double) correctCount / totalQuestions * 100;
+        boolean isPassed = score >= exam.getPassingMarks();
+        
+        // Create and save result
+        ExamResult result = new ExamResult();
+        result.setAttempt(attempt);
+        result.setScore(score);
+        result.setTotalQuestions(totalQuestions);
+        result.setCorrectAnswers(correctCount);
+        result.setIncorrectAnswers(incorrectCount);
+        result.setUnanswered(unansweredCount);
+        result.setTimeSpent(totalTimeSpent);
+        result.setIsPassed(isPassed);
+        result.setCompletedAt(LocalDateTime.now());
+        
+        return examResultRepository.save(result);
+    }
+    
+    /**
+     * Map ExamAttempt entity to ExamAttemptResponseDTO
+     */
+    private ExamAttemptResponseDTO mapToExamAttemptResponseDTO(ExamAttempt attempt) {
+        ExamAttemptResponseDTO dto = new ExamAttemptResponseDTO();
+        dto.setId(attempt.getId());
+        dto.setExamId(attempt.getExam().getId());
+        dto.setExamTitle(attempt.getExam().getTitle());
+        dto.setUserId(attempt.getUserId());
+        dto.setStartTime(attempt.getStartTime().toString());
+        if (attempt.getEndTime() != null) {
+            dto.setEndTime(attempt.getEndTime().toString());
+        }
+        dto.setStatus(attempt.getStatus().toString());
+        
+        return dto;
+    }
+    
+    /**
+     * Map FlaggedQuestion entity to FlaggedQuestionResponseDTO
+     */
+    private FlaggedQuestionResponseDTO mapToFlaggedQuestionResponseDTO(FlaggedQuestion flaggedQuestion) {
+        FlaggedQuestionResponseDTO dto = new FlaggedQuestionResponseDTO();
+        dto.setQuestionId(flaggedQuestion.getQuestion().getId());
+        dto.setAttemptId(flaggedQuestion.getAttempt().getId());
+        dto.setQuestionText(flaggedQuestion.getQuestion().getQuestionText());
+        return dto;
+    }
+    
+    /**
+     * Map ExamResult entity to ExamResultDTO
+     */
+    private ExamResultDTO mapToExamResultDTO(ExamResult result, ExamAttempt attempt) {
+        Exam exam = attempt.getExam();
+        List<UserAnswer> userAnswers = userAnswerRepository.findByAttemptId(attempt.getId());
+        List<Question> questions = questionRepository.findByExamId(exam.getId());
+        
+        // Map of questionId to Question for quick lookup
+        Map<Long, Question> questionMap = questions.stream()
+                .collect(Collectors.toMap(Question::getId, q -> q));
+        
+        // Map of questionId to UserAnswer for quick lookup
+        Map<Long, UserAnswer> answerMap = userAnswers.stream()
+                .collect(Collectors.toMap(
+                        answer -> answer.getQuestion().getId(),
+                        answer -> answer,
+                        (a1, a2) -> a1 // Keep first in case of duplicate (should not happen)
+                ));
+        
+        // Create question results
+        List<ExamResultDTO.QuestionResultDTO> questionResults = new ArrayList<>();
+        
+        for (Question question : questions) {
+            UserAnswer userAnswer = answerMap.get(question.getId());
+            boolean isCorrect = false;
+            String userAnswerId = null;
+            int earnedPoints = 0;
+            
+            if (userAnswer != null) {
+                userAnswerId = userAnswer.getSelectedOptionId();
+                
+                // Check if answer is correct
+                isCorrect = userAnswerId != null && userAnswerId.equals(question.getCorrectAnswer());
+                if (isCorrect) {
+                    earnedPoints = question.getMarks();
+                }
+            }
+            
+            ExamResultDTO.QuestionResultDTO questionResult = ExamResultDTO.QuestionResultDTO.builder()
+                    .questionId(question.getId())
+                    .questionText(question.getQuestionText())
+                    .userAnswerId(userAnswerId)
+                    .correctAnswerId(question.getCorrectAnswer())
+                    .isCorrect(isCorrect)
+                    .explanation(question.getExplanation())
+                    .points(question.getMarks())
+                    .earnedPoints(earnedPoints)
+                    .build();
+            
+            questionResults.add(questionResult);
+        }
+        
+        // Build the result DTO
+        return ExamResultDTO.builder()
+                .examId(exam.getId())
+                .examTitle(exam.getTitle())
+                .score(result.getScore())
+                .totalMarks(exam.getTotalMarks())
+                .passingMarks(exam.getPassingMarks())
+                .isPassed(result.getIsPassed())
+                .timeSpent(result.getTimeSpent())
+                .questionResults(questionResults)
+                .build();
     }
 }

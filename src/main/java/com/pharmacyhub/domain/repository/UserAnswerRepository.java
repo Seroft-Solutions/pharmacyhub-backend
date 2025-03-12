@@ -16,4 +16,18 @@ public interface UserAnswerRepository extends JpaRepository<UserAnswer, Long> {
     
     @Query("SELECT a FROM UserAnswer a WHERE a.deleted = false AND a.attempt.id = :attemptId AND a.question.id = :questionId")
     Optional<UserAnswer> findByAttemptIdAndQuestionId(Long attemptId, Long questionId);
+    
+    @Query("SELECT COUNT(a) FROM UserAnswer a JOIN a.question q " +
+           "WHERE a.deleted = false AND a.attempt.id = :attemptId " +
+           "AND a.selectedOptionId = q.correctAnswer")
+    Long countCorrectAnswersByAttemptId(Long attemptId);
+    
+    @Query("SELECT COUNT(a) FROM UserAnswer a " +
+           "WHERE a.deleted = false AND a.attempt.id = :attemptId " +
+           "AND a.selectedOptionId IS NOT NULL")
+    Long countAnsweredQuestionsByAttemptId(Long attemptId);
+    
+    @Query("SELECT SUM(a.timeSpent) FROM UserAnswer a " +
+           "WHERE a.deleted = false AND a.attempt.id = :attemptId")
+    Integer sumTimeSpentByAttemptId(Long attemptId);
 }

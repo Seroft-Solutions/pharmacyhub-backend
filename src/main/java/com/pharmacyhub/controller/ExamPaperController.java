@@ -1,132 +1,119 @@
 package com.pharmacyhub.controller;
 
-import com.pharmacyhub.domain.entity.ExamPaper;
-import com.pharmacyhub.dto.ExamPaperDTO;
-import com.pharmacyhub.dto.ExamStatsDTO;
-import com.pharmacyhub.service.ExamPaperService;
-import jakarta.persistence.EntityNotFoundException;
+import com.pharmacyhub.dto.response.ApiResponse;
+import com.pharmacyhub.dto.response.ExamResponseDTO;
+import com.pharmacyhub.dto.request.ExamFilterRequestDTO;
+import com.pharmacyhub.service.ExamService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/exams/papers")
+@RequestMapping("/api/v1/exams/papers")
+@CrossOrigin(origins = "*", maxAge = 3600)
+@Tag(name = "Exam Papers", description = "API endpoints for exam papers management")
 public class ExamPaperController {
 
-    private final ExamPaperService examPaperService;
+    private static final Logger logger = LoggerFactory.getLogger(ExamPaperController.class);
+    private final ExamService examService;
 
-    public ExamPaperController(ExamPaperService examPaperService) {
-        this.examPaperService = examPaperService;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<ExamPaperDTO>> getAllPapers() {
-        return ResponseEntity.ok(examPaperService.getAllPapers().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList()));
+    public ExamPaperController(ExamService examService) {
+        this.examService = examService;
     }
 
     @GetMapping("/model")
-    public ResponseEntity<List<ExamPaperDTO>> getModelPapers() {
-        return ResponseEntity.ok(examPaperService.getModelPapers().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList()));
+    @Operation(summary = "Get all model papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getModelPapers(
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String topic) {
+        
+        logger.info("Fetching model papers with filters: difficulty={}, topic={}", difficulty, topic);
+        
+        ExamFilterRequestDTO filters = new ExamFilterRequestDTO();
+        filters.setType("MODEL");
+        filters.setDifficulty(difficulty);
+        filters.setTopic(topic);
+        
+        List<ExamResponseDTO> papers = examService.findPapersByFilter(filters);
+        logger.info("Found {} model papers matching criteria", papers.size());
+        
+        return ResponseEntity.ok(ApiResponse.success(papers));
     }
 
     @GetMapping("/past")
-    public ResponseEntity<List<ExamPaperDTO>> getPastPapers() {
-        return ResponseEntity.ok(examPaperService.getPastPapers().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList()));
+    @Operation(summary = "Get all past papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getPastPapers(
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String topic) {
+        
+        logger.info("Fetching past papers with filters: difficulty={}, topic={}", difficulty, topic);
+        
+        ExamFilterRequestDTO filters = new ExamFilterRequestDTO();
+        filters.setType("PAST");
+        filters.setDifficulty(difficulty);
+        filters.setTopic(topic);
+        
+        List<ExamResponseDTO> papers = examService.findPapersByFilter(filters);
+        logger.info("Found {} past papers matching criteria", papers.size());
+        
+        return ResponseEntity.ok(ApiResponse.success(papers));
+    }
+
+    @GetMapping("/subject")
+    @Operation(summary = "Get papers by subject")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getSubjectPapers(
+            @RequestParam(required = true) String subject,
+            @RequestParam(required = false) String difficulty) {
+        
+        logger.info("Fetching subject papers: subject={}, difficulty={}", subject, difficulty);
+        
+        ExamFilterRequestDTO filters = new ExamFilterRequestDTO();
+        filters.setTopic(subject);
+        filters.setDifficulty(difficulty);
+        
+        List<ExamResponseDTO> papers = examService.findPapersByFilter(filters);
+        logger.info("Found {} subject papers matching criteria", papers.size());
+        
+        return ResponseEntity.ok(ApiResponse.success(papers));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ExamPaperDTO> getPaperById(@PathVariable Long id) {
-        return examPaperService.getPaperById(id)
-                .map(paper -> ResponseEntity.ok(convertToDTO(paper)))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam paper not found"));
+    @Operation(summary = "Get paper by ID")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> getPaperById(@PathVariable Long id) {
+        logger.info("Fetching paper with ID: {}", id);
+        
+        ExamResponseDTO paper = examService.findPaperById(id);
+        
+        return ResponseEntity.ok(ApiResponse.success(paper));
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<ExamStatsDTO> getExamStats() {
-        return ResponseEntity.ok(examPaperService.getExamStats());
+    @Operation(summary = "Get exam statistics")
+    public ResponseEntity<ApiResponse<Object>> getExamStats() {
+        logger.info("Fetching exam statistics");
+        
+        Object stats = examService.getExamStats();
+        
+        return ResponseEntity.ok(ApiResponse.success(stats));
     }
 
-    @PostMapping
-    public ResponseEntity<ExamPaperDTO> createPaper(@Valid @RequestBody ExamPaperDTO examPaperDTO) {
-        try {
-            ExamPaper paper = convertToEntity(examPaperDTO);
-            ExamPaper createdPaper = examPaperService.createPaper(paper);
-            return new ResponseEntity<>(convertToDTO(createdPaper), HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ExamPaperDTO> updatePaper(@PathVariable Long id, @Valid @RequestBody ExamPaperDTO examPaperDTO) {
-        try {
-            ExamPaper paper = convertToEntity(examPaperDTO);
-            ExamPaper updatedPaper = examPaperService.updatePaper(id, paper);
-            return ResponseEntity.ok(convertToDTO(updatedPaper));
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePaper(@PathVariable Long id) {
-        try {
-            examPaperService.deletePaper(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        }
-    }
-
-    private ExamPaperDTO convertToDTO(ExamPaper paper) {
-        ExamPaperDTO dto = new ExamPaperDTO();
-        dto.setId(paper.getId());
-        dto.setTitle(paper.getTitle());
-        dto.setDescription(paper.getDescription());
-        dto.setDifficulty(paper.getDifficulty().toString().toLowerCase());
-        dto.setQuestionCount(paper.getQuestionCount());
-        dto.setDurationMinutes(paper.getDurationMinutes());
-        dto.setTags(paper.getTags());
-        dto.setPremium(paper.getPremium());
-        dto.setAttemptCount(paper.getAttemptCount());
-        dto.setSuccessRatePercent(paper.getSuccessRatePercent());
-        dto.setLastUpdatedDate(paper.getLastUpdatedDate().format(DateTimeFormatter.ISO_DATE));
-        dto.setType(paper.getType().toString());
-        // Only take the ID of the exam entity to prevent recursion
-        dto.setExamId(paper.getExam() != null ? paper.getExam().getId() : null);
-        return dto;
-    }
-
-    private ExamPaper convertToEntity(ExamPaperDTO dto) {
-        ExamPaper paper = new ExamPaper();
-        paper.setTitle(dto.getTitle());
-        paper.setDescription(dto.getDescription());
-        paper.setDifficulty(ExamPaper.Difficulty.valueOf(dto.getDifficulty().toUpperCase()));
-        paper.setQuestionCount(dto.getQuestionCount());
-        paper.setDurationMinutes(dto.getDurationMinutes());
-        paper.setTags(dto.getTags() != null ? dto.getTags() : new HashSet<>());
-        paper.setPremium(dto.getPremium());
-        paper.setType(ExamPaper.PaperType.valueOf(dto.getType().toUpperCase()));
-        if (dto.getLastUpdatedDate() != null) {
-            paper.setLastUpdatedDate(LocalDate.parse(dto.getLastUpdatedDate()));
-        }
-        // Note: Exam entity will be set by the service based on examId
-        return paper;
+    @PostMapping("/search")
+    @Operation(summary = "Search for papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> searchPapers(
+            @RequestBody @Valid ExamFilterRequestDTO filters) {
+        
+        logger.info("Searching papers with filters: {}", filters);
+        
+        List<ExamResponseDTO> papers = examService.findPapersByFilter(filters);
+        logger.info("Found {} papers matching search criteria", papers.size());
+        
+        return ResponseEntity.ok(ApiResponse.success(papers));
     }
 }

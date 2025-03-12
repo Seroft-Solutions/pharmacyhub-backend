@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Service interface for managing exams
  */
-public interface ExamService {
+public interface IExamService {
     
     /**
      * Find all active (non-deleted) exams

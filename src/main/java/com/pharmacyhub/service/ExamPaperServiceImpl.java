@@ -102,17 +102,22 @@ public class ExamPaperServiceImpl implements ExamPaperService {
     @Override
     @Transactional(readOnly = true)
     public ExamStatsDTO getExamStats() {
-        Integer totalPapers = examPaperRepository.getTotalPaperCount();
-        Integer avgDuration = examPaperRepository.getAverageDuration() != null ? 
-                examPaperRepository.getAverageDuration().intValue() : 0;
+        // Convert Long to Integer
+        Long totalPapersLong = examPaperRepository.getTotalPaperCount();
+        Integer totalPapers = totalPapersLong != null ? totalPapersLong.intValue() : 0;
+        
+        // Convert Double to Integer
+        Double avgDurationDouble = examPaperRepository.getAverageDuration();
+        Integer avgDuration = avgDurationDouble != null ? avgDurationDouble.intValue() : 0;
         
         Double completionRate = examResultRepository.getAverageCompletionRate();
         Integer completionRatePercent = completionRate != null ? 
                 (int) (completionRate * 100) : 0;
         
-        // Active users in the last 30 days
+        // Active users in the last 30 days - convert long to Integer
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-        Integer activeUsers = examAttemptRepository.countUniqueUsersSince(thirtyDaysAgo);
+        long activeUsersLong = examAttemptRepository.countUniqueUsersSince(thirtyDaysAgo);
+        Integer activeUsers = (int) activeUsersLong;
         
         return ExamStatsDTO.builder()
                 .totalPapers(totalPapers)

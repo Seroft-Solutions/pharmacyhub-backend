@@ -18,8 +18,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Exam
-{
+public class Exam {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -47,6 +46,11 @@ public class Exam
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
+    
+    @ElementCollection
+    @CollectionTable(name = "exam_tags", joinColumns = @JoinColumn(name = "exam_id"))
+    @Column(name = "tag")
+    private List<String> tags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -56,21 +60,35 @@ public class Exam
     private boolean deleted = false;
 
     // Helper method to add question
-    public void addQuestion(Question question)
-    {
+    public void addQuestion(Question question) {
         questions.add(question);
         question.setExam(this);
     }
 
     // Helper method to remove question
-    public void removeQuestion(Question question)
-    {
+    public void removeQuestion(Question question) {
         questions.remove(question);
         question.setExam(null);
     }
+    
+    // Helper method to add tag
+    public void addTag(String tag) {
+        if (tags == null) {
+            tags = new ArrayList<>();
+        }
+        if (!tags.contains(tag)) {
+            tags.add(tag);
+        }
+    }
+    
+    // Helper method to remove tag
+    public void removeTag(String tag) {
+        if (tags != null) {
+            tags.remove(tag);
+        }
+    }
 
-    public enum ExamStatus
-    {
+    public enum ExamStatus {
         DRAFT,
         PUBLISHED,
         ARCHIVED

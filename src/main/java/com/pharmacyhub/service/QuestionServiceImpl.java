@@ -30,6 +30,36 @@ public class QuestionServiceImpl implements QuestionService {
     public Optional<Question> getQuestionById(Long id) {
         return questionRepository.findByIdAndNotDeleted(id);
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Question> findById(Long id) {
+        return questionRepository.findByIdAndNotDeleted(id);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Question> findByExamId(Long examId) {
+        return questionRepository.findByExamId(examId);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Question> findByTopic(String topic) {
+        return questionRepository.findByTopic(topic);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Question> findByDifficulty(String difficulty) {
+        return questionRepository.findByDifficulty(difficulty);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Question> findRandom(int count, String topic, String difficulty) {
+        return questionRepository.findRandom(count, topic, difficulty);
+    }
 
     @Override
     public Question createQuestion(Question question) {
