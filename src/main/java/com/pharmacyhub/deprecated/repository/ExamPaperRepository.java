@@ -1,8 +1,11 @@
-package com.pharmacyhub.domain.repository;
+package com.pharmacyhub.deprecated.repository;
 
-import com.pharmacyhub.domain.entity.ExamPaper;
-import com.pharmacyhub.domain.entity.ExamPaper.PaperType;
-import com.pharmacyhub.domain.entity.ExamPaper.Difficulty;
+// DEPRECATED: This repository is for the deprecated ExamPaper entity
+// Use ExamRepository for all new development
+
+import com.pharmacyhub.deprecated.entity.ExamPaper;
+import com.pharmacyhub.deprecated.entity.ExamPaper.PaperType;
+import com.pharmacyhub.deprecated.entity.ExamPaper.Difficulty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

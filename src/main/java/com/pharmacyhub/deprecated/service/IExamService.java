@@ -1,4 +1,7 @@
-package com.pharmacyhub.service;
+package com.pharmacyhub.deprecated.service;
+
+// DEPRECATED: This interface is redundant with ExamService
+// Do not use for new development
 
 import com.pharmacyhub.domain.entity.Exam;
 import com.pharmacyhub.dto.request.ExamFilterRequestDTO;

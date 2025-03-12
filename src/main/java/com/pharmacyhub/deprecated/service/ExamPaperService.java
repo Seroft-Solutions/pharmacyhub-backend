@@ -1,6 +1,9 @@
-package com.pharmacyhub.service;
+package com.pharmacyhub.deprecated.service;
 
-import com.pharmacyhub.domain.entity.ExamPaper;
+// DEPRECATED: This service is for the deprecated ExamPaper entity
+// Use ExamService for all new development
+
+import com.pharmacyhub.deprecated.entity.ExamPaper;
 import com.pharmacyhub.dto.ExamStatsDTO;
 
 import java.util.List;

@@ -1,8 +1,11 @@
-package com.pharmacyhub.service;
+package com.pharmacyhub.deprecated.service;
 
-import com.pharmacyhub.domain.entity.ExamPaper;
+// DEPRECATED: This service implementation is for the deprecated ExamPaper entity
+// Use ExamServiceImpl for all new development
+
+import com.pharmacyhub.deprecated.entity.ExamPaper;
+import com.pharmacyhub.deprecated.repository.ExamPaperRepository;
 import com.pharmacyhub.domain.repository.ExamAttemptRepository;
-import com.pharmacyhub.domain.repository.ExamPaperRepository;
 import com.pharmacyhub.domain.repository.ExamResultRepository;
 import com.pharmacyhub.dto.ExamStatsDTO;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,7 +18,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class ExamPaperServiceImpl implements ExamPaperService {
+public class ExamPaperServiceImpl implements com.pharmacyhub.deprecated.service.ExamPaperService {
     
     private final ExamPaperRepository examPaperRepository;
     private final ExamAttemptRepository examAttemptRepository;

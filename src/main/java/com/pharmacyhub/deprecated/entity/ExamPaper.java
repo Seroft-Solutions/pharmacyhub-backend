@@ -1,4 +1,9 @@
-package com.pharmacyhub.domain.entity;
+package com.pharmacyhub.deprecated.entity;
+
+// DEPRECATED: This entity is redundant with Exam entity
+// Use Exam entity for all new development
+
+import com.pharmacyhub.domain.entity.Exam;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

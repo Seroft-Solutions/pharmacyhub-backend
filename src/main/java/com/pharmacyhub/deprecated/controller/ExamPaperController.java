@@ -1,4 +1,7 @@
-package com.pharmacyhub.controller;
+package com.pharmacyhub.deprecated.controller;
+
+// DEPRECATED: This controller functionality is now covered by ExamController
+// Use ExamController for all new development
 
 import com.pharmacyhub.dto.response.ApiResponse;
 import com.pharmacyhub.dto.response.ExamResponseDTO;

@@ -1,6 +1,9 @@
-package com.pharmacyhub.dto;
+package com.pharmacyhub.deprecated.dto;
 
-import com.pharmacyhub.domain.entity.ExamPaper;
+// DEPRECATED: This DTO is for the deprecated ExamPaper entity
+// Use ExamResponseDTO for all new development
+
+import com.pharmacyhub.deprecated.entity.ExamPaper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
