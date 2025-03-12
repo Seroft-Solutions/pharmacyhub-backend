@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ExamServiceImpl implements IExamService {
+public class ExamServiceImpl implements ExamService {
     
     private static final Logger logger = LoggerFactory.getLogger(ExamServiceImpl.class);
     

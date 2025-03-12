@@ -52,6 +52,12 @@ public class Question
     @Enumerated(EnumType.STRING)
     @Column(name = "question_type")
     private QuestionType type = QuestionType.MCQ;
+    
+    @Column(name = "topic")
+    private String topic;
+    
+    @Column(name = "difficulty")
+    private String difficulty;
 
     @Column(nullable = false)
     private boolean deleted = false;
