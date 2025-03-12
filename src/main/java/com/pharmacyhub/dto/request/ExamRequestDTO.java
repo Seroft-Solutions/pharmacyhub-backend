@@ -42,6 +42,8 @@ public class ExamRequestDTO implements BaseDTO {
     
     private Exam.ExamStatus status = Exam.ExamStatus.DRAFT;
     
+    private List<String> tags = new ArrayList<>();
+    
     @Valid
     private List<QuestionDTO> questions = new ArrayList<>();
     

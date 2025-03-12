@@ -4,9 +4,11 @@ import com.pharmacyhub.domain.entity.Exam;
 import com.pharmacyhub.domain.entity.Question;
 import com.pharmacyhub.dto.response.ApiResponse;
 import com.pharmacyhub.dto.request.ExamRequestDTO;
+import com.pharmacyhub.dto.request.JsonExamUploadRequestDTO;
 import com.pharmacyhub.dto.response.ExamResponseDTO;
 import com.pharmacyhub.dto.response.QuestionResponseDTO;
 import com.pharmacyhub.service.ExamService;
+import com.pharmacyhub.service.JsonExamUploadService;
 import com.pharmacyhub.service.QuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,10 +36,12 @@ public class ExamController {
 
     private final ExamService examService;
     private final QuestionService questionService;
+    private final JsonExamUploadService jsonExamUploadService;
 
-    public ExamController(ExamService examService, QuestionService questionService) {
+    public ExamController(ExamService examService, QuestionService questionService, JsonExamUploadService jsonExamUploadService) {
         this.examService = examService;
         this.questionService = questionService;
+        this.jsonExamUploadService = jsonExamUploadService;
     }
 
     @GetMapping
@@ -157,6 +161,23 @@ public class ExamController {
                     .body(ApiResponse.success(responseDTO, 201));
         } catch (Exception e) {
             logger.error("Error creating exam: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
+
+    @PostMapping("/upload-json")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @Operation(summary = "Upload and create an exam from JSON data")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> uploadJsonExam(
+            @Valid @RequestBody JsonExamUploadRequestDTO requestDTO) {
+        logger.info("Uploading JSON exam: {}", requestDTO.getTitle());
+        try {
+            Exam createdExam = jsonExamUploadService.processJsonAndCreateExam(requestDTO);
+            ExamResponseDTO responseDTO = mapToExamResponseDTO(createdExam);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(responseDTO, 201));
+        } catch (Exception e) {
+            logger.error("Error uploading JSON exam: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
