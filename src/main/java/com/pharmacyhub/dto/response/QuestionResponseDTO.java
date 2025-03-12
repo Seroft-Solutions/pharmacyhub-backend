@@ -27,6 +27,8 @@ public class QuestionResponseDTO implements BaseDTO {
     private List<OptionDTO> options = new ArrayList<>();
     private String explanation;
     private Integer points;
+    private String topic;
+    private String difficulty;
     
     @Data
     @Builder

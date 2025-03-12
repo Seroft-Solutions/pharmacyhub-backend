@@ -26,6 +26,7 @@ public class ExamResponseDTO implements BaseDTO {
     private Integer totalMarks;
     private Integer passingMarks;
     private Exam.ExamStatus status;
+    private List<String> tags = new ArrayList<>();
     private List<QuestionDTO> questions = new ArrayList<>();
     private Integer attemptCount;
     private Double averageScore;
@@ -42,6 +43,8 @@ public class ExamResponseDTO implements BaseDTO {
         private String correctAnswer;
         private String explanation;
         private Integer marks;
+        private String topic;
+        private String difficulty;
     }
     
     @Data

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,6 +67,50 @@ public class ExamController {
             logger.error("Error fetching published exams: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error fetching published exams", e);
         }
+    }
+    
+    @GetMapping("/papers/model")
+    @Operation(summary = "Get model papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getModelPapers() {
+        logger.info("Fetching model papers");
+        
+        // Get all published exams with "MODEL" tag
+        List<Exam> exams = examService.findAllPublished().stream()
+                .filter(exam -> exam.getTags() != null && 
+                      exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("MODEL")))
+                .collect(Collectors.toList());
+        
+        List<ExamResponseDTO> examDTOs = exams.stream()
+                .map(this::mapToExamResponseDTO)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(ApiResponse.success(examDTOs));
+    }
+
+    @GetMapping("/papers/past")
+    @Operation(summary = "Get past papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getPastPapers() {
+        logger.info("Fetching past papers");
+        
+        // Get all published exams with "PAST" tag
+        List<Exam> exams = examService.findAllPublished().stream()
+                .filter(exam -> exam.getTags() != null && 
+                      exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("PAST")))
+                .collect(Collectors.toList());
+        
+        List<ExamResponseDTO> examDTOs = exams.stream()
+                .map(this::mapToExamResponseDTO)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(ApiResponse.success(examDTOs));
+    }
+
+    @GetMapping("/stats")
+    @Operation(summary = "Get exam statistics")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getExamStats() {
+        logger.info("Fetching exam statistics");
+        Map<String, Object> stats = examService.getExamStats();
+        return ResponseEntity.ok(ApiResponse.success(stats));
     }
 
     @GetMapping("/{id}")
@@ -210,6 +255,7 @@ public class ExamController {
         dto.setTotalMarks(exam.getTotalMarks());
         dto.setPassingMarks(exam.getPassingMarks());
         dto.setStatus(exam.getStatus());
+        dto.setTags(exam.getTags());
         
         // Map questions if present (but don't include them for list operations)
         if (exam.getQuestions() != null && !exam.getQuestions().isEmpty()) {
@@ -230,6 +276,8 @@ public class ExamController {
         dto.setCorrectAnswer(question.getCorrectAnswer());
         dto.setExplanation(question.getExplanation());
         dto.setMarks(question.getMarks());
+        dto.setTopic(question.getTopic());
+        dto.setDifficulty(question.getDifficulty());
         
         // Map options
         if (question.getOptions() != null) {
@@ -257,6 +305,8 @@ public class ExamController {
         // Don't include the correct answer in the response for security
         dto.setExplanation(question.getExplanation());
         dto.setPoints(question.getMarks());
+        dto.setTopic(question.getTopic());
+        dto.setDifficulty(question.getDifficulty());
         
         // Map options without revealing which is correct
         if (question.getOptions() != null) {
@@ -284,6 +334,7 @@ public class ExamController {
         exam.setTotalMarks(dto.getTotalMarks());
         exam.setPassingMarks(dto.getPassingMarks());
         exam.setStatus(dto.getStatus() != null ? dto.getStatus() : Exam.ExamStatus.DRAFT);
+        exam.setTags(dto.getTags());
         
         // Questions will be added/updated separately
         return exam;
