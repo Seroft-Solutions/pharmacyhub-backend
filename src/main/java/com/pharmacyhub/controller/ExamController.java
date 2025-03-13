@@ -108,6 +108,42 @@ public class ExamController {
                 
         return ResponseEntity.ok(ApiResponse.success(examDTOs));
     }
+    
+    @GetMapping("/papers/subject")
+    @Operation(summary = "Get subject papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getSubjectPapers() {
+        logger.info("Fetching subject papers");
+        
+        // Get all published exams with "SUBJECT" tag
+        List<Exam> exams = examService.findAllPublished().stream()
+                .filter(exam -> exam.getTags() != null && 
+                      exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("SUBJECT")))
+                .collect(Collectors.toList());
+        
+        List<ExamResponseDTO> examDTOs = exams.stream()
+                .map(this::mapToExamResponseDTO)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(ApiResponse.success(examDTOs));
+    }
+    
+    @GetMapping("/papers/practice")
+    @Operation(summary = "Get practice papers")
+    public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getPracticePapers() {
+        logger.info("Fetching practice papers");
+        
+        // Get all published exams with "PRACTICE" tag
+        List<Exam> exams = examService.findAllPublished().stream()
+                .filter(exam -> exam.getTags() != null && 
+                      exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("PRACTICE")))
+                .collect(Collectors.toList());
+        
+        List<ExamResponseDTO> examDTOs = exams.stream()
+                .map(this::mapToExamResponseDTO)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(ApiResponse.success(examDTOs));
+    }
 
     @GetMapping("/stats")
     @Operation(summary = "Get exam statistics")
@@ -145,6 +181,34 @@ public class ExamController {
         } catch (Exception e) {
             logger.error("Error fetching questions for exam: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error fetching exam questions", e);
+        }
+    }
+    
+    @PutMapping("/{examId}/questions/{questionId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @Operation(summary = "Update a specific question in an exam")
+    public ResponseEntity<ApiResponse<QuestionResponseDTO>> updateQuestion(
+            @PathVariable Long examId,
+            @PathVariable Long questionId,
+            @Valid @RequestBody Question questionData) {
+        logger.info("Updating question {} for exam {}", questionId, examId);
+        try {
+            // Ensure the question belongs to the exam
+            Question existingQuestion = questionService.getQuestionById(questionId);
+            if (!existingQuestion.getExam().getId().equals(examId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Question doesn't belong to the specified exam");
+            }
+            
+            // Update the question
+            Question updatedQuestion = questionService.updateQuestion(questionId, questionData);
+            QuestionResponseDTO responseDTO = mapToQuestionResponseDTO(updatedQuestion);
+            
+            return ResponseEntity.ok(ApiResponse.success(responseDTO));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error updating question: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
 
