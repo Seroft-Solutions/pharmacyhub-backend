@@ -26,6 +26,12 @@ public @interface RequiresPermission {
     OperationType operation();
     
     /**
+     * The permission name (optional)
+     * If specified, this exact permission will be checked instead of generating one from resource and operation
+     */
+    String permissionName() default "";
+    
+    /**
      * Whether this operation requires approval
      * @return true if approval is required, false otherwise
      */

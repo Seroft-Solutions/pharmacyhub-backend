@@ -33,16 +33,30 @@ public class PermissionAspect extends PHEngine
         Set<Permission> userPermissions = rbacService.getUserEffectivePermissions(getLoggedInUser().getId());
 
         // Check if user has required permission
-        boolean hasPermission = userPermissions.stream()
-                                               .anyMatch(permission -> permission.getResourceType() == annotation.resource() &&
-                                                       permission.getOperationType() == annotation.operation() &&
-                                                       (!annotation.requiresApproval() ||
-                                                               permission.isRequiresApproval()));
+        boolean hasPermission;
+        
+        // If a specific permission name is provided, check for that
+        if (annotation.permissionName() != null && !annotation.permissionName().isEmpty()) {
+            hasPermission = userPermissions.stream()
+                                         .anyMatch(permission -> permission.getName().equals(annotation.permissionName()));
+        } else {
+            // Otherwise check based on resource and operation
+            hasPermission = userPermissions.stream()
+                                         .anyMatch(permission -> permission.getResourceType() == annotation.resource() &&
+                                                 permission.getOperationType() == annotation.operation() &&
+                                                 (!annotation.requiresApproval() ||
+                                                         permission.isRequiresApproval()));
+        }
 
         if (!hasPermission)
         {
-            throw new AccessDeniedException(
-                    "User does not have required permission: " + annotation.resource() + ":" + annotation.operation());
+            if (annotation.permissionName() != null && !annotation.permissionName().isEmpty()) {
+                throw new AccessDeniedException(
+                        "User does not have required permission: " + annotation.permissionName());
+            } else {
+                throw new AccessDeniedException(
+                        "User does not have required permission: " + annotation.resource() + ":" + annotation.operation());
+            }
         }
 
         return joinPoint.proceed();

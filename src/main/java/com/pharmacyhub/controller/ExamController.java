@@ -7,6 +7,10 @@ import com.pharmacyhub.dto.request.ExamRequestDTO;
 import com.pharmacyhub.dto.request.JsonExamUploadRequestDTO;
 import com.pharmacyhub.dto.response.ExamResponseDTO;
 import com.pharmacyhub.dto.response.QuestionResponseDTO;
+import com.pharmacyhub.security.annotation.RequiresPermission;
+import com.pharmacyhub.security.constants.ExamPermissionConstants;
+import com.pharmacyhub.security.domain.OperationType;
+import com.pharmacyhub.security.domain.ResourceType;
 import com.pharmacyhub.service.ExamService;
 import com.pharmacyhub.service.JsonExamUploadService;
 import com.pharmacyhub.service.QuestionService;
@@ -45,7 +49,7 @@ public class ExamController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.READ, permissionName = ExamPermissionConstants.VIEW_EXAMS)
     @Operation(summary = "Get all exams - Admin/Instructor only")
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getAllExams() {
         logger.info("Fetching all exams");
@@ -185,7 +189,7 @@ public class ExamController {
     }
     
     @PutMapping("/{examId}/questions/{questionId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.MANAGE_QUESTIONS)
     @Operation(summary = "Update a specific question in an exam")
     public ResponseEntity<ApiResponse<QuestionResponseDTO>> updateQuestion(
             @PathVariable Long examId,
@@ -194,7 +198,8 @@ public class ExamController {
         logger.info("Updating question {} for exam {}", questionId, examId);
         try {
             // Ensure the question belongs to the exam
-            Question existingQuestion = questionService.getQuestionById(questionId);
+            Question existingQuestion = questionService.getQuestionById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
             if (!existingQuestion.getExam().getId().equals(examId)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Question doesn't belong to the specified exam");
             }
@@ -213,7 +218,7 @@ public class ExamController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
     @Operation(summary = "Create a new exam")
     public ResponseEntity<ApiResponse<ExamResponseDTO>> createExam(@Valid @RequestBody ExamRequestDTO requestDTO) {
         logger.info("Creating new exam");
@@ -230,7 +235,7 @@ public class ExamController {
     }
 
     @PostMapping("/upload-json")
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
     @Operation(summary = "Upload and create an exam from JSON data")
     public ResponseEntity<ApiResponse<ExamResponseDTO>> uploadJsonExam(
             @Valid @RequestBody JsonExamUploadRequestDTO requestDTO) {
@@ -247,7 +252,7 @@ public class ExamController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.EDIT_EXAM)
     @Operation(summary = "Update an existing exam")
     public ResponseEntity<ApiResponse<ExamResponseDTO>> updateExam(
             @PathVariable Long id, 
@@ -267,7 +272,7 @@ public class ExamController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.DELETE, permissionName = ExamPermissionConstants.DELETE_EXAM)
     @Operation(summary = "Delete an exam (Admin only)")
     public ResponseEntity<ApiResponse<Void>> deleteExam(@PathVariable Long id) {
         logger.info("Deleting exam with ID: {}", id);
@@ -283,7 +288,7 @@ public class ExamController {
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.READ, permissionName = ExamPermissionConstants.VIEW_EXAMS)
     @Operation(summary = "Get exams by status")
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getExamsByStatus(@PathVariable Exam.ExamStatus status) {
         logger.info("Fetching exams with status: {}", status);
@@ -295,7 +300,7 @@ public class ExamController {
     }
 
     @PostMapping("/{id}/publish")
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.PUBLISH_EXAM)
     @Operation(summary = "Publish an exam")
     public ResponseEntity<ApiResponse<ExamResponseDTO>> publishExam(@PathVariable Long id) {
         logger.info("Publishing exam with ID: {}", id);
@@ -314,7 +319,7 @@ public class ExamController {
     }
 
     @PostMapping("/{id}/archive")
-    @PreAuthorize("hasAnyRole('ADMIN', 'INSTRUCTOR')")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.UNPUBLISH_EXAM)
     @Operation(summary = "Archive an exam")
     public ResponseEntity<ApiResponse<ExamResponseDTO>> archiveExam(@PathVariable Long id) {
         logger.info("Archiving exam with ID: {}", id);
