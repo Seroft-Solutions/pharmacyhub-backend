@@ -1,6 +1,10 @@
 package com.pharmacyhub.repository;
 
 import com.pharmacyhub.entity.User;
+import com.pharmacyhub.entity.enums.UserType;
+import com.pharmacyhub.security.domain.Group;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,4 +43,25 @@ public interface UserRepository extends JpaRepository<User, Long>
    */
   @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.id = :userId AND SIZE(u.permissionOverrides) > 0")
   boolean hasPermissionOverrides(@Param("userId") Long userId);
+  
+  /**
+   * Find users by their user type.
+   */
+  List<User> findByUserType(UserType userType);
+  
+  /**
+   * Find users by their user type with pagination.
+   */
+  Page<User> findByUserType(UserType userType, Pageable pageable);
+  
+  /**
+   * Find users who belong to a specific group.
+   */
+  List<User> findByGroupsContaining(Group group);
+  
+  /**
+   * Find users who have a specific role directly assigned (not through groups).
+   */
+  @Query("SELECT u FROM User u JOIN u.roles r WHERE r.id = :roleId")
+  List<User> findByRoleId(@Param("roleId") Long roleId);
 }
