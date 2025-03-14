@@ -1,6 +1,8 @@
 package com.pharmacyhub.security.infrastructure.configuration;
 
 import com.pharmacyhub.security.JwtAuthenticationFilter;
+import com.pharmacyhub.security.handler.CustomAccessDeniedHandler;
+import com.pharmacyhub.security.handler.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,12 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    @Autowired
+    private CustomAuthenticationEntryPoint authenticationEntryPoint;
+    
+    @Autowired
+    private CustomAccessDeniedHandler accessDeniedHandler;
 
     /**
      * Configures HTTP security for the application
@@ -47,6 +55,10 @@ public class SecurityConfig {
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

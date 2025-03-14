@@ -161,12 +161,14 @@ public class ExamController {
     @Operation(summary = "Get exam by ID")
     public ResponseEntity<ApiResponse<ExamResponseDTO>> getExamById(@PathVariable Long id) {
         logger.info("Fetching exam with ID: {}", id);
-        return examService.findById(id)
-                .map(exam -> {
-                    ExamResponseDTO examResponseDTO = mapToExamResponseDTO(exam);
-                    return ResponseEntity.ok(ApiResponse.success(examResponseDTO));
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exam not found with ID: " + id));
+        try {
+            Exam exam = examService.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Exam not found with ID: " + id));
+            ExamResponseDTO examResponseDTO = mapToExamResponseDTO(exam);
+            return ResponseEntity.ok(ApiResponse.success(examResponseDTO));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @GetMapping("/{examId}/questions")
