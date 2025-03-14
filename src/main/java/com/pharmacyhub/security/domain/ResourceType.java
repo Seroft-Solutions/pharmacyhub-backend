@@ -11,6 +11,7 @@ public enum ResourceType {
     ROLE,
     PERMISSION,
     GROUP,
+    FEATURE,
     
     // Pharmacy staff
     PHARMACIST,

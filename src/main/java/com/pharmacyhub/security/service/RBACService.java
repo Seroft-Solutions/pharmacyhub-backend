@@ -5,6 +5,7 @@ import com.pharmacyhub.engine.PHMapper;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.security.domain.AuditLog;
+import com.pharmacyhub.security.domain.Feature;
 import com.pharmacyhub.security.domain.Group;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.Role;
@@ -13,6 +14,7 @@ import com.pharmacyhub.security.dto.PermissionDTO;
 import com.pharmacyhub.security.dto.RoleDTO;
 import com.pharmacyhub.security.exception.RBACException;
 import com.pharmacyhub.security.infrastructure.AuditLogRepository;
+import com.pharmacyhub.security.infrastructure.FeatureRepository;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import com.pharmacyhub.security.infrastructure.RolesRepository;
@@ -39,29 +41,35 @@ public class RBACService extends PHEngine
     private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
+    private final FeatureRepository featureRepository;
     private final AuditLogRepository auditLogRepository;
     private final PHMapper phMapper;
     private final AuditService auditService;
     private final RBACValidationService validationService;
+    private final FeatureService featureService;
 
     public RBACService(
             UserRepository userRepository,
             RolesRepository rolesRepository,
             PermissionRepository permissionRepository,
             GroupRepository groupRepository,
+            FeatureRepository featureRepository,
             AuditLogRepository auditLogRepository,
             PHMapper phMapper,
             AuditService auditService,
-            RBACValidationService validationService)
+            RBACValidationService validationService,
+            FeatureService featureService)
     {
         this.userRepository = userRepository;
         this.rolesRepository = rolesRepository;
         this.permissionRepository = permissionRepository;
         this.groupRepository = groupRepository;
+        this.featureRepository = featureRepository;
         this.auditLogRepository = auditLogRepository;
         this.phMapper = phMapper;
         this.auditService = auditService;
         this.validationService = validationService;
+        this.featureService = featureService;
     }
 
     @Cacheable(value = "userPermissions", key = "#userId")
@@ -452,5 +460,95 @@ public class RBACService extends PHEngine
             );
             return false;
         }
+    }
+    
+    /**
+     * Check if a user has access to a specific feature
+     * A user has access if they have at least one of the permissions required by the feature
+     */
+    @Cacheable(value = "featureAccess", key = "#userId + '_' + #featureCode")
+    public boolean userHasFeatureAccess(Long userId, String featureCode) {
+        Feature feature = featureRepository.findByCode(featureCode)
+                .orElseThrow(() -> RBACException.entityNotFound("Feature with code " + featureCode));
+                
+        // If feature is not active, deny access
+        if (!feature.isActive()) {
+            return false;
+        }
+        
+        // Get user's effective permissions
+        Set<Permission> userPermissions = getUserEffectivePermissions(userId);
+        
+        // Check if user has any of the permissions required by the feature
+        Set<Permission> featurePermissions = featureService.getAllFeaturePermissions(feature);
+        
+        // If feature has no permissions, allow access by default
+        if (featurePermissions.isEmpty()) {
+            return true;
+        }
+        
+        // Check for any matching permission
+        for (Permission userPermission : userPermissions) {
+            for (Permission featurePermission : featurePermissions) {
+                if (userPermission.getId().equals(featurePermission.getId())) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if a user has access to perform a specific operation on a feature
+     * A user has access if they have at least one of the permissions required for the operation
+     */
+    @Cacheable(value = "featureOperationAccess", key = "#userId + '_' + #featureCode + '_' + #operation")
+    public boolean userHasFeatureOperation(Long userId, String featureCode, String operation) {
+        // First check general feature access
+        if (!userHasFeatureAccess(userId, featureCode)) {
+            return false;
+        }
+        
+        Feature feature = featureRepository.findByCode(featureCode)
+                .orElseThrow(() -> RBACException.entityNotFound("Feature with code " + featureCode));
+                
+        // If feature doesn't have the specified operation, deny access
+        if (!feature.getOperations().contains(operation)) {
+            return false;
+        }
+        
+        // Get user's effective permissions
+        Set<Permission> userPermissions = getUserEffectivePermissions(userId);
+        
+        // Check for operation-specific permissions (format: "FEATURE_CODE:OPERATION")
+        String operationPermission = featureCode + ":" + operation;
+        
+        for (Permission permission : userPermissions) {
+            if (permission.getName().equals(operationPermission)) {
+                return true;
+            }
+        }
+        
+        // If no operation-specific permissions found, fall back to general feature permissions
+        // This allows backward compatibility with existing features
+        return true;
+    }
+    
+    /**
+     * Get all features a user has access to
+     */
+    @Cacheable(value = "userFeatures", key = "#userId")
+    public Set<Feature> getUserAccessibleFeatures(Long userId) {
+        List<Feature> allFeatures = featureRepository.findByActiveTrue();
+        Set<Feature> accessibleFeatures = new HashSet<>();
+        
+        for (Feature feature : allFeatures) {
+            if (userHasFeatureAccess(userId, feature.getCode())) {
+                accessibleFeatures.add(feature);
+            }
+        }
+        
+        return accessibleFeatures;
     }
 }
