@@ -55,7 +55,11 @@ public class JwtHelper
   //for retrieveing any information from token we will need the secret key
   protected Claims getAllClaimsFromToken(String token)
   {
-    return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+    return Jwts.parserBuilder()
+            .setSigningKey(java.util.Base64.getEncoder().encode(secret.getBytes()))
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
   }
 
   //check if the token has expired
@@ -134,10 +138,13 @@ public class JwtHelper
   //   compaction of the JWT to a URL-safe string
   private String doGenerateToken(Map<String, Object> claims, String subject)
   {
-
-    return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+    return Jwts.builder()
+            .setClaims(claims)
+            .setSubject(subject)
+            .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-            .signWith(SignatureAlgorithm.HS512, secret).compact();
+            .signWith(io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes()), io.jsonwebtoken.SignatureAlgorithm.HS512)
+            .compact();
   }
 
   //validate token

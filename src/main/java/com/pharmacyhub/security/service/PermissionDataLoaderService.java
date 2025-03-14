@@ -1,5 +1,6 @@
 package com.pharmacyhub.security.service;
 
+import com.pharmacyhub.security.constants.AuthPermissionConstants;
 import com.pharmacyhub.security.constants.ExamPermissionConstants;
 import com.pharmacyhub.security.constants.PermissionConstants;
 import com.pharmacyhub.security.domain.OperationType;
@@ -54,6 +55,9 @@ public class PermissionDataLoaderService {
         // Load core permissions
         loadCorePermissions();
         
+        // Load auth-specific permissions
+        loadAuthPermissions();
+        
         // Load exam-specific permissions
         loadExamPermissions();
         
@@ -107,6 +111,51 @@ public class PermissionDataLoaderService {
         // Reports
         definePermission(PermissionConstants.VIEW_REPORTS, 
             "View reports", ResourceType.REPORTS, OperationType.READ);
+    }
+    
+    /**
+     * Load auth-specific permissions from AuthPermissionConstants class
+     */
+    private void loadAuthPermissions() {
+        // Authentication
+        definePermission(AuthPermissionConstants.LOGIN, 
+            "Log into the system", ResourceType.USER, OperationType.READ);
+        definePermission(AuthPermissionConstants.LOGOUT, 
+            "Log out of the system", ResourceType.USER, OperationType.READ);
+        definePermission(AuthPermissionConstants.REGISTER, 
+            "Register a new account", ResourceType.USER, OperationType.CREATE);
+        
+        // Account Management
+        definePermission(AuthPermissionConstants.MANAGE_ACCOUNT, 
+            "Manage own account settings", ResourceType.USER, OperationType.UPDATE);
+        definePermission(AuthPermissionConstants.VERIFY_EMAIL, 
+            "Verify email address", ResourceType.USER, OperationType.UPDATE);
+        definePermission(AuthPermissionConstants.RESET_PASSWORD, 
+            "Reset password", ResourceType.USER, OperationType.UPDATE);
+        
+        // Profile
+        definePermission(AuthPermissionConstants.VIEW_PROFILE, 
+            "View own profile", ResourceType.USER, OperationType.READ);
+        definePermission(AuthPermissionConstants.EDIT_PROFILE, 
+            "Edit own profile", ResourceType.USER, OperationType.UPDATE);
+        
+        // Sessions
+        definePermission(AuthPermissionConstants.MANAGE_SESSIONS, 
+            "Manage active sessions", ResourceType.USER, OperationType.MANAGE);
+        definePermission(AuthPermissionConstants.VIEW_SESSIONS, 
+            "View active sessions", ResourceType.USER, OperationType.READ);
+        
+        // User Management (Admin)
+        definePermission(AuthPermissionConstants.MANAGE_USERS, 
+            "Manage all users", ResourceType.USER, OperationType.MANAGE);
+        definePermission(AuthPermissionConstants.VIEW_USERS, 
+            "View all users", ResourceType.USER, OperationType.READ);
+        definePermission(AuthPermissionConstants.EDIT_USERS, 
+            "Edit user details", ResourceType.USER, OperationType.UPDATE);
+        definePermission(AuthPermissionConstants.DELETE_USERS, 
+            "Delete users", ResourceType.USER, OperationType.DELETE);
+        definePermission(AuthPermissionConstants.IMPERSONATE_USER, 
+            "Impersonate other users", ResourceType.USER, OperationType.MANAGE, true); // Requires approval
     }
     
     /**
@@ -306,6 +355,13 @@ public class PermissionDataLoaderService {
      */
     public List<Permission> getExamPermissions() {
         return getFeaturePermissions("exams");
+    }
+    
+    /**
+     * Get permissions for the auth feature
+     */
+    public List<Permission> getAuthPermissions() {
+        return getFeaturePermissions("auth");
     }
     
     /**

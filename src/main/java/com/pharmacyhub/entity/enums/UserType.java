@@ -6,5 +6,6 @@ public enum UserType {
     PROPRIETOR,
     SALESMAN,
     ADMIN,
-    SUPER_ADMIN
+    SUPER_ADMIN,
+    USER
 }

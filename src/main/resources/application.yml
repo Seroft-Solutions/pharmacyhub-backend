@@ -37,7 +37,7 @@ clientApp:
 
 pharmacyhub:
   seeder:
-    engine: false
+    engine: true
   test:
     data:
       pharmacist: 1-10

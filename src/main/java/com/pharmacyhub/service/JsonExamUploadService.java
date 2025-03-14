@@ -197,7 +197,8 @@ public class JsonExamUploadService {
         
         try {
             // If options is a Map with A, B, C, D keys
-            if (optionsObj instanceof Map) {
+            if (optionsObj instanceof Map<?, ?>) {
+                @SuppressWarnings("unchecked")
                 Map<String, Object> optionsMap = (Map<String, Object>) optionsObj;
                 
                 for (Map.Entry<String, Object> entry : optionsMap.entrySet()) {
@@ -215,7 +216,8 @@ public class JsonExamUploadService {
                 }
             }
             // If options is a List
-            else if (optionsObj instanceof List) {
+            else if (optionsObj instanceof List<?>) {
+                @SuppressWarnings("unchecked")
                 List<Object> optionsList = (List<Object>) optionsObj;
                 
                 // Generate labels A, B, C, D...
@@ -226,7 +228,8 @@ public class JsonExamUploadService {
                     // Handle different formats (string or object with text property)
                     if (optionsList.get(i) instanceof String) {
                         text = (String) optionsList.get(i);
-                    } else if (optionsList.get(i) instanceof Map) {
+                    } else if (optionsList.get(i) instanceof Map<?, ?>) {
+                        @SuppressWarnings("unchecked")
                         Map<String, Object> optionMap = (Map<String, Object>) optionsList.get(i);
                         text = optionMap.get("text").toString();
                     } else {

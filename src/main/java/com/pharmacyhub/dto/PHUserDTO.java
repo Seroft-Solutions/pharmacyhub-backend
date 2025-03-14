@@ -38,7 +38,7 @@ public interface PHUserDTO {
     /**
      * Static builder method.
      */
-    static PHUserDTOBuilder builder() {
+    static Impl.ImplBuilder builder() {
         return new Impl.ImplBuilder();
     }
 }

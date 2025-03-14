@@ -72,7 +72,9 @@ public class UserTypeFactory {
         
         // Add SUPER_ADMIN role directly
         Optional<Role> superAdminRole = rolesRepository.findByName(RoleEnum.SUPER_ADMIN);
-        superAdminRole.ifPresent(role -> user.setRole(role));
+        if (superAdminRole.isPresent()) {
+            user.setRole(superAdminRole.get());
+        }
         
         // Save user to generate ID
         user = userRepository.save(user);
@@ -116,7 +118,9 @@ public class UserTypeFactory {
         
         // Add ADMIN role directly
         Optional<Role> adminRole = rolesRepository.findByName(RoleEnum.ADMIN);
-        adminRole.ifPresent(role -> user.setRole(role));
+        if (adminRole.isPresent()) {
+            user.setRole(adminRole.get());
+        }
         
         // Save user to generate ID
         user = userRepository.save(user);
@@ -160,7 +164,9 @@ public class UserTypeFactory {
         
         // Add USER role directly
         Optional<Role> userRole = rolesRepository.findByName(RoleEnum.USER);
-        userRole.ifPresent(role -> user.setRole(role));
+        if (userRole.isPresent()) {
+            user.setRole(userRole.get());
+        }
         
         // Save user to generate ID
         user = userRepository.save(user);

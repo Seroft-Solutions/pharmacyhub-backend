@@ -1,5 +1,7 @@
 package com.pharmacyhub.security.initializer;
 
+import com.pharmacyhub.security.constants.AuthPermissionConstants;
+import com.pharmacyhub.security.constants.ExamPermissionConstants;
 import com.pharmacyhub.security.domain.*;
 import com.pharmacyhub.security.infrastructure.GroupRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
@@ -9,6 +11,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -16,7 +20,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import java.util.*;
 
 @Slf4j
-@Component
+@Component("roleInitializer")
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class RoleInitializer implements ApplicationListener<ContextRefreshedEvent> {
     private final RolesRepository rolesRepository;
@@ -83,7 +88,73 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
         permissionMap.put("MANAGE_PERMISSIONS", createPermission("MANAGE_PERMISSIONS", 
             "Manage system permissions", ResourceType.PERMISSION, OperationType.MANAGE, false));
         
+        // Auth permissions
+        for (String permName : AuthPermissionConstants.BASIC_USER_PERMISSIONS) {
+            permissionMap.put(permName, createPermission(permName,
+                "Permission to " + permName.replace("auth:", "").replace("-", " "),
+                ResourceType.USER, getOperationTypeForPermission(permName), false));
+        }
+        
+        for (String permName : AuthPermissionConstants.ADMIN_PERMISSIONS) {
+            permissionMap.put(permName, createPermission(permName,
+                "Admin permission to " + permName.replace("auth:", "").replace("-", " "),
+                ResourceType.USER, getOperationTypeForPermission(permName), false));
+        }
+        
+        // Exam permissions for students
+        for (String permName : ExamPermissionConstants.STUDENT_PERMISSIONS) {
+            permissionMap.put(permName, createPermission(permName,
+                "Student permission to " + permName.replace("exams:", "").replace("-", " "),
+                ResourceType.PHARMACY, getOperationTypeForPermission(permName), false));
+        }
+        
+        // Exam permissions for instructors
+        for (String permName : ExamPermissionConstants.INSTRUCTOR_PERMISSIONS) {
+            if (!permissionMap.containsKey(permName)) {
+                permissionMap.put(permName, createPermission(permName,
+                    "Instructor permission to " + permName.replace("exams:", "").replace("-", " "),
+                    ResourceType.PHARMACY, getOperationTypeForPermission(permName), false));
+            }
+        }
+        
+        // Admin exam permissions
+        for (String permName : ExamPermissionConstants.ADMIN_PERMISSIONS) {
+            if (!permissionMap.containsKey(permName)) {
+                permissionMap.put(permName, createPermission(permName,
+                    "Admin permission to " + permName.replace("exams:", "").replace("-", " "),
+                    ResourceType.PHARMACY, getOperationTypeForPermission(permName), false));
+            }
+        }
+        
         return permissionMap;
+    }
+    
+    /**
+     * Helper method to determine operation type from permission name
+     */
+    private OperationType getOperationTypeForPermission(String permissionName) {
+        String lowerName = permissionName.toLowerCase();
+        if (lowerName.contains("create") || lowerName.contains("add")) {
+            return OperationType.CREATE;
+        } else if (lowerName.contains("view") || lowerName.contains("read") || lowerName.contains("login") || lowerName.contains("logout")) {
+            return OperationType.READ;
+        } else if (lowerName.contains("edit") || lowerName.contains("update") || lowerName.contains("reset") || lowerName.contains("verify")) {
+            return OperationType.UPDATE;
+        } else if (lowerName.contains("delete") || lowerName.contains("remove")) {
+            return OperationType.DELETE;
+        } else if (lowerName.contains("approve")) {
+            return OperationType.APPROVE;
+        } else if (lowerName.contains("reject")) {
+            return OperationType.REJECT;
+        } else if (lowerName.contains("manage") || lowerName.contains("impersonate")) {
+            return OperationType.MANAGE;
+        } else if (lowerName.contains("export")) {
+            return OperationType.EXPORT;
+        } else if (lowerName.contains("import")) {
+            return OperationType.IMPORT;
+        } else {
+            return OperationType.READ; // Default to READ
+        }
     }
 
     private Map<RoleEnum, Role> initializeRoles(Map<String, Permission> permissions) {
@@ -95,6 +166,11 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
         userPermissions.add(permissions.get("VIEW_PROFILE"));
         userPermissions.add(permissions.get("UPDATE_PROFILE"));
         
+        // Add auth basic user permissions
+        for (String permName : AuthPermissionConstants.BASIC_USER_PERMISSIONS) {
+            addPermissionIfExists(userPermissions, permissions, permName);
+        }
+        
         Role userRole = Role.builder()
                 .name(RoleEnum.USER)
                 .description("Base user role with minimal permissions")
@@ -103,10 +179,29 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
                 .system(true)
                 .build();
         roleMap.put(RoleEnum.USER, rolesRepository.save(userRole));
+        
+        // Create STUDENT role (precedence - 90)
+        Set<Permission> studentPermissions = new HashSet<>(userPermissions);
+        // Add student exam permissions
+        for (String permName : ExamPermissionConstants.STUDENT_PERMISSIONS) {
+            addPermissionIfExists(studentPermissions, permissions, permName);
+        }
+        
+        Role studentRole = Role.builder()
+                .name(RoleEnum.STUDENT)
+                .description("Student role with exam taking permissions")
+                .precedence(90)
+                .permissions(studentPermissions)
+                .system(true)
+                .build();
+        roleMap.put(RoleEnum.STUDENT, rolesRepository.save(studentRole));
 
         // Create PHARMACIST role (precedence - 80)
         Set<Permission> pharmacistPermissions = new HashSet<>(userPermissions);
         pharmacistPermissions.add(permissions.get("VIEW_PHARMACY_INVENTORY"));
+        // Add exam permissions like view and take
+        addPermissionIfExists(pharmacistPermissions, permissions, ExamPermissionConstants.VIEW_EXAMS);
+        addPermissionIfExists(pharmacistPermissions, permissions, ExamPermissionConstants.TAKE_EXAM);
         
         Role pharmacistRole = Role.builder()
                 .name(RoleEnum.PHARMACIST)
@@ -116,6 +211,58 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
                 .system(true)
                 .build();
         roleMap.put(RoleEnum.PHARMACIST, rolesRepository.save(pharmacistRole));
+        
+        // Create TECHNICIAN role (precedence - 75)
+        Set<Permission> technicianPermissions = new HashSet<>(pharmacistPermissions);
+        // Additional technician permissions if needed
+        
+
+        // Create INSTRUCTOR role (precedence - 70)
+        Set<Permission> instructorPermissions = new HashSet<>(userPermissions);
+        // Add instructor exam permissions
+        for (String permName : ExamPermissionConstants.INSTRUCTOR_PERMISSIONS) {
+            addPermissionIfExists(instructorPermissions, permissions, permName);
+        }
+        
+        Role instructorRole = Role.builder()
+                .name(RoleEnum.INSTRUCTOR)
+                .description("Instructor role with exam management permissions")
+                .precedence(70)
+                .permissions(instructorPermissions)
+                .system(true)
+                .build();
+        roleMap.put(RoleEnum.INSTRUCTOR, rolesRepository.save(instructorRole));
+        
+        // Create EXAM_CREATOR role (precedence - 65)
+        Set<Permission> examCreatorPermissions = new HashSet<>(userPermissions);
+        // Add specific exam creation permissions
+        addPermissionIfExists(examCreatorPermissions, permissions, ExamPermissionConstants.CREATE_EXAM);
+        addPermissionIfExists(examCreatorPermissions, permissions, ExamPermissionConstants.EDIT_EXAM);
+        addPermissionIfExists(examCreatorPermissions, permissions, ExamPermissionConstants.MANAGE_QUESTIONS);
+        addPermissionIfExists(examCreatorPermissions, permissions, ExamPermissionConstants.VIEW_EXAMS);
+        
+        Role examCreatorRole = Role.builder()
+                .name(RoleEnum.EXAM_CREATOR)
+                .description("Role for creating and managing exams")
+                .precedence(65)
+                .permissions(examCreatorPermissions)
+                .system(true)
+                .build();
+        roleMap.put(RoleEnum.EXAM_CREATOR, rolesRepository.save(examCreatorRole));
+
+        // Create SALESMAN role (precedence - 85)
+        Set<Permission> salesmanPermissions = new HashSet<>(userPermissions);
+        salesmanPermissions.add(permissions.get("PROCESS_SALES"));
+        salesmanPermissions.add(permissions.get("VIEW_SALES"));
+        
+        Role salesmanRole = Role.builder()
+                .name(RoleEnum.SALESMAN)
+                .description("Salesman role for processing sales")
+                .precedence(85)
+                .permissions(salesmanPermissions)
+                .system(true)
+                .build();
+        roleMap.put(RoleEnum.SALESMAN, rolesRepository.save(salesmanRole));
 
         // Create PHARMACY_MANAGER role (precedence - 60)
         Set<Permission> managerPermissions = new HashSet<>(pharmacistPermissions);
@@ -144,23 +291,9 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
                 .build();
         roleMap.put(RoleEnum.PROPRIETOR, rolesRepository.save(proprietorRole));
 
-        // Create SALESMAN role (precedence - 90)
-        Set<Permission> salesmanPermissions = new HashSet<>(userPermissions);
-        salesmanPermissions.add(permissions.get("PROCESS_SALES"));
-        salesmanPermissions.add(permissions.get("VIEW_SALES"));
-        
-        Role salesmanRole = Role.builder()
-                .name(RoleEnum.SALESMAN)
-                .description("Salesman role for processing sales")
-                .precedence(90)
-                .permissions(salesmanPermissions)
-                .system(true)
-                .build();
-        roleMap.put(RoleEnum.SALESMAN, rolesRepository.save(salesmanRole));
-
         // Create ADMIN role (precedence - 20)
-        Set<Permission> adminPermissions = new HashSet<>();
-        permissions.values().forEach(adminPermissions::add);
+        // Admin gets ALL permissions just like super admin
+        Set<Permission> adminPermissions = new HashSet<>(permissions.values());
         
         Role adminRole = Role.builder()
                 .name(RoleEnum.ADMIN)
@@ -172,26 +305,41 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
         roleMap.put(RoleEnum.ADMIN, rolesRepository.save(adminRole));
 
         // Create SUPER_ADMIN role (precedence - 10)
+        // Super admin gets ALL permissions
+        Set<Permission> superAdminPermissions = new HashSet<>(permissions.values());
+        
         Role superAdminRole = Role.builder()
                 .name(RoleEnum.SUPER_ADMIN)
                 .description("Super administrator with highest privileges")
                 .precedence(10)
-                .permissions(adminPermissions)
+                .permissions(superAdminPermissions)
                 .system(true)
                 .build();
         roleMap.put(RoleEnum.SUPER_ADMIN, rolesRepository.save(superAdminRole));
 
         return roleMap;
     }
+    
+    /**
+     * Helper method to add a permission to a set if it exists in the map
+     */
+    private void addPermissionIfExists(Set<Permission> permissions, Map<String, Permission> permissionMap, String permissionName) {
+        Permission permission = permissionMap.get(permissionName);
+        if (permission != null) {
+            permissions.add(permission);
+        } else {
+            log.warn("Permission not found: {}", permissionName);
+        }
+    }
 
     private void initializeGroups(Map<RoleEnum, Role> roles) {
         log.info("Initializing groups...");
         
-        // Create Staff Group (Pharmacists, Salesmen)
+        // Create Staff Group (Pharmacists, Salesmen, Technicians)
         Set<Role> staffRoles = new HashSet<>();
         staffRoles.add(roles.get(RoleEnum.PHARMACIST));
         staffRoles.add(roles.get(RoleEnum.SALESMAN));
-        
+
         Group staffGroup = Group.builder()
                 .name("PHARMACY_STAFF")
                 .description("Group for pharmacy staff members")
@@ -211,17 +359,52 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
                 .build();
         groupRepository.save(managementGroup);
         
+        // Create Education Group (Students, Instructors)
+        Set<Role> educationRoles = new HashSet<>();
+        educationRoles.add(roles.get(RoleEnum.STUDENT));
+        educationRoles.add(roles.get(RoleEnum.INSTRUCTOR));
+        educationRoles.add(roles.get(RoleEnum.EXAM_CREATOR));
+        
+        Group educationGroup = Group.builder()
+                .name("EDUCATION")
+                .description("Group for education-related roles")
+                .roles(educationRoles)
+                .build();
+        groupRepository.save(educationGroup);
+        
         // Create Admin Group
         Set<Role> adminRoles = new HashSet<>();
         adminRoles.add(roles.get(RoleEnum.ADMIN));
-        adminRoles.add(roles.get(RoleEnum.SUPER_ADMIN));
         
         Group adminGroup = Group.builder()
-                .name("SYSTEM_ADMINISTRATORS")
+                .name("Administrators")
                 .description("Group for system administrators")
                 .roles(adminRoles)
                 .build();
         groupRepository.save(adminGroup);
+        
+        // Create SuperAdmin Group
+        Set<Role> superAdminRoles = new HashSet<>();
+        superAdminRoles.add(roles.get(RoleEnum.SUPER_ADMIN));
+        superAdminRoles.add(roles.get(RoleEnum.ADMIN)); // Super admins also have admin roles
+        
+        Group superAdminGroup = Group.builder()
+                .name("SuperAdmins")
+                .description("Group for super administrators")
+                .roles(superAdminRoles)
+                .build();
+        groupRepository.save(superAdminGroup);
+        
+        // Create Demo User Group
+        Set<Role> demoRoles = new HashSet<>();
+        demoRoles.add(roles.get(RoleEnum.USER));
+        
+        Group demoGroup = Group.builder()
+                .name("DemoUsers")
+                .description("Group for demo users")
+                .roles(demoRoles)
+                .build();
+        groupRepository.save(demoGroup);
     }
 
     private Permission createPermission(String name, String description, 

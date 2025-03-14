@@ -5,7 +5,10 @@ import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.security.users.factory.UserTypeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +21,9 @@ import lombok.extern.slf4j.Slf4j;
  * Depends on GroupSeeder to ensure groups are created first.
  */
 @Component
-@DependsOn({"groupSeeder"})
+@Order(Ordered.LOWEST_PRECEDENCE - 50)
 @Slf4j
-public class DefaultUsersInitializer {
+public class DefaultUsersInitializer implements ApplicationListener<ContextRefreshedEvent> {
     private final UserTypeFactory userTypeFactory;
     private final UserRepository userRepository;
     
@@ -51,13 +54,14 @@ public class DefaultUsersInitializer {
     }
     
     /**
-     * Initialize default users if they don't exist.
+     * When the application is fully initialized,
+     * this method will run to create default users.
      */
-    @PostConstruct
+    @Override
     @Transactional
-    public void initialize() {
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
-            log.info("Initializing default users...");
+            log.info("Initializing default users on ContextRefreshedEvent...");
             createDefaultSuperAdmin();
             createDefaultAdmin();
             createDefaultDemoUser();
@@ -65,6 +69,15 @@ public class DefaultUsersInitializer {
         } catch (Exception e) {
             log.error("Error initializing default users", e);
         }
+    }
+    
+    /**
+     * Legacy initialization method - keeping for reference, but functionality
+     * has been moved to onApplicationEvent method.
+     */
+    @PostConstruct
+    public void initialize() {
+        log.info("PostConstruct method in DefaultUsersInitializer - not doing initialization here.");
     }
     
     /**

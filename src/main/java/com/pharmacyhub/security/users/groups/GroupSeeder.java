@@ -9,7 +9,8 @@ import com.pharmacyhub.security.infrastructure.RolesRepository;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
@@ -18,6 +19,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 /**
  * Seeds predefined groups for different user types.
@@ -27,8 +31,9 @@ import lombok.extern.slf4j.Slf4j;
  * - DemoUsers: Limited read-only access for demonstration
  */
 @Component
+@Order(Ordered.LOWEST_PRECEDENCE - 100)
 @Slf4j
-public class GroupSeeder {
+public class GroupSeeder implements ApplicationListener<ContextRefreshedEvent> {
     @Autowired
     private GroupRepository groupRepository;
     
@@ -41,20 +46,39 @@ public class GroupSeeder {
     /**
      * Initialize the predefined groups.
      */
-    @PostConstruct
+    @Override
     @Transactional
-    public void init() {
-        if (groupRepository.count() == 0) {
-            log.info("Initializing default user groups...");
-            createSuperAdminGroup();
-            createAdminGroup();
-            createDemoUserGroup();
-            log.info("Group initialization completed.");
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        log.info("Checking for groups in onApplicationEvent...");
+        
+        // We don't need to create the groups anymore since RoleInitializer handles that,
+        // but we'll verify they exist for DefaultUsersInitializer
+        boolean adminGroupExists = groupRepository.findByName("Administrators").isPresent();
+        boolean superAdminGroupExists = groupRepository.findByName("SuperAdmins").isPresent();
+        boolean demoGroupExists = groupRepository.findByName("DemoUsers").isPresent();
+        
+        if (adminGroupExists && superAdminGroupExists && demoGroupExists) {
+            log.info("All required groups exist. Ready for DefaultUsersInitializer.");
+        } else {
+            log.warn("Some required groups are missing. RoleInitializer may not have run correctly.");
+            if (!adminGroupExists) log.warn("Missing: Administrators group");
+            if (!superAdminGroupExists) log.warn("Missing: SuperAdmins group");
+            if (!demoGroupExists) log.warn("Missing: DemoUsers group");
         }
+    }
+    
+    /**
+     * This method is kept for reference but not used directly anymore.
+     * The initialization has been moved to onApplicationEvent.
+     */
+    @PostConstruct
+    public void init() {
+        log.info("PostConstruct method in GroupSeeder - not doing initialization here.");
     }
 
     /**
      * Creates the SuperAdmins group with full system access.
+     * NOT directly called via PostConstruct - handled by RoleInitializer.
      */
     private void createSuperAdminGroup() {
         if (groupRepository.findByName("SuperAdmins").isEmpty()) {
@@ -87,6 +111,7 @@ public class GroupSeeder {
 
     /**
      * Creates the Administrators group with administrative privileges.
+     * NOT directly called via PostConstruct - handled by RoleInitializer.
      */
     private void createAdminGroup() {
         if (groupRepository.findByName("Administrators").isEmpty()) {
@@ -115,6 +140,7 @@ public class GroupSeeder {
 
     /**
      * Creates the DemoUsers group with limited access for demonstration.
+     * NOT directly called via PostConstruct - handled by RoleInitializer.
      */
     private void createDemoUserGroup() {
         if (groupRepository.findByName("DemoUsers").isEmpty()) {

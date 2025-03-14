@@ -1,5 +1,6 @@
 package com.pharmacyhub.dto;
 
+import com.pharmacyhub.entity.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,14 @@ public class SalesmanDTO implements PHUserDTO
   private String previousPharmacyName;
   private String currentJobStatus;
   private String shiftTime;
+  private boolean openToConnect;
+  private boolean registered;
+  private String firstName;
+  private String lastName;
+  private String emailAddress;
+  
+  @Override
+  public UserType getUserType() {
+    return UserType.SALESMAN;
+  }
 }
