@@ -9,6 +9,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,11 +29,11 @@ public class JwtHelper
   @Autowired
   private RBACService rbacService;
 
-  //requirement :
-  public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+  @Value("${pharmacyhub.security.jwt.token-validity-in-seconds:18000}")
+  private long tokenValidityInSeconds;
 
-  //    public static final long JWT_TOKEN_VALIDITY =  60;
-  private String secret = "MIIBvTBXBgkqhkiG9w0BBQ0wY2V5lS9mwddwtSyzQ4YtRsG9CmEHYhWApO38Cm5L1HrHV4YJnYmmK9jgq+iWlLFDmB8s4TA6kMPWbCENlpr1kEXz4hLwY3ylH8XWI65WX2jGSn61jayCwpf1HPFBPDUaS5s3f92aKjk0AE8htsDBBiCVS3Yjq4QSbhfzuNIZ1TooXT9Xn+EJC0yjVnlTHZMfqrcA3OmVSi4kftugjAax4Z2qDqO+onkgeJAwP75scMcwH0SQUdrNrejgfIzJFWzcH9xWwKhOT9s9hLx2OfPlMtDDSJVRspqwwQrFQwinX0cR9Hx84rSMrFndxZi52o9EOLJ7cithncoW1KOAf7lIJIUzP0oIKkskAndQo2UiZsxgoMYuq02T07DOknc=";
+  @Value("${pharmacyhub.security.jwt.secret:pharmacyhub_jwt_secret_key_for_token_generation_and_validation_2025}")
+  private String secret;
 
   //retrieve username from jwt token
   public String getUsernameFromToken(String token)
@@ -56,7 +57,7 @@ public class JwtHelper
   protected Claims getAllClaimsFromToken(String token)
   {
     return Jwts.parserBuilder()
-            .setSigningKey(java.util.Base64.getEncoder().encode(secret.getBytes()))
+            .setSigningKey(io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes()))
             .build()
             .parseClaimsJws(token)
             .getBody();
@@ -142,7 +143,7 @@ public class JwtHelper
             .setClaims(claims)
             .setSubject(subject)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+            .setExpiration(new Date(System.currentTimeMillis() + tokenValidityInSeconds * 1000))
             .signWith(io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes()), io.jsonwebtoken.SignatureAlgorithm.HS512)
             .compact();
   }

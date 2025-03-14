@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,9 @@ public class AuthController extends BaseController
     private AuthenticationService authenticationService;
     @Autowired
     private UserService userService;
+    
+    @Value("${pharmacyhub.security.jwt.token-validity-in-seconds:18000}")
+    private long tokenValidityInSeconds;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -134,7 +138,7 @@ public class AuthController extends BaseController
         TokensDTO tokens = TokensDTO.builder()
                 .accessToken(token)
                 .tokenType("Bearer")
-                .expiresIn(5 * 60 * 60) // 5 hours expiry (matching JWT_TOKEN_VALIDITY)
+                .expiresIn(tokenValidityInSeconds) // Use the configured token validity
                 .build();
 
         // Create response DTO

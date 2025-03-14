@@ -44,3 +44,7 @@ pharmacyhub:
       pharmacy-manager: 11-20
       proprietor: 21-30
       salesman: 31-40
+  security:
+    jwt:
+      secret: pharmacyhub_jwt_secret_key_for_token_generation_and_validation_2025
+      token-validity-in-seconds: 18000  # 5 hours

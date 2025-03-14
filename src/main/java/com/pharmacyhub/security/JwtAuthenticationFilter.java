@@ -89,23 +89,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter
             logger.debug("Authentication successful for user: {}", username);
           } else {
             logger.warn("Token validation failed for user: {}", username);
+            // Don't return early, let the request continue as unauthenticated
           }
         } catch (UsernameNotFoundException e) {
           logger.error("User not found: {}", username);
-          sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid token", "User not found");
-          return;
+          // Don't return early, let the request continue as unauthenticated
         }
       }
     } catch (ExpiredJwtException e) {
       logger.error("JWT token is expired: {}", e.getMessage());
-      sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token expired", "Please login again");
-      return;
+      // Don't return early, let the request continue as unauthenticated
     } catch (MalformedJwtException e) {
       logger.error("Invalid JWT token: {}", e.getMessage());
-      sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid token", "Malformed JWT token");
-      return;
+      // Don't return early, let the request continue as unauthenticated
     } catch (Exception e) {
       logger.error("Error processing JWT token: {}", e.getMessage());
+      // Don't return early, let the request continue as unauthenticated
     }
     
     filterChain.doFilter(request, response);
