@@ -469,7 +469,7 @@ public class RBACService extends PHEngine
     @Cacheable(value = "featureAccess", key = "#userId + '_' + #featureCode")
     public boolean userHasFeatureAccess(Long userId, String featureCode) {
         Feature feature = featureRepository.findByCode(featureCode)
-                .orElseThrow(() -> RBACException.entityNotFound("Feature with code " + featureCode));
+                .orElseThrow(() -> new RBACException("Feature with code " + featureCode + " not found"));
                 
         // If feature is not active, deny access
         if (!feature.isActive()) {
@@ -511,7 +511,7 @@ public class RBACService extends PHEngine
         }
         
         Feature feature = featureRepository.findByCode(featureCode)
-                .orElseThrow(() -> RBACException.entityNotFound("Feature with code " + featureCode));
+                .orElseThrow(() -> new RBACException("Feature with code " + featureCode + " not found"));
                 
         // If feature doesn't have the specified operation, deny access
         if (!feature.getOperations().contains(operation)) {

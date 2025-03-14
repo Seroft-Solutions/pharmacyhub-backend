@@ -6,12 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity representing a system feature that requires access control
+ * Feature entity
+ * Represents a functional feature of the application
+ * Features can have permissions, operations, and be organized in a hierarchy
  */
 @Entity
 @Table(name = "features")
@@ -29,67 +30,38 @@ public class Feature {
 
     @Column
     private String description;
-
-    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    
+    @Column(unique = true, nullable = false)
+    private String code;
+    
+    @Column(nullable = false)
     @Builder.Default
-    private Set<FeaturePermission> featurePermissions = new HashSet<>();
+    private boolean active = true;
     
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "feature_permissions",
+        joinColumns = @JoinColumn(name = "feature_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    @Builder.Default
+    private Set<Permission> permissions = new HashSet<>();
     
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_feature_id")
+    private Feature parentFeature;
     
-    // Ensure name is never null
-    public String getName() {
-        return name != null ? name : "";
-    }
+    @OneToMany(mappedBy = "parentFeature", fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Feature> childFeatures = new HashSet<>();
     
-    public String getDescription() {
-        return description != null ? description : "";
-    }
-    
-    public Set<FeaturePermission> getFeaturePermissions() {
-        if (featurePermissions == null) {
-            return new HashSet<>();
-        }
-        return featurePermissions;
-    }
-    
-    public void setFeaturePermissions(Set<FeaturePermission> featurePermissions) {
-        this.featurePermissions = featurePermissions != null ? featurePermissions : new HashSet<>();
-    }
-    
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        
-        Feature feature = (Feature) o;
-        
-        if (id != null && feature.id != null) {
-            return id.equals(feature.id);
-        }
-        
-        return name != null && name.equals(feature.name);
-    }
-    
-    @Override
-    public int hashCode() {
-        if (id != null) {
-            return id.hashCode();
-        }
-        return name != null ? name.hashCode() : 0;
-    }
+    /**
+     * Operations supported by this feature
+     * Common operations include: READ, WRITE, DELETE, MANAGE, etc.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "feature_operations", joinColumns = @JoinColumn(name = "feature_id"))
+    @Column(name = "operation")
+    @Builder.Default
+    private Set<String> operations = new HashSet<>();
 }

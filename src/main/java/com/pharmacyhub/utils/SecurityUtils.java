@@ -1,74 +1,106 @@
 package com.pharmacyhub.utils;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
+/**
+ * Utility methods for security operations
+ */
 @Component
 public class SecurityUtils {
 
     /**
-     * Get the current authenticated username
-     * @return username or null if no authentication exists
+     * Get current user's username
      */
     public String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return "anonymous";
+        }
         
-        if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            return ((UserDetails) authentication.getPrincipal()).getUsername();
+        }
+        
+        return authentication.getName();
+    }
+    
+    /**
+     * Get current user's ID
+     */
+    public Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getPrincipal() == null) {
             return null;
         }
         
-        Object principal = authentication.getPrincipal();
-        
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
-        } else if (principal instanceof String) {
-            return (String) principal;
-        }
-        else {
-            return principal.toString();
-        }
-    }
-
-    /**
-     * Check if a user is authenticated
-     * @return true if user is authenticated, false otherwise
-     */
-    public boolean isAuthenticated() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.isAuthenticated() 
-               && !"anonymousUser".equals(authentication.getPrincipal());
-    }
-    
-    /**
-     * Get the current authenticated user's authorities
-     * @return Set of granted authority strings, or empty set if not authenticated
-     */
-    public Set<String> getCurrentUserAuthorities() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return Collections.emptySet();
+        if (authentication.getPrincipal() instanceof UserDetails) {
+            Object principal = authentication.getPrincipal();
+            // This depends on your UserDetails implementation
+            if (principal instanceof Object && principal.toString().contains("id=")) {
+                String id = principal.toString().split("id=")[1].split(",")[0];
+                try {
+                    return Long.parseLong(id);
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
         }
         
-        return authentication.getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.toSet());
-    }
-    
-    /**
-     * @deprecated Use getCurrentUsername() instead. This method is maintained for backward compatibility.
-     * @return Always returns null as we've moved away from numeric IDs
-     */
-    @Deprecated
-    public Long getCurrentUserId() {
         return null;
+    }
+    
+    /**
+     * Get current client's IP address
+     */
+    public String getCurrentClientIp() {
+        return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+                .filter(ServletRequestAttributes.class::isInstance)
+                .map(ServletRequestAttributes.class::cast)
+                .map(ServletRequestAttributes::getRequest)
+                .map(this::getClientIp)
+                .orElse("unknown");
+    }
+    
+    /**
+     * Get current user's agent
+     */
+    public String getCurrentUserAgent() {
+        return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+                .filter(ServletRequestAttributes.class::isInstance)
+                .map(ServletRequestAttributes.class::cast)
+                .map(ServletRequestAttributes::getRequest)
+                .map(request -> request.getHeader("User-Agent"))
+                .orElse("unknown");
+    }
+    
+    /**
+     * Extract client IP from request considering proxies
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String clientIp = request.getHeader("X-Forwarded-For");
+        if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getHeader("Proxy-Client-IP");
+        }
+        if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
+            clientIp = request.getRemoteAddr();
+        }
+        
+        // In case of multiple IPs from X-Forwarded-For, use the first one
+        if (clientIp != null && clientIp.contains(",")) {
+            clientIp = clientIp.split(",")[0].trim();
+        }
+        
+        return clientIp;
     }
 }

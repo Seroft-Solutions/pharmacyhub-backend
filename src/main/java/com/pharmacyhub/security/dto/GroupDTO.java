@@ -5,8 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Data Transfer Object for Group entity
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,5 +19,6 @@ public class GroupDTO {
     private Long id;
     private String name;
     private String description;
-    private Set<Long> roleIds;
+    @Builder.Default
+    private List<Long> roleIds = new ArrayList<>();
 }

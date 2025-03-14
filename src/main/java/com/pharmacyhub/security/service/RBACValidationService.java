@@ -77,7 +77,7 @@ public class RBACValidationService {
         // Check if resource type is valid
         if (permissionDTO.getResourceType() == null) {
             log.warn("Resource type not specified for permission {}, defaulting to USER", permissionDTO.getName());
-            permissionDTO.setResourceType(ResourceType.USER);
+            permissionDTO.setResourceType(ResourceType.USER.name());
         }
         
         // Check if operation type is valid

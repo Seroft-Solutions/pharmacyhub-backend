@@ -5,20 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * DTO for creating and updating feature permissions
+ * DTO for feature permission mappings
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class FeaturePermissionDTO {
-    private Long id;
-    private String accessLevel;
-    
-    @Builder.Default
-    private List<Long> permissionIds = new ArrayList<>();
+    private String name;
+    private String description;
 }

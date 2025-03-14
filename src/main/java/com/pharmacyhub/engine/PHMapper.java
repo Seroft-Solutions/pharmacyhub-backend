@@ -20,6 +20,7 @@ import com.pharmacyhub.security.infrastructure.RolesRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -172,7 +173,7 @@ public class PHMapper
             for (Permission permission : role.getPermissions()) {
                 permissionIds.add(permission.getId());
             }
-            dto.setPermissionIds(permissionIds);
+            dto.setPermissionIds(new ArrayList<>(permissionIds));
         }
 
         if (role.getChildRoles() != null && !role.getChildRoles().isEmpty())
@@ -180,7 +181,7 @@ public class PHMapper
             for (Role childRole : role.getChildRoles()) {
                 childRoleIds.add(childRole.getId());
             }
-            dto.setChildRoleIds(childRoleIds);
+            dto.setChildRoleIds(new ArrayList<>(childRoleIds));
         }
 
         return dto;
@@ -240,7 +241,7 @@ public class PHMapper
                 Role role = (Role) roleObj;
                 roleIds.add(role.getId());
             }
-            dto.setRoleIds(roleIds);
+            dto.setRoleIds(new ArrayList<>(roleIds));
         }
 
         return dto;

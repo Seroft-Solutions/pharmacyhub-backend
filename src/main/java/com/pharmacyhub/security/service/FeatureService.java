@@ -37,7 +37,7 @@ public class FeatureService {
      */
     public Feature getFeatureByCode(String code) {
         return featureRepository.findByCode(code)
-                .orElseThrow(() -> RBACException.entityNotFound("Feature with code " + code));
+                .orElseThrow(() -> new RBACException("Feature with code " + code + " not found"));
     }
 
     /**
@@ -47,16 +47,16 @@ public class FeatureService {
     public Feature createFeature(FeatureDTO featureDTO) {
         // Validate feature input
         if (featureDTO.getCode() == null || featureDTO.getCode().trim().isEmpty()) {
-            throw RBACException.invalidInput("Feature code is required");
+            throw new RBACException("Feature code is required");
         }
         
         if (featureDTO.getName() == null || featureDTO.getName().trim().isEmpty()) {
-            throw RBACException.invalidInput("Feature name is required");
+            throw new RBACException("Feature name is required");
         }
         
         // Check for duplicates
         if (featureRepository.findByCode(featureDTO.getCode()).isPresent()) {
-            throw RBACException.duplicateEntity("Feature with code " + featureDTO.getCode() + " already exists");
+            throw new RBACException("Feature with code " + featureDTO.getCode() + " already exists");
         }
         
         // Create the feature
@@ -65,12 +65,13 @@ public class FeatureService {
                 .description(featureDTO.getDescription())
                 .code(featureDTO.getCode())
                 .active(featureDTO.isActive())
+                .operations(new HashSet<>(featureDTO.getOperations()))
                 .build();
         
         // Set parent feature if provided
         if (featureDTO.getParentFeatureId() != null) {
             Feature parentFeature = featureRepository.findById(featureDTO.getParentFeatureId())
-                    .orElseThrow(() -> RBACException.entityNotFound("Parent Feature"));
+                    .orElseThrow(() -> new RBACException("Parent Feature not found"));
             feature.setParentFeature(parentFeature);
         }
         
@@ -80,7 +81,7 @@ public class FeatureService {
             
             for (String permissionName : featureDTO.getPermissions()) {
                 Permission permission = permissionRepository.findByName(permissionName)
-                        .orElseThrow(() -> RBACException.entityNotFound("Permission " + permissionName));
+                        .orElseThrow(() -> new RBACException("Permission " + permissionName + " not found"));
                 permissions.add(permission);
             }
             
@@ -104,7 +105,7 @@ public class FeatureService {
     @CacheEvict(value = {"featureAccess", "userFeatures"}, allEntries = true)
     public Feature updateFeature(Long featureId, FeatureDTO featureDTO) {
         Feature existingFeature = featureRepository.findById(featureId)
-                .orElseThrow(() -> RBACException.entityNotFound("Feature"));
+                .orElseThrow(() -> new RBACException("Feature not found"));
         
         // Update fields if provided
         if (featureDTO.getName() != null) {
@@ -119,7 +120,7 @@ public class FeatureService {
             // Check for duplicates if code is being changed
             if (!existingFeature.getCode().equals(featureDTO.getCode())) {
                 if (featureRepository.findByCode(featureDTO.getCode()).isPresent()) {
-                    throw RBACException.duplicateEntity("Feature with code " + featureDTO.getCode() + " already exists");
+                    throw new RBACException("Feature with code " + featureDTO.getCode() + " already exists");
                 }
             }
             existingFeature.setCode(featureDTO.getCode());
@@ -127,14 +128,19 @@ public class FeatureService {
         
         existingFeature.setActive(featureDTO.isActive());
         
+        // Update operations if provided
+        if (featureDTO.getOperations() != null) {
+            existingFeature.setOperations(new HashSet<>(featureDTO.getOperations()));
+        }
+        
         // Update parent feature if provided
         if (featureDTO.getParentFeatureId() != null) {
             if (featureDTO.getParentFeatureId().equals(featureId)) {
-                throw RBACException.invalidInput("A feature cannot be its own parent");
+                throw new RBACException("A feature cannot be its own parent");
             }
             
             Feature parentFeature = featureRepository.findById(featureDTO.getParentFeatureId())
-                    .orElseThrow(() -> RBACException.entityNotFound("Parent Feature"));
+                    .orElseThrow(() -> new RBACException("Parent Feature not found"));
             existingFeature.setParentFeature(parentFeature);
         } else if (featureDTO.getParentFeatureId() == null && existingFeature.getParentFeature() != null) {
             // Remove parent if null is explicitly provided
@@ -147,7 +153,7 @@ public class FeatureService {
             
             for (String permissionName : featureDTO.getPermissions()) {
                 Permission permission = permissionRepository.findByName(permissionName)
-                        .orElseThrow(() -> RBACException.entityNotFound("Permission " + permissionName));
+                        .orElseThrow(() -> new RBACException("Permission " + permissionName + " not found"));
                 permissions.add(permission);
             }
             
@@ -171,11 +177,11 @@ public class FeatureService {
     @CacheEvict(value = {"featureAccess", "userFeatures"}, allEntries = true)
     public void deleteFeature(Long featureId) {
         Feature feature = featureRepository.findById(featureId)
-                .orElseThrow(() -> RBACException.entityNotFound("Feature"));
+                .orElseThrow(() -> new RBACException("Feature not found"));
         
         // Check if feature has child features
         if (!feature.getChildFeatures().isEmpty()) {
-            throw RBACException.invalidOperation("Cannot delete feature with child features");
+            throw new RBACException("Cannot delete feature with child features");
         }
         
         featureRepository.delete(feature);
@@ -201,6 +207,7 @@ public class FeatureService {
                 .permissions(feature.getPermissions().stream()
                         .map(Permission::getName)
                         .collect(Collectors.toList()))
+                .operations(feature.getOperations())
                 .build();
         
         // Add child features if any

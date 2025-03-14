@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Entity to store security audit logs
+ */
 @Entity
 @Table(name = "audit_logs")
 @Data
@@ -18,29 +21,24 @@ public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private String username;
-
+    
     @Column(nullable = false)
     private String action;
-
+    
     @Column(length = 1000)
     private String details;
-
+    
     @Column(nullable = false)
     private String outcome;
-
+    
+    private String username;
+    
+    private Long userId;
+    
+    private String ipAddress;
+    
+    private String userAgent;
+    
     @Column(nullable = false)
     private LocalDateTime timestamp;
-
-    @Column(name = "user_id")
-    private Long userId;
-
-    @PrePersist
-    protected void onCreate() {
-        if (timestamp == null) {
-            timestamp = LocalDateTime.now();
-        }
-    }
 }

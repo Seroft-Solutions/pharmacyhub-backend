@@ -1,12 +1,13 @@
 package com.pharmacyhub.security.dto;
 
-import com.pharmacyhub.security.domain.OperationType;
-import com.pharmacyhub.security.domain.ResourceType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object for Permission entity
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,8 +16,6 @@ public class PermissionDTO {
     private Long id;
     private String name;
     private String description;
-    private ResourceType resourceType;
-    private OperationType operationType;
-    private boolean requiresApproval;
-    private String conditions;
+    private String resourceType;
+    private String operationType;
 }

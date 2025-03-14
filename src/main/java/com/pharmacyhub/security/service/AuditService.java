@@ -1,59 +1,51 @@
 package com.pharmacyhub.security.service;
 
-import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.domain.AuditLog;
 import com.pharmacyhub.security.infrastructure.AuditLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.pharmacyhub.utils.SecurityUtils;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
+/**
+ * Service for auditing security events
+ */
 @Service
+@Transactional
+@RequiredArgsConstructor
+@Slf4j
 public class AuditService {
-    
-    @Autowired
-    private AuditLogRepository auditLogRepository;
+    private final AuditLogRepository auditLogRepository;
+    private final SecurityUtils securityUtils;
 
+    /**
+     * Log a security event
+     *
+     * @param action  The action performed
+     * @param details Details of the action
+     * @param outcome Outcome of the action (SUCCESS, FAILURE, etc.)
+     */
     public void logSecurityEvent(String action, String details, String outcome) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth != null ? auth.getName() : "SYSTEM";
-        Long userId = null;
+        String username = securityUtils.getCurrentUsername();
+        Long userId = securityUtils.getCurrentUserId();
+        String ipAddress = securityUtils.getCurrentClientIp();
+        String userAgent = securityUtils.getCurrentUserAgent();
 
-        if (auth != null && auth.getPrincipal() instanceof User) {
-            User user = (User) auth.getPrincipal();
-            userId = user.getId();
-        }
-
-        AuditLog log = AuditLog.builder()
-                .username(username)
-                .userId(userId)
+        AuditLog auditLog = AuditLog.builder()
                 .action(action)
                 .details(details)
                 .outcome(outcome)
+                .username(username)
+                .userId(userId)
+                .ipAddress(ipAddress)
+                .userAgent(userAgent)
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        auditLogRepository.save(log);
-    }
-
-    public List<AuditLog> getUserAuditLogs(Long userId, Pageable pageable) {
-        return auditLogRepository.findByUserId(userId, pageable);
-    }
-
-    public List<AuditLog> getAllAuditLogs() {
-        return auditLogRepository.findAllByOrderByTimestampDesc();
-    }
-
-    public List<AuditLog> getAuditLogsByAction(String action) {
-        return auditLogRepository.findByActionOrderByTimestampDesc(action);
-    }
-
-    public List<AuditLog> getAuditLogsByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return auditLogRepository.findByTimestampBetweenOrderByTimestampDesc(startDate, endDate);
+        auditLogRepository.save(auditLog);
+        log.debug("Logged security event: {}, {}, {}", action, details, outcome);
     }
 }

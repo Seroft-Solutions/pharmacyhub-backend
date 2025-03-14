@@ -9,44 +9,44 @@ CREATE TABLE IF NOT EXISTS feature_operations (
 -- Add common operations to existing features
 -- For exam feature
 INSERT INTO feature_operations (feature_id, operation)
-SELECT id, 'READ' FROM features WHERE code = 'exams';
+SELECT id, 'READ' FROM features WHERE code = 'exam_management';
 
 INSERT INTO feature_operations (feature_id, operation)
-SELECT id, 'WRITE' FROM features WHERE code = 'exams';
+SELECT id, 'WRITE' FROM features WHERE code = 'exam_management';
 
 INSERT INTO feature_operations (feature_id, operation)
-SELECT id, 'DELETE' FROM features WHERE code = 'exams';
+SELECT id, 'DELETE' FROM features WHERE code = 'exam_management';
 
 INSERT INTO feature_operations (feature_id, operation)
-SELECT id, 'PUBLISH' FROM features WHERE code = 'exams';
+SELECT id, 'PUBLISH' FROM features WHERE code = 'exam_management';
 
 INSERT INTO feature_operations (feature_id, operation)
-SELECT id, 'TAKE' FROM features WHERE code = 'exams';
+SELECT id, 'TAKE' FROM features WHERE code = 'exam_management';
 
 -- Create standard operation-specific permissions
 INSERT INTO permissions (name, description, resource_type, operation_type)
 VALUES 
-('exams:READ', 'Permission to view exams', 'FEATURE', 'READ'),
-('exams:WRITE', 'Permission to create and edit exams', 'FEATURE', 'WRITE'),
-('exams:DELETE', 'Permission to delete exams', 'FEATURE', 'DELETE'),
-('exams:PUBLISH', 'Permission to publish exams', 'FEATURE', 'MANAGE'),
-('exams:TAKE', 'Permission to take exams', 'FEATURE', 'EXECUTE');
+('exam_management:READ', 'Permission to view exams', 'FEATURE', 'READ'),
+('exam_management:WRITE', 'Permission to create and edit exams', 'FEATURE', 'WRITE'),
+('exam_management:DELETE', 'Permission to delete exams', 'FEATURE', 'DELETE'),
+('exam_management:PUBLISH', 'Permission to publish exams', 'FEATURE', 'MANAGE'),
+('exam_management:TAKE', 'Permission to take exams', 'FEATURE', 'EXECUTE');
 
 -- Assign these permissions to existing roles
 -- For admin role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id 
 FROM roles r, permissions p 
-WHERE r.name = 'ADMIN' AND p.name IN ('exams:READ', 'exams:WRITE', 'exams:DELETE', 'exams:PUBLISH');
+WHERE r.name = 'ADMIN' AND p.name IN ('exam_management:READ', 'exam_management:WRITE', 'exam_management:DELETE', 'exam_management:PUBLISH');
 
 -- For student role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id 
 FROM roles r, permissions p 
-WHERE r.name = 'STUDENT' AND p.name IN ('exams:READ', 'exams:TAKE');
+WHERE r.name = 'STUDENT' AND p.name IN ('exam_management:READ', 'exam_management:TAKE');
 
 -- For instructor role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id 
 FROM roles r, permissions p 
-WHERE r.name = 'INSTRUCTOR' AND p.name IN ('exams:READ', 'exams:WRITE', 'exams:PUBLISH');
+WHERE r.name = 'INSTRUCTOR' AND p.name IN ('exam_management:READ', 'exam_management:WRITE', 'exam_management:PUBLISH');

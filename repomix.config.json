@@ -1,13 +1,13 @@
 {
   "output": {
-    "filePath": "repomix-output.xml",
-    "style": "xml",
+    "filePath": "repomix-output.md",
+    "style": "markdown",
     "parsableStyle": false,
     "fileSummary": true,
     "directoryStructure": true,
-    "removeComments": true,
-    "removeEmptyLines": true,
-    "compress": true,
+    "removeComments": false,
+    "removeEmptyLines": false,
+    "compress": false,
     "topFilesLength": 5,
     "showLineNumbers": false,
     "copyToClipboard": false
