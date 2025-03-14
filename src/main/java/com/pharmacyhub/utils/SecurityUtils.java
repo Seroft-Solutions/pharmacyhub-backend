@@ -43,14 +43,9 @@ public class SecurityUtils {
         
         if (authentication.getPrincipal() instanceof UserDetails) {
             Object principal = authentication.getPrincipal();
-            // This depends on your UserDetails implementation
-            if (principal instanceof Object && principal.toString().contains("id=")) {
-                String id = principal.toString().split("id=")[1].split(",")[0];
-                try {
-                    return Long.parseLong(id);
-                } catch (NumberFormatException e) {
-                    return null;
-                }
+            // Better way to get user ID from UserDetails than using toString()
+            if (principal instanceof com.pharmacyhub.entity.User) {
+                return ((com.pharmacyhub.entity.User) principal).getId();
             }
         }
         

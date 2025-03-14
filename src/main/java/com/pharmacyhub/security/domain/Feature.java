@@ -38,9 +38,10 @@ public class Feature {
     @Builder.Default
     private boolean active = true;
     
+    // Changed join table name to avoid conflict with FeaturePermission entity
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-        name = "feature_permissions",
+        name = "feature_to_permissions",  // Changed from "feature_permissions"
         joinColumns = @JoinColumn(name = "feature_id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )

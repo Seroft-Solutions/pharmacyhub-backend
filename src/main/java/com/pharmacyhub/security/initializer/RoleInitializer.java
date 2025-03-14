@@ -18,6 +18,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.util.*;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component("roleInitializer")
@@ -27,9 +29,12 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
     private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final GroupRepository groupRepository;
+    
+    // Store the current working set of permissions
+    private Map<String, Permission> permissionMap = new HashMap<>();
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = {Exception.class})
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
             if (rolesRepository.count() > 0) {
@@ -38,19 +43,28 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
             }
 
             log.info("Initializing default roles and permissions");
-            Map<String, Permission> permissions = initializePermissions();
+            // First get all existing permissions before attempting to create any new ones
+            List<Permission> existingPermissions = permissionRepository.findAll();
+            permissionMap = existingPermissions.stream()
+                .collect(Collectors.toMap(Permission::getName, p -> p));
+            
+            // Then initialize any missing permissions
+            Map<String, Permission> permissions = initializePermissions(permissionMap);
             Map<RoleEnum, Role> roles = initializeRoles(permissions);
             initializeGroups(roles);
             
             log.info("Role initialization completed successfully");
         } catch (Exception e) {
-            log.error("Error initializing roles: ", e);
+            log.error("Error initializing roles: {}", e.getMessage());
+            // Log the full stack trace at debug level
+            log.debug("Full stack trace:", e);
+            // Do not rethrow to prevent application startup from failing
         }
     }
 
-    private Map<String, Permission> initializePermissions() {
+    private Map<String, Permission> initializePermissions(Map<String, Permission> existingPermissions) {
         log.info("Initializing permissions...");
-        Map<String, Permission> permissionMap = new HashMap<>();
+        Map<String, Permission> permissionMap = new HashMap<>(existingPermissions);
         
         // Common permissions
         permissionMap.put("VIEW_PROFILE", createPermission("VIEW_PROFILE", 
@@ -410,8 +424,23 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
     private Permission createPermission(String name, String description, 
                                        ResourceType resourceType, OperationType operationType, 
                                        boolean requiresApproval) {
+        // First check if the permission is already in the permission map (from previous call)
+        Permission permission = permissionMap.get(name);
+        if (permission != null) {
+            log.info("Permission already exists in map: {}", name);
+            return permission;
+        }
+
         log.info("Creating permission: {}", name);
-        Permission permission = Permission.builder()
+        // Then check if permission already exists in the database to avoid duplicate key errors
+        Optional<Permission> existingPermission = permissionRepository.findByName(name);
+        if (existingPermission.isPresent()) {
+            log.info("Permission already exists in database: {}", name);
+            return existingPermission.get();
+        }
+        
+        // If not found anywhere, create a new permission
+        permission = Permission.builder()
                 .name(name)
                 .description(description)
                 .resourceType(resourceType)

@@ -131,4 +131,9 @@ public class Role {
         }
         return name != null ? name.hashCode() : 0;
     }
+    
+    @Override
+    public String toString() {
+        return "Role(id=" + id + ", name=" + (name != null ? name.toString() : "null") + ", precedence=" + precedence + ", system=" + system + ")";    
+    }
 }

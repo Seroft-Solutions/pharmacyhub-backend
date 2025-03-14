@@ -34,7 +34,7 @@ public class FeaturePermission {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "feature_permission_mappings",
-        joinColumns = @JoinColumn(name = "feature_permission_id"),
+        joinColumns = @JoinColumn(name = "feature_permission_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
     @Builder.Default

@@ -80,6 +80,7 @@ public class FeatureAccessController {
      * Returns a list of features with access details
      */
     @GetMapping("/user-features")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<List<FeatureAccessDTO>> getUserFeatures() {
         Long userId = securityUtils.getCurrentUserId();
         List<Feature> features = featureService.getAllFeatures();
@@ -169,6 +170,7 @@ public class FeatureAccessController {
      * Get the current user's access profile
      */
     @GetMapping("/profile")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<AccessProfile> getUserAccessProfile() {
         Long userId = securityUtils.getCurrentUserId();
         String username = securityUtils.getCurrentUsername();
