@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class JsonExamUploadRequestDTO {
@@ -24,6 +25,12 @@ public class JsonExamUploadRequestDTO {
     private Exam.ExamStatus status = Exam.ExamStatus.DRAFT;
     
     private List<String> tags;
+    
+    // Paper type (MODEL, PAST, SUBJECT, PRACTICE)
+    private String paperType;
+    
+    // Paper-specific metadata fields
+    private Map<String, Object> metadata;
     
     // The JSON content as a string (will be parsed by the service)
     @NotBlank(message = "JSON content is required")
