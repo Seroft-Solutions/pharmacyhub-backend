@@ -175,10 +175,15 @@ public class JsonExamUploadService {
         
         String answer = questionData.get("answer").toString();
         
-        // Extract just the letter if it's in a format like "A)" or "A) Option text"
+        // Extract just the label if it's in a format like "A)" or "A) Option text"
         if (answer.length() > 1) {
-            if (answer.matches("^[A-D]\\).*") || answer.matches("^[A-D]\\s.*")) {
+            if (answer.matches("^[A-Za-z]\\).*")) {
                 answer = answer.substring(0, 1);
+            } else if (answer.matches("^[A-Za-z]\\s.*")) {
+                answer = answer.substring(0, 1);
+            } else if (answer.contains(")")) {
+                // Try to get the first character before closing parenthesis
+                answer = answer.substring(0, answer.indexOf(")"));
             }
         }
         
@@ -222,7 +227,15 @@ public class JsonExamUploadService {
                 
                 // Generate labels A, B, C, D...
                 for (int i = 0; i < optionsList.size(); i++) {
-                    String label = String.valueOf((char) ('A' + i));
+                    // Generate standard labels (A, B, C, D...) for options
+                    String label;
+                    if (i < 26) {
+                        label = String.valueOf((char) ('A' + i));
+                    } else {
+                        // For more than 26 options, use AA, AB, etc.
+                        label = String.valueOf((char) ('A' + (i / 26) - 1)) + 
+                               String.valueOf((char) ('A' + (i % 26)));
+                    }
                     String text;
                     
                     // Handle different formats (string or object with text property)

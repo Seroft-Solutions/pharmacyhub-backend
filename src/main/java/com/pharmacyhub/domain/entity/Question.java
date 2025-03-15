@@ -40,7 +40,7 @@ public class Question
     private List<Option> options = new ArrayList<>();
 
     @NotBlank(message = "Correct answer is required")
-    @Column(name = "correct_answer", length = 1)
+    @Column(name = "correct_answer")
     private String correctAnswer;
 
     @Column(columnDefinition = "TEXT")

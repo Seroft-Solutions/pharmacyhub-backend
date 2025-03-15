@@ -27,7 +27,7 @@ public class Option {
     private String text;
 
     @NotBlank(message = "Option label is required")
-    @Column(name = "option_label", length = 1)
+    @Column(name = "option_label")
     private String label;
 
     @Column(name = "is_correct", nullable = false)
