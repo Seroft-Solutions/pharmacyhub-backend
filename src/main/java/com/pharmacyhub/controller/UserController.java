@@ -4,6 +4,8 @@ import com.pharmacyhub.constants.APIConstants;
 import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.dto.PHUserDTO;
 import com.pharmacyhub.dto.UserDTO;
+import com.pharmacyhub.dto.response.ApiResponse;
+import com.pharmacyhub.dto.response.UserProfileResponseDTO;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.service.UserService;
@@ -11,12 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(APIConstants.BASE_MAPPING)
@@ -52,6 +53,39 @@ public class UserController
       return new ResponseEntity<PHUserDTO>(user, HttpStatus.OK);
     }
     return new ResponseEntity<PHUserDTO>(user, HttpStatus.NOT_FOUND);
+  }
+
+  /**
+   * Endpoint to get the current user's profile information
+   * This endpoint is used by the frontend to get the logged-in user's profile
+   */
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/users/me")
+  public ResponseEntity<ApiResponse<UserProfileResponseDTO>> getCurrentUserProfile() {
+    User user = userService.getLoggedInUser();
+    
+    if (user == null) {
+      return ResponseEntity
+          .status(HttpStatus.NOT_FOUND)
+          .body(ApiResponse.error(HttpStatus.NOT_FOUND.value(), "User not found"));
+    }
+    
+    UserProfileResponseDTO profileDTO = new UserProfileResponseDTO();
+    profileDTO.setId(user.getId());
+    profileDTO.setUsername(user.getUsername());
+    profileDTO.setEmail(user.getEmailAddress());
+    profileDTO.setFirstName(user.getFirstName());
+    profileDTO.setLastName(user.getLastName());
+    profileDTO.setActive(user.isActive());
+    profileDTO.setRegistered(user.isRegistered());
+    
+    // You can add more user details as needed
+    Map<String, Object> metadata = new HashMap<>();
+    metadata.put("userType", user.getUserType());
+    
+    return ResponseEntity.ok(
+        ApiResponse.success(profileDTO, HttpStatus.OK.value(), metadata)
+    );
   }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
