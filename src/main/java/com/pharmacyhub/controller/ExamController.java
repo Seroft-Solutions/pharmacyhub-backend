@@ -393,7 +393,7 @@ public class ExamController {
         QuestionResponseDTO dto = new QuestionResponseDTO();
         dto.setId(question.getId());
         dto.setQuestionNumber(question.getQuestionNumber());
-        dto.setText(question.getQuestionText());
+        dto.setText(question.getQuestionText()); // Map questionText to text for frontend compatibility
         // Don't include the correct answer in the response for security
         dto.setExplanation(question.getExplanation());
         dto.setPoints(question.getMarks());
@@ -406,8 +406,8 @@ public class ExamController {
                     .map(option -> {
                         QuestionResponseDTO.OptionDTO optionDTO = new QuestionResponseDTO.OptionDTO();
                         optionDTO.setId(option.getId());
-                        optionDTO.setLabel(option.getLabel());
-                        optionDTO.setText(option.getText());
+                        optionDTO.setLabel(option.getLabel()); // This matches frontend's expected 'label' property
+                        optionDTO.setText(option.getText()); // This matches frontend's expected 'text' property
                         // Don't include isCorrect flag for security
                         return optionDTO;
                     })

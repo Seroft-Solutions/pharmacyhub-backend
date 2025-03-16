@@ -22,7 +22,7 @@ public class QuestionResponseDTO implements BaseDTO {
     
     private Long id;
     private Integer questionNumber;
-    private String text;
+    private String text; // Renamed from questionText to match frontend expectations
     @Builder.Default
     private List<OptionDTO> options = new ArrayList<>();
     private String explanation;

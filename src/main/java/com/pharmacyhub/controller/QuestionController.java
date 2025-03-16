@@ -143,7 +143,7 @@ public class QuestionController extends BaseController {
         QuestionResponseDTO dto = new QuestionResponseDTO();
         dto.setId(question.getId());
         dto.setQuestionNumber(question.getQuestionNumber());
-        dto.setText(question.getQuestionText());
+        dto.setText(question.getQuestionText()); // Map questionText to text for frontend
         // Don't include the correct answer in the response for security
         dto.setExplanation(question.getExplanation());
         dto.setPoints(question.getMarks());
