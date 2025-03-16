@@ -349,13 +349,43 @@ public class ExamController {
         dto.setStatus(exam.getStatus());
         dto.setTags(exam.getTags());
         
+        // Set difficulty - derive from tags if possible, otherwise use default MEDIUM
+        if (exam.getTags() != null) {
+            // Look for a difficulty tag (easy, medium, hard)
+            for (String tag : exam.getTags()) {
+                String lowercaseTag = tag.toLowerCase();
+                if (lowercaseTag.equals("easy") || lowercaseTag.equals("medium") || lowercaseTag.equals("hard")) {
+                    dto.setDifficulty(lowercaseTag.toUpperCase());
+                    break;
+                }
+            }
+        }
+        
         // Map questions if present (but don't include them for list operations)
         if (exam.getQuestions() != null && !exam.getQuestions().isEmpty()) {
             List<ExamResponseDTO.QuestionDTO> questionDTOs = exam.getQuestions().stream()
+                    .filter(q -> !q.isDeleted())
                     .map(this::mapToQuestionDTO)
                     .collect(Collectors.toList());
             dto.setQuestions(questionDTOs);
         }
+        
+        // Set additional fields that might be used by frontend
+        dto.setAttemptCount(0); // Replace with actual count when available
+        dto.setAverageScore(0.0); // Replace with actual average when available
+        
+        // Calculate the number of questions - this is crucial for the frontend
+        // Don't rely on getQuestionCount() method to calculate this explicitly
+        int questionCount = 0;
+        if (exam.getQuestions() != null) {
+            questionCount = (int) exam.getQuestions().stream()
+                    .filter(q -> !q.isDeleted())
+                    .count();
+        }
+        
+        // Log the data for debugging
+        logger.debug("Mapped exam with ID {} to DTO: title={}, questions={}, duration={}", 
+                exam.getId(), exam.getTitle(), questionCount, exam.getDuration());
         
         return dto;
     }
@@ -364,27 +394,32 @@ public class ExamController {
         ExamResponseDTO.QuestionDTO dto = new ExamResponseDTO.QuestionDTO();
         dto.setId(question.getId());
         dto.setQuestionNumber(question.getQuestionNumber());
-        dto.setQuestionText(question.getQuestionText());
+        dto.setText(question.getQuestionText()); // Now matches frontend's text field
         dto.setCorrectAnswer(question.getCorrectAnswer());
         dto.setExplanation(question.getExplanation());
         dto.setMarks(question.getMarks());
         dto.setTopic(question.getTopic());
-        dto.setDifficulty(question.getDifficulty());
+        dto.setDifficulty(question.getDifficulty() != null ? question.getDifficulty() : "MEDIUM");
         
         // Map options
         if (question.getOptions() != null) {
             List<ExamResponseDTO.OptionDTO> optionDTOs = question.getOptions().stream()
+                    .filter(option -> !option.isDeleted())
                     .map(option -> {
                         ExamResponseDTO.OptionDTO optionDTO = new ExamResponseDTO.OptionDTO();
                         optionDTO.setId(option.getId());
-                        optionDTO.setOptionKey(option.getLabel());
-                        optionDTO.setOptionText(option.getText());
+                        optionDTO.setLabel(option.getLabel()); // Frontend expects 'label'
+                        optionDTO.setText(option.getText());  // Frontend expects 'text'
                         optionDTO.setIsCorrect(option.getIsCorrect());
                         return optionDTO;
                     })
                     .collect(Collectors.toList());
             dto.setOptions(optionDTOs);
         }
+        
+        // Log the mapping for debugging purposes
+        logger.debug("Mapped question {} to DTO with {} options", question.getId(), 
+                (question.getOptions() != null ? question.getOptions().size() : 0));
         
         return dto;
     }
@@ -403,6 +438,7 @@ public class ExamController {
         // Map options without revealing which is correct
         if (question.getOptions() != null) {
             List<QuestionResponseDTO.OptionDTO> optionDTOs = question.getOptions().stream()
+                    .filter(option -> !option.isDeleted())
                     .map(option -> {
                         QuestionResponseDTO.OptionDTO optionDTO = new QuestionResponseDTO.OptionDTO();
                         optionDTO.setId(option.getId());
@@ -414,6 +450,11 @@ public class ExamController {
                     .collect(Collectors.toList());
             dto.setOptions(optionDTOs);
         }
+        
+        // Log the mapping for debugging purposes
+        logger.debug("Mapped question ID {} with {} options", 
+            question.getId(), 
+            question.getOptions() != null ? question.getOptions().size() : 0);
         
         return dto;
     }

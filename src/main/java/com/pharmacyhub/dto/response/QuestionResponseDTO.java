@@ -1,6 +1,7 @@
 package com.pharmacyhub.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pharmacyhub.dto.BaseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,12 @@ public class QuestionResponseDTO implements BaseDTO {
     private Integer points;
     private String topic;
     private String difficulty;
+    
+    // For frontend compatibility - maps points to marks
+    @JsonProperty("marks")
+    public Integer getMarks() {
+        return points;
+    }
     
     @Data
     @Builder

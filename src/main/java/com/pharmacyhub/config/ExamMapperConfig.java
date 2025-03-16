@@ -57,7 +57,7 @@ public class ExamMapperConfig {
             protected void configure() {
                 map().setId(source.getId());
                 map().setQuestionNumber(source.getQuestionNumber());
-                map().setQuestionText(source.getQuestionText());
+                map().setText(source.getQuestionText());
                 map().setCorrectAnswer(source.getCorrectAnswer());
                 map().setExplanation(source.getExplanation());
                 map().setMarks(source.getMarks());
@@ -68,8 +68,8 @@ public class ExamMapperConfig {
             @Override
             protected void configure() {
                 map().setId(source.getId());
-                map().setOptionKey(source.getLabel());
-                map().setOptionText(source.getText());
+                map().setLabel(source.getLabel());
+                map().setText(source.getText());
                 map().setIsCorrect(source.getIsCorrect());
             }
         });
