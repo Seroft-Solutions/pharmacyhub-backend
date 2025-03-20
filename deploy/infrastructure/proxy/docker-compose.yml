@@ -70,6 +70,7 @@ services:
       - "9000:9000"
     networks:
       - proxy-network
+    command: -H unix:///var/run/docker.sock  # Ensure Docker mode
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:9000"]
       interval: 30s

@@ -39,10 +39,57 @@ mkdir -p ./data/nginx/stream
 mkdir -p ./data/nginx/dead_host
 mkdir -p ./data/nginx/temp
 
-# Create resolvers.conf to prevent the error
-echo -e "${YELLOW}Creating resolvers.conf file...${NC}"
+# Create required configuration files
+echo -e "${YELLOW}Creating necessary configuration files...${NC}"
+
+# Create resolvers.conf
 cat > ./data/nginx/include/resolvers.conf << EOF
 resolver 127.0.0.11 valid=10s;
+EOF
+
+# Create log.conf
+cat > ./data/nginx/include/log.conf << EOF
+log_format proxy '[\$time_local] \$remote_addr - \$remote_user - \$server_name to: \$upstream_addr: \$request upstream_response_time \$upstream_response_time msec \$msec request_time \$request_time';
+access_log /var/log/nginx/access.log proxy;
+error_log /var/log/nginx/error.log warn;
+EOF
+
+# Create default locations conf
+cat > ./data/nginx/include/default-locations.conf << EOF
+location /stub_status {
+    allow 127.0.0.1;
+    deny all;
+    stub_status;
+}
+EOF
+
+# Create gzip.conf
+cat > ./data/nginx/include/gzip.conf << EOF
+gzip on;
+gzip_disable "msie6";
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 6;
+gzip_buffers 16 8k;
+gzip_http_version 1.1;
+gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+EOF
+
+# Create websocket.conf
+cat > ./data/nginx/include/websocket.conf << EOF
+proxy_set_header Upgrade \$http_upgrade;
+proxy_set_header Connection \$http_connection;
+proxy_http_version 1.1;
+EOF
+
+# Create proxy.conf
+cat > ./data/nginx/include/proxy.conf << EOF
+proxy_set_header Host \$host;
+proxy_set_header X-Real-IP \$remote_addr;
+proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto \$scheme;
+proxy_set_header X-Forwarded-Host \$host;
+proxy_set_header X-Forwarded-Port \$server_port;
 EOF
 
 # Create production.json config file
@@ -60,7 +107,8 @@ cat > ./data/production.json << EOF
 }
 EOF
 
-# Symlink config.json to production.json
+# Create a symbolic link from config.json to production.json
+echo -e "${YELLOW}Linking config.json to production.json...${NC}"
 ln -sf ./data/production.json ./data/config.json || true
 
 # Start database first
@@ -157,8 +205,8 @@ check_container_logs() {
 }
 
 # Wait for containers to be healthy
-echo -e "${YELLOW}Waiting for services to be ready...${NC}"
-sleep 15
+echo -e "${YELLOW}Waiting for services to be ready (30 seconds)...${NC}"
+sleep 30
 
 # Check container status
 echo -e "${YELLOW}Checking container status:${NC}"
