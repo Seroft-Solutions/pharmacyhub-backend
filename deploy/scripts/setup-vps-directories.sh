@@ -42,53 +42,15 @@ for ENV in "${ENVIRONMENTS[@]}"; do
   mkdir -p $ENV_DIR/data/keycloak
   mkdir -p $ENV_DIR/data/backups/postgres
   
-  # Set proper permissions
-  # Add NOPASSWD permission for postgres directory operations if needed
-  if [ "$CI" != "true" ] && ! sudo -n -l | grep -q "NOPASSWD: /usr/bin/chown"; then
-    echo -e "${YELLOW}Setting up NOPASSWD permissions for postgres directory management...${NC}"
-    
-    # Fix: Create a temporary file with proper sudoers syntax
-    # Use the actual username (root) instead of ubuntu
-    cat > /tmp/pharmacyhub-postgres-sudoers << 'EOF'
-root ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres
-root ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres
-EOF
-    
-    # Use visudo to safely install and validate the sudoers file
-    # Only proceed if not in CI mode
-    sudo visudo -cf /tmp/pharmacyhub-postgres-sudoers
-    if [ $? -eq 0 ]; then
-      sudo cp /tmp/pharmacyhub-postgres-sudoers /etc/sudoers.d/pharmacyhub-postgres
-      sudo chmod 440 /etc/sudoers.d/pharmacyhub-postgres
-      echo -e "${GREEN}Successfully created sudoers file${NC}"
-    else
-      echo -e "${RED}Failed to create valid sudoers file. Check syntax.${NC}"
-      exit 1
-    fi
-    
-    # Remove temporary file
-    rm -f /tmp/pharmacyhub-postgres-sudoers
-  else
-    echo -e "${YELLOW}Skipping sudoers setup (CI mode or already configured)${NC}"
-  fi
-  
-  # PostgreSQL data - postgres user (UID 999)
+  # Set permissions directly without using sudoers
+  # Use PostgreSQL's default UID (999) and GID (999)
+  echo -e "${YELLOW}Setting PostgreSQL directory permissions...${NC}"
   # Skip if running in CI environment
   if [ "$CI" != "true" ]; then
-    echo -e "${YELLOW}Setting PostgreSQL directory permissions...${NC}"
-    # Try without sudo first - might work if permissions are already correct
-    chown -R 999:999 "$ENV_DIR/data/postgres" 2>/dev/null || \
-    # Try non-interactive sudo
-    sudo -n chown -R 999:999 "$ENV_DIR/data/postgres" 2>/dev/null || \
-    # Try regular sudo as last resort
-    sudo chown -R 999:999 "$ENV_DIR/data/postgres" 2>/dev/null || \
-    echo "Warning: Could not set Postgres directory ownership. You may need to set it manually."
-    
-    # Similar approach for chmod
-    chmod 750 "$ENV_DIR/data/postgres" 2>/dev/null || \
-    sudo -n chmod 750 "$ENV_DIR/data/postgres" 2>/dev/null || \
-    sudo chmod 750 "$ENV_DIR/data/postgres" 2>/dev/null || \
-    echo "Warning: Could not set Postgres directory permissions. You may need to set them manually."
+    # Since we're running as root, we can set permissions directly
+    chown -R 999:999 $ENV_DIR/data/postgres
+    chmod 750 $ENV_DIR/data/postgres
+    echo -e "${GREEN}Set Postgres directory permissions${NC}"
   else
     echo -e "${YELLOW}Skipping PostgreSQL permissions (CI mode)${NC}"
   fi
