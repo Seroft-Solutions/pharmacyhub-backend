@@ -66,15 +66,15 @@ jobs:
         if: ${{ inputs.fix_sudoers }}
         run: |
           echo "Fixing sudoers file syntax..."
-          # Create temporary fix script
+          # Create temporary fix script with proper syntax and username
           cat > fix_sudoers.sh << 'EOF'
           #!/bin/bash
           set -e
           
           echo "Creating a properly formatted sudoers file..."
           cat > /tmp/pharmacyhub-postgres-sudoers << 'SUDOERS'
-          ubuntu ALL=(ALL) NOPASSWD:/usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres
-          ubuntu ALL=(ALL) NOPASSWD:/usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres
+          root ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres
+          root ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres
           SUDOERS
           
           # Validate the file
@@ -172,6 +172,7 @@ jobs:
           echo "Docker networks created successfully!"
 
       - name: Deploy Nginx Proxy Manager and Portainer
+        if: ${{ inputs.fix_proxy_manager }}
         run: |
           echo "Deploying Nginx Proxy Manager and Portainer..."
           # Copy infrastructure files
@@ -200,7 +201,7 @@ jobs:
             find /opt/PharmacyHub -type d -maxdepth 3 | sort
             
             echo 'Checking Nginx and Portainer containers...'
-            docker ps | grep -E 'nginx-proxy-manager|portainer'
+            docker ps | grep -E 'nginx-proxy-manager|portainer' || echo 'Some containers are not running!'
             
             echo 'Checking Nginx Proxy Manager status...'
             curl -s http://localhost:81 > /dev/null && echo 'Nginx Proxy Manager admin UI is accessible' || echo 'Nginx Proxy Manager admin UI is not available'

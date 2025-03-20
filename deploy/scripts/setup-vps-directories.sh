@@ -48,9 +48,10 @@ for ENV in "${ENVIRONMENTS[@]}"; do
     echo -e "${YELLOW}Setting up NOPASSWD permissions for postgres directory management...${NC}"
     
     # Fix: Create a temporary file with proper sudoers syntax
+    # Use the actual username (root) instead of ubuntu
     cat > /tmp/pharmacyhub-postgres-sudoers << 'EOF'
-ubuntu ALL=(ALL) NOPASSWD:/usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres
-ubuntu ALL=(ALL) NOPASSWD:/usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres
+root ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres
+root ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres
 EOF
     
     # Use visudo to safely install and validate the sudoers file
