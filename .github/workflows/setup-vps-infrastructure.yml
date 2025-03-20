@@ -22,6 +22,16 @@ on:
         required: false
         type: boolean
         default: false
+      fix_sudoers:
+        description: 'Fix sudoers file syntax issues'
+        required: false
+        type: boolean
+        default: true
+      fix_proxy_manager:
+        description: 'Fix Nginx Proxy Manager deployment'
+        required: false
+        type: boolean
+        default: true
 
 env:
   VPS_HOST: '103.135.45.76'
@@ -51,6 +61,50 @@ jobs:
 
       - name: Test SSH connection
         run: ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} 'echo "SSH connection successful"'
+
+      - name: Fix sudoers file syntax (if requested)
+        if: ${{ inputs.fix_sudoers }}
+        run: |
+          echo "Fixing sudoers file syntax..."
+          # Create temporary fix script
+          cat > fix_sudoers.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          
+          echo "Creating a properly formatted sudoers file..."
+          cat > /tmp/pharmacyhub-postgres-sudoers << 'SUDOERS'
+          ubuntu ALL=(ALL) NOPASSWD:/usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres
+          ubuntu ALL=(ALL) NOPASSWD:/usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres
+          SUDOERS
+          
+          # Validate the file
+          visudo -cf /tmp/pharmacyhub-postgres-sudoers
+          if [ $? -eq 0 ]; then
+            # Backup the old file if it exists
+            if [ -f /etc/sudoers.d/pharmacyhub-postgres ]; then
+              cp /etc/sudoers.d/pharmacyhub-postgres /etc/sudoers.d/pharmacyhub-postgres.bak
+            fi
+            
+            # Install the new file
+            cp /tmp/pharmacyhub-postgres-sudoers /etc/sudoers.d/pharmacyhub-postgres
+            chmod 440 /etc/sudoers.d/pharmacyhub-postgres
+            
+            echo "Sudoers file fixed successfully"
+            
+            # Verify file contents
+            cat /etc/sudoers.d/pharmacyhub-postgres
+          else
+            echo "Failed to create a valid sudoers file, check syntax"
+            exit 1
+          fi
+          
+          # Clean up
+          rm -f /tmp/pharmacyhub-postgres-sudoers
+          EOF
+          
+          # Copy and execute the script
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} fix_sudoers.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/tmp/
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /tmp/fix_sudoers.sh && /tmp/fix_sudoers.sh"
 
       - name: Copy infrastructure scripts
         run: |
@@ -106,7 +160,7 @@ jobs:
       - name: Setup VPS directories
         run: |
           echo "Setting up directory structure on VPS..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt && chmod +x setup-vps-directories.sh && ./setup-vps-directories.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt && chmod +x setup-vps-directories.sh && CI=true ./setup-vps-directories.sh"
           
           echo "VPS directory structure created successfully!"
 
@@ -117,7 +171,7 @@ jobs:
           
           echo "Docker networks created successfully!"
 
-      - name: Deploy Nginx and Portainer
+      - name: Deploy Nginx Proxy Manager and Portainer
         run: |
           echo "Deploying Nginx Proxy Manager and Portainer..."
           # Copy infrastructure files
@@ -131,7 +185,7 @@ jobs:
           scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./proxy_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           
           # Make scripts executable and start services
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x *.sh && ./run-custom-setup.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x *.sh && CI=true ./run-custom-setup.sh"
           
           echo "Nginx Proxy Manager and Portainer deployed successfully!"
 
@@ -152,7 +206,7 @@ jobs:
             curl -s http://localhost:81 > /dev/null && echo 'Nginx Proxy Manager admin UI is accessible' || echo 'Nginx Proxy Manager admin UI is not available'
             
             echo 'Checking MariaDB status...'
-            docker exec npm-db mysqladmin ping -h localhost -u npm -pnpm 2>/dev/null && echo 'MariaDB is responding to queries' || echo 'MariaDB is not responding'
+            docker exec npm-db mysqladmin ping -h localhost -u root -pnpm 2>/dev/null && echo 'MariaDB is responding to queries' || echo 'MariaDB is not responding'
           "
           
           echo "Infrastructure verification completed!"
