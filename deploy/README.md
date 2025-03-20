@@ -81,7 +81,7 @@ To manually deploy to a specific environment:
 
 ```bash
 # SSH to the VPS
-ssh ubuntu@175.111.97.58 -p 50489
+ssh root103.135.45.76 -p 22
 
 # Navigate to the environment directory
 cd /opt/CRM/dev/backend

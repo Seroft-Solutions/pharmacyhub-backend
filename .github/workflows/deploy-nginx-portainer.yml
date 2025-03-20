@@ -20,9 +20,9 @@ on:
         default: false
 
 env:
-  VPS_HOST: '175.111.97.58'
-  VPS_USER: 'ubuntu'
-  VPS_PORT: '50489'
+  VPS_HOST: '103.135.45.76'
+  VPS_USER: 'root'
+  VPS_PORT: '22'
   CI: 'true'
 
 jobs:

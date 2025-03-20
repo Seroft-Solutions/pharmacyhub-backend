@@ -24,9 +24,9 @@ on:
 
 env:
   DOCKER_IMAGE: syedus06/pharmacyhub-backend
-  VPS_HOST: '175.111.97.58'
-  VPS_USER: 'ubuntu'
-  VPS_PORT: '50489'
+  VPS_HOST: '103.135.45.76'
+  VPS_USER: 'root'
+  VPS_PORT: '22'
   CI: 'true'
 
 jobs:
@@ -147,7 +147,7 @@ jobs:
           ENV="$1"
           echo "Setting up permissions for $ENV environment"
           # We'll create this file on the server and run it locally there
-          chown -R ubuntu:ubuntu /opt/PharmacyHub/$ENV/
+          chown -R root:root /opt/PharmacyHub/$ENV/
           # These commands will be run by the user directly on the server
           # later in the deployment process
           EOF

@@ -50,17 +50,17 @@ for ENV in "${ENVIRONMENTS[@]}"; do
   sudo -n chmod 750 $ENV_DIR/data/postgres || sudo chmod 750 $ENV_DIR/data/postgres || true
   
   # Other directories - regular user
-  chown -R ubuntu:ubuntu $ENV_DIR/data/redis || true
+  chown -R root:root $ENV_DIR/data/redis || true
   # Keycloak directory ownership removed as it's not needed for PharmacyHub
-  chown -R ubuntu:ubuntu $ENV_DIR/data/backups || true
-  chown -R ubuntu:ubuntu $ENV_DIR/backend/logs || true
-  chown -R ubuntu:ubuntu $ENV_DIR/frontend/logs || true
+  chown -R root:root $ENV_DIR/data/backups || true
+  chown -R root:root $ENV_DIR/backend/logs || true
+  chown -R root:root $ENV_DIR/frontend/logs || true
   
   echo "Created and configured data directories for $ENV environment"
 done
 
 # Create nginx directory for Nginx Proxy Manager logs if needed
 mkdir -p $CRM_BASE/nginx/logs
-chown -R ubuntu:ubuntu $CRM_BASE/nginx/logs || true
+chown -R root:root $CRM_BASE/nginx/logs || true
 
 echo "PharmacyHub VPS directory setup completed successfully!"

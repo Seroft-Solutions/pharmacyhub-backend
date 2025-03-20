@@ -41,9 +41,9 @@ mkdir -p "$ENV_DIR/data/backups/postgres"
 # Permissions management with safer error handling
 echo "Setting up directory permissions..."
 # For user-owned directories, set permissions directly
-chown -R ubuntu:ubuntu "$ENV_DIR/data/redis" 2>/dev/null || true
-chown -R ubuntu:ubuntu "$ENV_DIR/data/backups" 2>/dev/null || true
-chown -R ubuntu:ubuntu "$BE_DIR/logs" 2>/dev/null || true
+chown -R root:root "$ENV_DIR/data/redis" 2>/dev/null || true
+chown -R root:root "$ENV_DIR/data/backups" 2>/dev/null || true
+chown -R root:root "$BE_DIR/logs" 2>/dev/null || true
 
 # If not running in GitHub Actions (CI=true is set by GitHub), try to set postgres permissions
 if [ "$CI" != "true" ]; then
