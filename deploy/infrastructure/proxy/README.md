@@ -1,90 +1,80 @@
-# CRM Proxy Infrastructure
+# Nginx Proxy Manager Configuration
 
-This directory contains the Nginx Proxy Manager and Portainer setup for the CRM system.
+This directory contains the Docker Compose configuration and related scripts for deploying Nginx Proxy Manager, which serves as a reverse proxy for the PharmacyHub application.
 
-## Components
+## Overview
 
-- **Nginx Proxy Manager**: A user-friendly reverse proxy with SSL management
-- **Portainer**: Docker container management UI
-- **MariaDB**: Database for Nginx Proxy Manager
+- **Nginx Proxy Manager**: Used for managing NGINX proxy hosts with an easy-to-use admin interface
+- **MariaDB**: Stores proxy configurations
+- **Portainer**: Web-based container management
 
-## Directory Structure
+## Automatic Proxy Loading
 
-```
-/proxy
-├── data/                                  # Nginx Proxy Manager data
-│   ├── nginx/                             # Nginx configurations
-│   │   └── proxy_host/                    # Individual proxy host configurations (1.conf, 2.conf, etc.)
-│   ├── letsencrypt-acme-challenge/        # ACME challenge for SSL verification
-│   └── keys.json                          # Encryption keys
-├── letsencrypt/                           # SSL certificates
-│   └── renewal/                           # SSL renewal configurations
-├── mysql/                                 # MariaDB database files
-├── docker-compose.yml                     # Deployment configuration
-└── docker-cleanup.sh                      # Utility script for Docker cleanup
-```
+The system has been enhanced to ensure proxy configurations are properly loaded at startup, fixing previous issues where proxies would not load automatically.
 
-## Proxy Host Configurations
+### Key Improvements
 
-The proxy host configurations are stored in the `data/nginx/proxy_host/` directory:
+1. **Service Startup Order**: Added `depends_on.condition: service_healthy` to ensure the database is fully ready before Nginx Proxy Manager starts
+2. **Database Health Checks**: Improved health checks for MariaDB with better timing and retry parameters
+3. **Configuration Persistence**: Enhanced volume mapping to ensure data persists correctly
+4. **Config.json**: Explicitly creates a `config.json` file with database connection details
+5. **Permission Management**: Sets proper file permissions on all data directories
+6. **Enhanced Startup Process**: Added proper sequence for container restart after config changes
 
-| Config   | Domain                | Service            | Port | Environment |
-|----------|----------------------|-------------------|------|-------------|
-| 1.conf   | dev.crmcup.com       | crm-frontend-dev  | 3000 | Development |
-| 2.conf   | auth.dev.crmcup.com  | keycloak-dev      | 8080 | Development |
-| 3.conf   | api.dev.crmcup.com   | crm-backend-dev   | 8081 | Development |
-| 4.conf   | portainer.crmcup.com | portainer         | 9000 | Shared      |
-| 5.conf   | nginx.crmcup.com     | nginx-proxy-manager| 81   | Shared      |
-| 6.conf   | auth.qa.crmcup.com   | keycloak-qa       | 8080 | QA          |
-| 7.conf   | qa.crmcup.com        | crm-frontend-qa   | 3000 | QA          |
-| 8.conf   | api.qa.crmcup.com    | crm-backend-qa    | 8082 | QA          |
-| 9.conf   | www.crmcup.com       | crm-frontend-prod | 3000 | Production  |
-| 10.conf  | api.crmcup.com       | crm-backend-prod  | 8080 | Production  |
-| 11.conf  | auth.crmcup.com      | keycloak-prod     | 8080 | Production  |
+## Usage
 
-## Environment Port Mapping
+The infrastructure is automatically deployed by the GitHub Actions workflow, but can also be managed manually:
 
-### Development Environment
-- Frontend: Container `crm-frontend-dev` on port 3000
-- Backend: Container `crm-backend-dev` on port 8081
-- Keycloak: Container `keycloak-dev` on port 8080
+### Manual Steps
 
-### QA Environment
-- Frontend: Container `crm-frontend-qa` on port 3000 (external 3010)
-- Backend: Container `crm-backend-qa` on port 8082
-- Keycloak: Container `keycloak-qa` on port 8080
+1. **Start Services**:
+   ```bash
+   cd /opt/PharmacyHub/infrastructure/proxy
+   docker-compose up -d
+   ```
 
-### Production Environment
-- Frontend: Container `crm-frontend-prod` on port 3000 (external 3020)
-- Backend: Container `crm-backend-prod` on port 8080
-- Keycloak: Container `keycloak-prod` on port 8080
+2. **Generate Proxy Configurations**:
+   ```bash
+   ./setup-proxy-configs.sh
+   ```
 
-## SSL Certificates
+3. **Check Status**:
+   ```bash
+   docker ps | grep nginx-proxy-manager
+   ```
 
-The SSL certificates are managed by Let's Encrypt and configured in the `letsencrypt/renewal/` directory.
+### Troubleshooting
 
-## Data Persistence
+If proxies are not loading after restart:
 
-All configuration data is preserved in Docker volumes:
+1. **Check Database Connection**:
+   ```bash
+   docker exec npm-db mysqladmin ping -h localhost -u npm -pnpm
+   ```
 
-- Nginx Proxy Manager data: `./data` directory
-- MariaDB database: `./mysql` directory
-- Let's Encrypt certificates: `./letsencrypt` directory
-- Portainer data: Docker named volume `portainer_data`
+2. **Verify Config Files**:
+   ```bash
+   ls -la /opt/PharmacyHub/infrastructure/proxy/data/
+   cat /opt/PharmacyHub/infrastructure/proxy/data/config.json
+   ```
 
-## Deployment
+3. **Check Permissions**:
+   ```bash
+   ls -la /opt/PharmacyHub/infrastructure/proxy/data/
+   ```
 
-The infrastructure is deployed using GitHub Actions. The workflow:
+4. **View Container Logs**:
+   ```bash
+   docker logs nginx-proxy-manager
+   ```
 
-1. Stops any running containers to prevent conflicts
-2. Creates a backup of existing configurations before deployment
-3. Deploys the updated configuration while preserving data
-4. Verifies that deployment was successful
+5. **Force Regenerate Configurations**:
+   ```bash
+   ./setup-proxy-configs.sh
+   ```
 
-See the `.github/workflows/deploy-nginx-portainer.yml` file for details.
+## Additional Information
 
-## Access 
-
-- Nginx Proxy Manager UI: `http://<server-ip>:81` or `https://nginx.crmcup.com`
-  - Default login: `admin@example.com` / `changeme`
-- Portainer UI: `http://<server-ip>:9000` or `https://portainer.crmcup.com`
+- Default admin credentials: admin@example.com / changeme (change after first login)
+- Admin interface: http://<server-ip>:81
+- All proxy configurations are stored in `data/nginx/proxy_host/` directory

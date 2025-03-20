@@ -19,9 +19,13 @@ services:
       DB_MYSQL_NAME: "npm"
     volumes:
       - ./data:/data
+      # Create volume binding for configuration to ensure persistence
+      - ./data/config.json:/app/config/production.json
+      - ./data/nginx:/etc/nginx/conf.d
       - ./letsencrypt:/etc/letsencrypt
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - proxy-network
     healthcheck:
@@ -48,10 +52,10 @@ services:
       - proxy-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Portainer - Docker Container Management
   portainer:

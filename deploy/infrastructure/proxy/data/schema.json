@@ -1,0 +1,91 @@
+{
+  "hosts": {
+    "id": {
+      "type": "serial",
+      "primary": true
+    },
+    "created_on": {
+      "type": "timestamp"
+    },
+    "modified_on": {
+      "type": "timestamp"
+    },
+    "owner_user_id": {
+      "type": "int"
+    },
+    "domain_names": {
+      "type": "json"
+    },
+    "forward_host": {
+      "type": "string",
+      "maxlength": 100
+    },
+    "forward_port": {
+      "type": "int"
+    },
+    "access_list_id": {
+      "type": "int"
+    },
+    "certificate_id": {
+      "type": "int"
+    },
+    "ssl_forced": {
+      "type": "boolean"
+    },
+    "caching_enabled": {
+      "type": "boolean"
+    },
+    "block_exploits": {
+      "type": "boolean"
+    },
+    "advanced_config": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "json"
+    },
+    "allow_websocket_upgrade": {
+      "type": "boolean"
+    },
+    "http2_support": {
+      "type": "boolean"
+    },
+    "forward_scheme": {
+      "type": "string",
+      "maxlength": 50
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "locations": {
+      "type": "json"
+    }
+  },
+  "users": {
+    "id": {
+      "type": "serial",
+      "primary": true
+    },
+    "created_on": {
+      "type": "timestamp"
+    },
+    "modified_on": {
+      "type": "timestamp"
+    },
+    "name": {
+      "type": "string",
+      "maxlength": 100
+    },
+    "nickname": {
+      "type": "string",
+      "maxlength": 100
+    },
+    "email": {
+      "type": "string",
+      "maxlength": 100
+    },
+    "roles": {
+      "type": "json"
+    }
+  }
+}

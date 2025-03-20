@@ -1,0 +1,153 @@
+{
+  "hosts": [
+    {
+      "id": 1,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "owner_user_id": 1,
+      "domain_names": ["dev.pharmacyhub.pk"],
+      "forward_host": "pharmacyhub-frontend-dev",
+      "forward_port": 3000,
+      "access_list_id": 0,
+      "certificate_id": 0,
+      "ssl_forced": false,
+      "caching_enabled": false,
+      "block_exploits": false,
+      "advanced_config": "",
+      "meta": {
+        "letsencrypt_agree": false
+      },
+      "allow_websocket_upgrade": true,
+      "http2_support": false,
+      "forward_scheme": "http",
+      "enabled": true,
+      "locations": []
+    },
+    {
+      "id": 3,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "owner_user_id": 1,
+      "domain_names": ["api.dev.pharmacyhub.pk"],
+      "forward_host": "pharmacyhub-backend-dev",
+      "forward_port": 8081,
+      "access_list_id": 0,
+      "certificate_id": 0,
+      "ssl_forced": false,
+      "caching_enabled": false,
+      "block_exploits": false,
+      "advanced_config": "",
+      "meta": {
+        "letsencrypt_agree": false
+      },
+      "allow_websocket_upgrade": true,
+      "http2_support": false,
+      "forward_scheme": "http",
+      "enabled": true,
+      "locations": []
+    },
+    {
+      "id": 4,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "owner_user_id": 1,
+      "domain_names": ["api.qa.pharmacyhub.pk"],
+      "forward_host": "pharmacyhub-backend-qa",
+      "forward_port": 8080,
+      "access_list_id": 0,
+      "certificate_id": 0,
+      "ssl_forced": false,
+      "caching_enabled": false,
+      "block_exploits": false,
+      "advanced_config": "",
+      "meta": {
+        "letsencrypt_agree": false
+      },
+      "allow_websocket_upgrade": true,
+      "http2_support": false,
+      "forward_scheme": "http",
+      "enabled": true,
+      "locations": []
+    },
+    {
+      "id": 5,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "owner_user_id": 1,
+      "domain_names": ["qa.pharmacyhub.pk"],
+      "forward_host": "pharmacyhub-frontend-qa",
+      "forward_port": 3000,
+      "access_list_id": 0,
+      "certificate_id": 0,
+      "ssl_forced": false,
+      "caching_enabled": false,
+      "block_exploits": false,
+      "advanced_config": "",
+      "meta": {
+        "letsencrypt_agree": false
+      },
+      "allow_websocket_upgrade": true,
+      "http2_support": false,
+      "forward_scheme": "http",
+      "enabled": true,
+      "locations": []
+    },
+    {
+      "id": 9,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "owner_user_id": 1,
+      "domain_names": ["www.pharmacyhub.pk"],
+      "forward_host": "pharmacyhub-frontend-prod",
+      "forward_port": 3000,
+      "access_list_id": 0,
+      "certificate_id": 0,
+      "ssl_forced": false,
+      "caching_enabled": false,
+      "block_exploits": false,
+      "advanced_config": "",
+      "meta": {
+        "letsencrypt_agree": false
+      },
+      "allow_websocket_upgrade": true,
+      "http2_support": false,
+      "forward_scheme": "http",
+      "enabled": true,
+      "locations": []
+    },
+    {
+      "id": 10,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "owner_user_id": 1,
+      "domain_names": ["api.pharmacyhub.pk"],
+      "forward_host": "pharmacyhub-backend-prod",
+      "forward_port": 8080,
+      "access_list_id": 0,
+      "certificate_id": 0,
+      "ssl_forced": false,
+      "caching_enabled": false,
+      "block_exploits": false,
+      "advanced_config": "",
+      "meta": {
+        "letsencrypt_agree": false
+      },
+      "allow_websocket_upgrade": true,
+      "http2_support": false,
+      "forward_scheme": "http",
+      "enabled": true,
+      "locations": []
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "created_on": "2024-03-20 02:15:00",
+      "modified_on": "2024-03-20 02:15:00",
+      "name": "Administrator",
+      "nickname": "Admin",
+      "email": "admin@example.com",
+      "roles": ["admin"]
+    }
+  ]
+}

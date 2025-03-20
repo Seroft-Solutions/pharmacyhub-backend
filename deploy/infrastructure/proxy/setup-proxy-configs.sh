@@ -5,10 +5,28 @@
 mkdir -p /opt/PharmacyHub/infrastructure/proxy/data/nginx/proxy_host
 mkdir -p /opt/PharmacyHub/infrastructure/proxy/data/letsencrypt-acme-challenge
 mkdir -p /opt/PharmacyHub/infrastructure/proxy/data/nginx/custom
+mkdir -p /opt/PharmacyHub/infrastructure/proxy/data/logs
 
 # Create empty custom server_proxy.conf if it doesn't exist
 if [ ! -f "/opt/PharmacyHub/infrastructure/proxy/data/nginx/custom/server_proxy.conf" ]; then
   touch "/opt/PharmacyHub/infrastructure/proxy/data/nginx/custom/server_proxy.conf"
+fi
+
+# Create config.json for Nginx Proxy Manager if it doesn't exist
+if [ ! -f "/opt/PharmacyHub/infrastructure/proxy/data/config.json" ]; then
+  cat > "/opt/PharmacyHub/infrastructure/proxy/data/config.json" << EOF
+{
+  "database": {
+    "engine": "mysql",
+    "host": "db",
+    "name": "npm",
+    "user": "npm",
+    "password": "npm",
+    "port": 3306
+  }
+}
+EOF
+  echo "Created config.json for Nginx Proxy Manager"
 fi
 
 # Define environments and their corresponding configs
@@ -125,6 +143,11 @@ EOF
 
   echo "Created backend proxy config for ${DOMAIN}"
 done
+
+# Set proper permissions for data directory
+echo "Setting correct permissions on data directory..."
+chmod -R 755 /opt/PharmacyHub/infrastructure/proxy/data
+chown -R 1000:1000 /opt/PharmacyHub/infrastructure/proxy/data
 
 # Need to restart Nginx Proxy Manager to apply changes
 echo "Restarting Nginx Proxy Manager to apply configurations..."
