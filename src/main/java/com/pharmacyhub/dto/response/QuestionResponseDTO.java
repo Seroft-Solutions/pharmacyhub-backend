@@ -30,6 +30,8 @@ public class QuestionResponseDTO implements BaseDTO {
     private Integer points;
     private String topic;
     private String difficulty;
+    private String correctAnswer;
+
     
     // For frontend compatibility - maps points to marks
     @JsonProperty("marks")

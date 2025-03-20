@@ -461,7 +461,7 @@ public class ExamController {
         dto.setPoints(question.getMarks());
         dto.setTopic(question.getTopic());
         dto.setDifficulty(question.getDifficulty());
-        
+        dto.setCorrectAnswer(question.getCorrectAnswer().replaceAll("\\([A-D]\\)\\s.*", "$1").replaceAll("[^A-D]", ""));
         // Map options without revealing which is correct
         if (question.getOptions() != null) {
             List<QuestionResponseDTO.OptionDTO> optionDTOs = question.getOptions().stream()
