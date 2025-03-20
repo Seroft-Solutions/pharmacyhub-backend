@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Nginx Proxy Manager - Reverse Proxy with SSL Support
   npm:
-    image: 'jc21/nginx-proxy-manager:latest'
+    image: 'jc21/nginx-proxy-manager:2.12.3'
     container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
@@ -55,7 +55,7 @@ services:
 
   # Portainer - Docker Container Management
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.28.1
     container_name: portainer
     restart: unless-stopped
     security_opt:
