@@ -66,12 +66,25 @@ public class SecurityConfig {
     }
 
     /**
-     * Configures CORS for the application
+     * Configures CORS for the application's secured endpoints.
+     * 
+     * IMPORTANT: This configuration takes precedence over the one in CorsConfig.java
+     * for secured endpoints. If you add new allowed origins here, make sure to also
+     * update CorsConfig.java to maintain consistency across the application.
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000", "https://pharmacyhub.pk"));
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:3000", 
+            "http://127.0.0.1:3000", 
+            "https://pharmacyhub.pk", 
+            "https://dev.pharmacyhub.pk", 
+            "https://www.pharmacyhub.pk", 
+            "http://pharmacyhub.pk", 
+            "http://dev.pharmacyhub.pk", 
+            "http://www.pharmacyhub.pk"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Cache-Control", "Pragma"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
