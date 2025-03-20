@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres-qa:
     image: postgres:12.20-alpine3.20
-    container_name: crm-postgres-qa
+    container_name: pharmacyhub-postgres-qa
     ports:
       - "5433:5432"
     environment:
-      - POSTGRES_DB=crm_qa
+      - POSTGRES_DB=pharmacyhub_qa
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${QA_DB_PASSWORD}
     volumes:
@@ -29,7 +29,7 @@ services:
 
   redis-qa:
     image: redis:7.2-alpine
-    container_name: crm-redis-qa
+    container_name: pharmacyhub-redis-qa
     ports:
       - "6380:6379"
     volumes:
@@ -51,12 +51,12 @@ services:
 
   keycloak-qa:
     image: quay.io/keycloak/keycloak:25.0.2
-    container_name: crm-keycloak-qa
+    container_name: pharmacyhub-keycloak-qa
     environment:
       - KEYCLOAK_ADMIN=${QA_KEYCLOAK_ADMIN_USER}
       - KEYCLOAK_ADMIN_PASSWORD=${QA_KEYCLOAK_ADMIN_PASSWORD}
       - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres-qa:5432/crm_qa
+      - KC_DB_URL=jdbc:postgresql://postgres-qa:5432/pharmacyhub_qa
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=${QA_DB_PASSWORD}
       - KC_HOSTNAME=${QA_KEYCLOAK_HOST}
@@ -83,13 +83,13 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  crm-backend-qa:
+  pharmacyhub-backend-qa:
     image: ${QA_BACKEND_DOCKER_IMAGE}
-    container_name: crm-backend-qa
+    container_name: pharmacyhub-backend-qa
     environment:
       - SPRING_PROFILES_ACTIVE=qa
       - SERVER_PORT=${QA_SERVER_PORT}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-qa:5432/crm_qa
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-qa:5432/pharmacyhub_qa
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=${QA_DB_PASSWORD}
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak-qa:8080
@@ -124,7 +124,7 @@ services:
 
 networks:
   qa-network:
-    name: crm-qa-network
+    name: pharmacyhub-qa-network
     driver: bridge
   proxy-network:
     name: proxy-network
@@ -132,21 +132,21 @@ networks:
 
 volumes:
   postgres_data_qa:
-    name: crm_postgres_data_qa
+    name: pharmacyhub_postgres_data_qa
     driver: local
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/qa/data/postgres
       o: bind
   keycloak_data_qa:
-    name: crm-keycloak-data-qa
+    name: pharmacyhub-keycloak-data-qa
     driver: local
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/qa/data/keycloak
       o: bind
   redis_data_qa:
-    name: crm-redis-data-qa
+    name: pharmacyhub-redis-data-qa
     driver: local
     driver_opts:
       type: none

@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres-local:
     image: postgres:12.20-alpine3.20
-    container_name: crm-postgres-local
+    container_name: pharmacyhub-postgres-local
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=crm_local
+      - POSTGRES_DB=pharmacyhub_local
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
@@ -18,7 +18,7 @@ services:
 
   redis-local:
     image: redis:7.2-alpine
-    container_name: crm-redis-local
+    container_name: pharmacyhub-redis-local
     ports:
       - "6379:6379"
     volumes:
@@ -30,12 +30,12 @@ services:
 
   keycloak-local:
     image: quay.io/keycloak/keycloak:25.0.2
-    container_name: crm-keycloak-local
+    container_name: pharmacyhub-keycloak-local
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin
       - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres-local:5432/crm_local
+      - KC_DB_URL=jdbc:postgresql://postgres-local:5432/pharmacyhub_local
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=postgres
       - KC_HOSTNAME=localhost
@@ -56,7 +56,7 @@ services:
 
 networks:
   local-network:
-    name: crm-local-network
+    name: pharmacyhub-local-network
     driver: bridge
 
 volumes:

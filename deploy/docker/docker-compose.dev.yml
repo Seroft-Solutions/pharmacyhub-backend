@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres-dev:
     image: postgres:12.20-alpine3.20
-    container_name: crm-postgres-dev
+    container_name: pharmacyhub-postgres-dev
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=crm_dev
+      - POSTGRES_DB=pharmacyhub_dev
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${DEV_DB_PASSWORD}
     volumes:
@@ -29,7 +29,7 @@ services:
 
   redis-dev:
     image: redis:7.2-alpine
-    container_name: crm-redis-dev
+    container_name: pharmacyhub-redis-dev
     ports:
       - "6379:6379"
     volumes:
@@ -51,12 +51,12 @@ services:
 
   keycloak-dev:
     image: quay.io/keycloak/keycloak:25.0.2
-    container_name: crm-keycloak-dev
+    container_name: pharmacyhub-keycloak-dev
     environment:
       - KEYCLOAK_ADMIN=${DEV_KEYCLOAK_ADMIN_USER}
       - KEYCLOAK_ADMIN_PASSWORD=${DEV_KEYCLOAK_ADMIN_PASSWORD}
       - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres-dev:5432/crm_dev
+      - KC_DB_URL=jdbc:postgresql://postgres-dev:5432/pharmacyhub_dev
       - KC_DB_USERNAME=postgres
       - KC_DB_PASSWORD=${DEV_DB_PASSWORD}
       - KC_HOSTNAME=${DEV_KEYCLOAK_HOST}
@@ -83,13 +83,13 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  crm-backend-dev:
+  pharmacyhub-backend-dev:
     image: ${DEV_BACKEND_DOCKER_IMAGE}
-    container_name: crm-backend-dev
+    container_name: pharmacyhub-backend-dev
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - SERVER_PORT=${DEV_SERVER_PORT}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/crm_dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-dev:5432/pharmacyhub_dev
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=${DEV_DB_PASSWORD}
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak-dev:8080
@@ -124,7 +124,7 @@ services:
 
 networks:
   dev-network:
-    name: crm-dev-network
+    name: pharmacyhub-dev-network
     driver: bridge
   proxy-network:
     name: proxy-network
@@ -132,21 +132,21 @@ networks:
 
 volumes:
   postgres_data_dev:
-    name: crm_postgres_data_dev
+    name: pharmacyhub_postgres_data_dev
     driver: local
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/dev/data/postgres
       o: bind
   keycloak_data_dev:
-    name: crm-keycloak-data-dev
+    name: pharmacyhub-keycloak-data-dev
     driver: local
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/dev/data/keycloak
       o: bind
   redis_data_dev:
-    name: crm-redis-data-dev
+    name: pharmacyhub-redis-data-dev
     driver: local
     driver_opts:
       type: none
