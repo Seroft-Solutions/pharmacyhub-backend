@@ -1,0 +1,172 @@
+name: PharmacyHub Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Set environment-specific variables
+        id: set_env
+        run: |
+          echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          
+          if [[ "${{ github.event.inputs.environment }}" == "dev" ]]; then
+            echo "API_URL=https://api.dev.pharmacyhub.pk" >> $GITHUB_ENV
+            echo "FRONTEND_URL=https://dev.pharmacyhub.pk" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "qa" ]]; then
+            echo "API_URL=https://api.qa.pharmacyhub.pk" >> $GITHUB_ENV
+            echo "FRONTEND_URL=https://qa.pharmacyhub.pk" >> $GITHUB_ENV
+          elif [[ "${{ github.event.inputs.environment }}" == "prod" ]]; then
+            echo "API_URL=https://api.pharmacyhub.pk" >> $GITHUB_ENV
+            echo "FRONTEND_URL=https://www.pharmacyhub.pk" >> $GITHUB_ENV
+          fi
+      
+      - name: Checkout backend code
+        uses: actions/checkout@v4
+        with:
+          repository: 'syedus06/pharmacyhub-backend'
+          ref: 'main'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: 'backend'
+          
+      - name: Checkout frontend code
+        uses: actions/checkout@v4
+        with:
+          repository: 'syedus06/pharmacyhub-frontend'
+          ref: 'main'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: 'frontend'
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.17.0'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+          
+      - name: Install test dependencies
+        run: |
+          cd frontend
+          npm install -g playwright
+          npm install @playwright/test axios
+          npx playwright install --with-deps
+          
+      - name: Create test script
+        run: |
+          mkdir -p integration-tests
+          cd integration-tests
+          
+          cat > basic-health-check.js << 'EOF'
+          const axios = require('axios');
+          const { test, expect } = require('@playwright/test');
+          
+          // Environment variables from GitHub workflow
+          const API_URL = process.env.API_URL;
+          const FRONTEND_URL = process.env.FRONTEND_URL;
+          
+          console.log(`Testing API: ${API_URL}`);
+          console.log(`Testing Frontend: ${FRONTEND_URL}`);
+          
+          // Basic health check test
+          test('Backend API is healthy', async () => {
+            try {
+              const response = await axios.get(`${API_URL}/actuator/health`);
+              console.log('Backend health check response:', response.data);
+              expect(response.status).toBe(200);
+              expect(response.data.status).toBe('UP');
+            } catch (error) {
+              console.error('Backend health check failed:', error.message);
+              throw error;
+            }
+          });
+          
+          // Test frontend is accessible
+          test('Frontend is accessible', async ({ page }) => {
+            try {
+              const response = await page.goto(FRONTEND_URL);
+              expect(response.status()).toBe(200);
+              
+              // Capture screenshot for verification
+              await page.screenshot({ path: 'frontend-screenshot.png' });
+              console.log('Frontend is accessible');
+            } catch (error) {
+              console.error('Frontend accessibility check failed:', error.message);
+              throw error;
+            }
+          });
+          
+          // Test basic user journey
+          test('Basic user journey', async ({ page }) => {
+            try {
+              // Visit the homepage
+              await page.goto(FRONTEND_URL);
+              
+              // Check that login form exists
+              const loginButton = await page.getByText('Login');
+              expect(await loginButton.isVisible()).toBe(true);
+              
+              console.log('Basic user journey test passed');
+            } catch (error) {
+              console.error('Basic user journey test failed:', error.message);
+              throw error;
+            }
+          });
+          EOF
+          
+          cat > playwright.config.js << 'EOF'
+          module.exports = {
+            testDir: './',
+            timeout: 60000,
+            use: {
+              headless: true,
+              viewport: { width: 1280, height: 720 },
+              trace: 'on-first-retry',
+              screenshot: 'only-on-failure',
+            },
+            projects: [
+              {
+                name: 'Chromium',
+                use: { browserName: 'chromium' },
+              },
+            ],
+          };
+          EOF
+          
+      - name: Run integration tests
+        env:
+          API_URL: ${{ env.API_URL }}
+          FRONTEND_URL: ${{ env.FRONTEND_URL }}
+        run: |
+          cd integration-tests
+          npx playwright test
+          
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-${{ env.DEPLOY_ENV }}
+          path: |
+            integration-tests/frontend-screenshot.png
+            integration-tests/test-results
+            
+      - name: Report test status
+        if: always()
+        run: |
+          if [ ${{ job.status }} == "success" ]; then
+            echo "✅ Integration tests for ${{ env.DEPLOY_ENV }} environment passed successfully!"
+          else
+            echo "❌ Integration tests for ${{ env.DEPLOY_ENV }} environment failed."
+          fi

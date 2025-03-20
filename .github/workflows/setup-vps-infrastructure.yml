@@ -1,0 +1,154 @@
+name: Initialize PharmacyHub VPS Infrastructure
+
+# Force the use of bash shell for all run steps
+defaults:
+  run:
+    shell: bash
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to initialize'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+      force_recreate:
+        description: 'Force recreate networks and directories'
+        required: false
+        type: boolean
+        default: false
+
+env:
+  VPS_HOST: '175.111.97.58'
+  VPS_USER: 'ubuntu'
+  VPS_PORT: '50489'
+  CI: 'true'
+
+jobs:
+  initialize-infrastructure:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Disable host key checking
+          echo "Host ${{ env.VPS_HOST }}" > ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} 'echo "SSH connection successful"'
+
+      - name: Copy infrastructure scripts
+        run: |
+          # Create a working directory
+          mkdir -p ./infrastructure_setup
+          
+          # Copy setup script with modifications
+          cp deploy/scripts/setup-vps-directories.sh ./infrastructure_setup/
+          
+          # Create network setup script
+          cat > ./infrastructure_setup/setup-networks.sh << 'EOF'
+          #!/bin/bash
+          # setup-networks.sh
+          # Creates the necessary Docker networks for PharmacyHub environments
+          
+          # Exit on any error
+          set -e
+          
+          # Environment names
+          ENVIRONMENTS=("dev" "qa" "prod")
+          
+          echo "Setting up Docker networks for PharmacyHub..."
+          
+          # Create the shared proxy network if it doesn't exist
+          if ! docker network inspect proxy-network >/dev/null 2>&1; then
+            echo "Creating proxy-network..."
+            docker network create proxy-network
+          else
+            echo "proxy-network already exists."
+          fi
+          
+          # Create environment-specific networks
+          for ENV in "${ENVIRONMENTS[@]}"; do
+            NETWORK_NAME="pharmacyhub-${ENV}-network"
+            
+            if ! docker network inspect $NETWORK_NAME >/dev/null 2>&1; then
+              echo "Creating $NETWORK_NAME..."
+              docker network create $NETWORK_NAME
+            else
+              echo "$NETWORK_NAME already exists."
+            fi
+          done
+          
+          echo "Docker network setup completed successfully!"
+          EOF
+          
+          # Make scripts executable
+          chmod +x ./infrastructure_setup/*.sh
+          
+          # Copy scripts to server
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./infrastructure_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/
+
+      - name: Setup VPS directories
+        run: |
+          echo "Setting up directory structure on VPS..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu && chmod +x setup-vps-directories.sh && ./setup-vps-directories.sh"
+          
+          echo "VPS directory structure created successfully!"
+
+      - name: Setup Docker networks
+        run: |
+          echo "Setting up Docker networks on VPS..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu && chmod +x setup-networks.sh && ./setup-networks.sh"
+          
+          echo "Docker networks created successfully!"
+
+      - name: Deploy Nginx and Portainer
+        run: |
+          echo "Deploying Nginx Proxy Manager and Portainer..."
+          # Copy infrastructure files
+          mkdir -p ./proxy_setup
+          cp -r deploy/infrastructure/proxy/* ./proxy_setup/
+          
+          # Create base directory on VPS
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy"
+          
+          # Copy files to VPS
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./proxy_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/
+          
+          # Make scripts executable and start services
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/infrastructure/proxy && chmod +x *.sh && docker-compose up -d"
+          
+          echo "Nginx Proxy Manager and Portainer deployed successfully!"
+
+      - name: Verify infrastructure
+        run: |
+          echo "Verifying infrastructure deployment..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
+            echo 'Checking Docker networks...'
+            docker network ls | grep -E 'proxy-network|pharmacyhub'
+            
+            echo 'Checking directory structure...'
+            find /home/ubuntu/PharmacyHub -type d -maxdepth 3 | sort
+            
+            echo 'Checking Nginx and Portainer containers...'
+            docker ps | grep -E 'nginx-proxy-manager|portainer'
+          "
+          
+          echo "Infrastructure verification completed!"
+          echo "Nginx Proxy Manager is accessible at: http://${{ env.VPS_HOST }}:81 or https://nginx.pharmacyhub.pk"
+          echo "Portainer is accessible at: http://${{ env.VPS_HOST }}:9000 or https://portainer.pharmacyhub.pk"
