@@ -33,7 +33,6 @@ env:
   VPS_USER: 'root'
   VPS_PORT: '22'
   CI: 'true'
-  GITHUB_MINUTES_SAVING: 'true'
 
 jobs:
   initialize-infrastructure:
@@ -124,10 +123,10 @@ jobs:
           
           echo "Docker networks created successfully!"
 
-      - name: Deploy Nginx Proxy Manager and Portainer
+      - name: Prepare Nginx Proxy Manager and Portainer
         if: ${{ inputs.fix_proxy_manager }}
         run: |
-          echo "Deploying Nginx Proxy Manager and Portainer..."
+          echo "Preparing Nginx Proxy Manager and Portainer files..."
           
           # Create infrastructure directory
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /opt/PharmacyHub/infrastructure/proxy"
@@ -136,27 +135,62 @@ jobs:
           scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/docker-compose.yml ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/run-custom-setup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           
-          # Make script executable and run asynchronously to save GitHub minutes
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x run-custom-setup.sh && nohup ./run-custom-setup.sh > setup.log 2>&1 &"
+          # Make script executable
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x run-custom-setup.sh"
           
-          # Wait a few seconds to see if it starts correctly
-          sleep 10
+          echo "Files transferred successfully. Creating launcher script..."
           
-          # Check if the process is running
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "ps aux | grep run-custom-setup.sh | grep -v grep"
+          # Create a launcher script that will run in background
+          cat > launch-proxy-setup.sh << 'EOF'
+          #!/bin/bash
+          cd /opt/PharmacyHub/infrastructure/proxy
+          ./run-custom-setup.sh > setup.log 2>&1
+          echo $? > setup_exit_code.txt
+          EOF
           
-          # Show beginning of the log
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "head -20 /opt/PharmacyHub/infrastructure/proxy/setup.log"
+          chmod +x launch-proxy-setup.sh
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} launch-proxy-setup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/
           
-          echo "Nginx Proxy Manager and Portainer deployment started in background."
-          echo "Check /opt/PharmacyHub/infrastructure/proxy/setup.log on the server for progress."
+          echo "Setup files prepared successfully"
+
+      - name: Launch Infrastructure Setup on VPS
+        if: ${{ inputs.fix_proxy_manager }}
+        run: |
+          echo "Starting infrastructure setup on VPS (this will run in background)..."
+          
+          # Create screen session to run the setup in
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
+            # Check if screen is installed
+            if ! command -v screen &> /dev/null; then
+              apt-get update && apt-get install -y screen
+            fi
+            
+            # Start screen session for setup
+            cd /opt
+            chmod +x launch-proxy-setup.sh
+            screen -dmS setup ./launch-proxy-setup.sh
+          "
+          
+          # Verify screen session started
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
+            if screen -list | grep -q setup; then
+              echo 'Setup started successfully in background screen session'
+            else
+              echo 'Failed to start setup screen session'
+              exit 1
+            fi
+          "
+          
+          echo "Infrastructure setup launched in background!"
 
       - name: Provide verification instructions
         run: |
           echo "Infrastructure deployment initiated!"
           echo ""
           echo "To verify completion, SSH to your server and run:"
-          echo "  tail -f /opt/PharmacyHub/infrastructure/proxy/setup.log"
+          echo "  screen -r setup  # To reattach to the running setup"
+          echo "  # Or"
+          echo "  cat /opt/PharmacyHub/infrastructure/proxy/setup.log  # To view the log"
           echo ""
           echo "To check container status once deployment completes:"
           echo "  docker ps | grep -E 'nginx-proxy-manager|portainer'"
