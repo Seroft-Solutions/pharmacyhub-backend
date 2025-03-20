@@ -73,4 +73,47 @@ public class ExamAccessEvaluator {
         logger.debug("Exam {} exists, granting access to user {}", examId, userId);
         return true;
     }
+    
+    /**
+     * Determines if the authenticated user can access the specified exam attempt.
+     * Access is granted if:
+     * 1. The user has an ADMIN or INSTRUCTOR role
+     * 2. The exam attempt belongs to the authenticated user
+     *
+     * @param authentication The current authentication context
+     * @param attemptId The ID of the exam attempt to check access for
+     * @return True if the user can access the exam attempt, false otherwise
+     */
+    public boolean canAccessAttempt(Authentication authentication, Long attemptId) {
+        if (authentication == null) {
+            logger.warn("Authentication is null when checking attempt access for attemptId: {}", attemptId);
+            return false;
+        }
+        
+        // If user has ADMIN or INSTRUCTOR role, they automatically have access
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        if (authorities.stream().anyMatch(a -> 
+                a.getAuthority().equals("ROLE_ADMIN") || 
+                a.getAuthority().equals("ROLE_INSTRUCTOR"))) {
+            logger.debug("User has ADMIN or INSTRUCTOR role, granting access to attempt: {}", attemptId);
+            return true;
+        }
+        
+        // Get the user ID from the authentication
+        String userId = authentication.getName();
+        logger.debug("Checking if user {} can access attempt {}", userId, attemptId);
+        
+        // Check if the attempt exists and belongs to the user
+        ExamAttempt attempt = examAttemptRepository.findById(attemptId).orElse(null);
+        if (attempt == null) {
+            logger.debug("Attempt {} doesn't exist, denying access", attemptId);
+            return false;
+        }
+        
+        // Check if the attempt belongs to the user
+        boolean isOwner = attempt.getUserId().equals(userId);
+        logger.debug("Attempt {} belongs to user {}: {}", attemptId, userId, isOwner);
+        
+        return isOwner;
+    }
 }

@@ -219,6 +219,33 @@ public class ExamController {
         }
     }
 
+    @DeleteMapping("/{examId}/questions/{questionId}")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.DELETE, permissionName = ExamPermissionConstants.MANAGE_QUESTIONS)
+    @Operation(summary = "Delete a specific question from an exam")
+    public ResponseEntity<ApiResponse<Void>> deleteQuestion(
+            @PathVariable Long examId,
+            @PathVariable Long questionId) {
+        logger.info("Deleting question {} from exam {}", questionId, examId);
+        try {
+            // Ensure the question belongs to the exam
+            Question existingQuestion = questionService.getQuestionById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + questionId));
+            if (!existingQuestion.getExam().getId().equals(examId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Question doesn't belong to the specified exam");
+            }
+            
+            // Delete the question
+            questionService.deleteQuestion(questionId);
+            
+            return ResponseEntity.ok(ApiResponse.success(null));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error deleting question: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error deleting question", e);
+        }
+    }
+
     @PostMapping
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
     @Operation(summary = "Create a new exam")
