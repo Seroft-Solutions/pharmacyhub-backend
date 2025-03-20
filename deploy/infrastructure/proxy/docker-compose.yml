@@ -78,7 +78,7 @@ services:
 networks:
   proxy-network:
     name: proxy-network
-    driver: bridge
+    external: true
 
 volumes:
   portainer_data:
