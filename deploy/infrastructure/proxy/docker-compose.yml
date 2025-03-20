@@ -1,41 +1,9 @@
-# Removed version attribute to avoid warnings
+version: '3.8'
 
 services:
-  # Nginx Proxy Manager - Reverse Proxy with SSL Support
-  npm:
-    image: 'jc21/nginx-proxy-manager:latest'
-    container_name: nginx-proxy-manager
-    restart: unless-stopped
-    ports:
-      - '0.0.0.0:80:80'   # Public HTTP Port
-      - '0.0.0.0:443:443' # Public HTTPS Port
-      - '0.0.0.0:81:81'   # Admin Web Port (Default credentials: admin@example.com / changeme)
-    environment:
-      # Database connection settings
-      DB_MYSQL_HOST: "db"
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: "npm"
-      DB_MYSQL_PASSWORD: "npm"
-      DB_MYSQL_NAME: "npm"
-    volumes:
-      - ./data:/data
-      - ./data/nginx:/etc/nginx/conf.d
-      - ./letsencrypt:/etc/letsencrypt
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - proxy-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s -f http://localhost:81 || exit 1"]
-      interval: 45s
-      timeout: 10s
-      retries: 6
-      start_period: 120s
-
-  # MariaDB database for Nginx Proxy Manager
+  # Database for Nginx Proxy Manager
   db:
-    image: 'mariadb:10.6.13'
+    image: 'mariadb:10.6.16'
     container_name: npm-db
     restart: unless-stopped
     environment:
@@ -48,16 +16,53 @@ services:
     networks:
       - proxy-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--silent", "-h", "localhost", "-u", "root", "-pnpm"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pnpm"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
-  # Portainer - Docker Container Management
+  # Nginx Proxy Manager
+  npm:
+    image: 'jc21/nginx-proxy-manager:2.10.3'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+      - '0.0.0.0:81:81'
+    environment:
+      # Database connection
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB_MYSQL_NAME: "npm"
+      # Disable HSTS by default - prevents HTTPS redirect lockout
+      DISABLE_HSTS: "true"
+      # Disable forced SSL - prevents lockout
+      DISABLE_FORCED_SSL: "true"
+      # Force HTTP for admin interface
+      FORCE_HTTP: "true"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - proxy-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --fail http://localhost:81/ping || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+
+  # Portainer - Container Management
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:2.19.4
     container_name: portainer
     restart: unless-stopped
     security_opt:
@@ -70,13 +75,12 @@ services:
       - "0.0.0.0:9000:9000"
     networks:
       - proxy-network
-    command: -H unix:///var/run/docker.sock  # Ensure Docker mode
     healthcheck:
-      test: ["CMD-SHELL", "curl -s -f http://localhost:9000 || exit 1"]
-      interval: 45s
-      timeout: 10s
-      retries: 6
-      start_period: 120s
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 networks:
   proxy-network:

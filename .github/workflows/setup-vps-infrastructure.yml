@@ -22,8 +22,8 @@ on:
         required: false
         type: boolean
         default: false
-      fix_proxy_manager:
-        description: 'Fix Nginx Proxy Manager deployment'
+      setup_infrastructure:
+        description: 'Setup Nginx Proxy Manager and Portainer'
         required: false
         type: boolean
         default: true
@@ -37,7 +37,7 @@ env:
 jobs:
   initialize-infrastructure:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Add timeout to save GitHub minutes
+    timeout-minutes: 15  # Increased timeout for full setup
     
     steps:
       - name: Checkout code
@@ -61,35 +61,23 @@ jobs:
       - name: Setup VPS directories
         run: |
           echo "Setting up directory structure on VPS..."
-          # Create a working directory
-          mkdir -p ./infrastructure_setup
           
           # Copy setup script
-          cp deploy/scripts/setup-vps-directories.sh ./infrastructure_setup/
-          chmod +x ./infrastructure_setup/setup-vps-directories.sh
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/scripts/setup-vps-directories.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/tmp/
           
-          # Copy to server and execute
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure_setup/setup-vps-directories.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt && chmod +x setup-vps-directories.sh && CI=true ./setup-vps-directories.sh"
+          # Make script executable and run it
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /tmp/setup-vps-directories.sh && cd /tmp && ./setup-vps-directories.sh"
           
           echo "VPS directory structure created successfully!"
 
       - name: Setup Docker networks
         run: |
           echo "Setting up Docker networks on VPS..."
+          
           # Create network setup script
           cat > ./setup-networks.sh << 'EOF'
           #!/bin/bash
-          # setup-networks.sh
-          # Creates the necessary Docker networks for PharmacyHub environments
-          
-          # Exit on any error
-          set -e
-          
-          # Environment names
-          ENVIRONMENTS=("dev" "qa" "prod")
-          
-          echo "Setting up Docker networks for PharmacyHub..."
+          # Create Docker networks for PharmacyHub environments
           
           # Create the shared proxy network if it doesn't exist
           if ! docker network inspect proxy-network >/dev/null 2>&1; then
@@ -100,7 +88,7 @@ jobs:
           fi
           
           # Create environment-specific networks
-          for ENV in "${ENVIRONMENTS[@]}"; do
+          for ENV in "dev" "qa" "prod"; do
             NETWORK_NAME="pharmacyhub-${ENV}-network"
             
             if ! docker network inspect $NETWORK_NAME >/dev/null 2>&1; then
@@ -118,87 +106,53 @@ jobs:
           chmod +x ./setup-networks.sh
           
           # Copy script to server and execute
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./setup-networks.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt && chmod +x setup-networks.sh && ./setup-networks.sh"
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./setup-networks.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/tmp/
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /tmp/setup-networks.sh && /tmp/setup-networks.sh"
           
           echo "Docker networks created successfully!"
 
-      - name: Prepare Nginx Proxy Manager and Portainer
-        if: ${{ inputs.fix_proxy_manager }}
+      - name: Deploy proxy infrastructure
+        if: ${{ inputs.setup_infrastructure }}
         run: |
-          echo "Preparing Nginx Proxy Manager and Portainer files..."
+          echo "Deploying Nginx Proxy Manager and Portainer..."
           
           # Create infrastructure directory
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /opt/PharmacyHub/infrastructure/proxy"
           
-          # Copy docker-compose and setup scripts
+          # Copy files to server
           scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/docker-compose.yml ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/run-custom-setup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/fix-connection-refused.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/diagnose-proxy-network.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/restart-proxy-services.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/setup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/manage.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/configure-firewall.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/README.md ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           
           # Make scripts executable
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x *.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /opt/PharmacyHub/infrastructure/proxy/*.sh"
           
-          echo "Files transferred successfully. Creating launcher script..."
+          # Configure firewall
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && ./configure-firewall.sh"
           
-          # Create a launcher script that will run in background
-          cat > launch-proxy-setup.sh << 'EOF'
-          #!/bin/bash
-          cd /opt/PharmacyHub/infrastructure/proxy
-          ./run-custom-setup.sh > setup.log 2>&1
-          echo $? > setup_exit_code.txt
-          EOF
+          # Run setup script
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && ./setup.sh"
           
-          chmod +x launch-proxy-setup.sh
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} launch-proxy-setup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/
-          
-          echo "Setup files prepared successfully"
+          echo "Infrastructure deployment completed!"
 
-      - name: Launch Infrastructure Setup on VPS
-        if: ${{ inputs.fix_proxy_manager }}
+      - name: Verify setup
+        if: ${{ inputs.setup_infrastructure }}
         run: |
-          echo "Starting infrastructure setup on VPS (this will run in background)..."
+          # Wait a moment for services to initialize
+          echo "Waiting 30 seconds for services to initialize..."
+          sleep 30
           
-          # Create screen session to run the setup in
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            # Check if screen is installed
-            if ! command -v screen &> /dev/null; then
-              apt-get update && apt-get install -y screen
-            fi
-            
-            # Start screen session for setup
-            cd /opt
-            chmod +x launch-proxy-setup.sh
-            screen -dmS setup ./launch-proxy-setup.sh
-          "
+          # Check container status
+          echo "Checking container status..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && docker-compose ps"
           
-          # Verify screen session started
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            if screen -list | grep -q setup; then
-              echo 'Setup started successfully in background screen session'
-            else
-              echo 'Failed to start setup screen session'
-              exit 1
-            fi
-          "
-          
-          echo "Infrastructure setup launched in background!"
-
-      - name: Provide verification instructions
-        run: |
-          echo "Infrastructure deployment initiated!"
+          # Provide access information
           echo ""
-          echo "To verify completion, SSH to your server and run:"
-          echo "  screen -r setup  # To reattach to the running setup"
-          echo "  # Or"
-          echo "  cat /opt/PharmacyHub/infrastructure/proxy/setup.log  # To view the log"
-          echo ""
-          echo "To check container status once deployment completes:"
-          echo "  docker ps | grep -E 'nginx-proxy-manager|portainer'"
-          echo ""
-          echo "Once deployed, you can access:"
+          echo "Access details:"
           echo "- Nginx Proxy Manager: http://${{ env.VPS_HOST }}:81"
           echo "  Default login: admin@example.com / changeme"
           echo "- Portainer: http://${{ env.VPS_HOST }}:9000"
+          echo ""
+          echo "Deployment complete!"

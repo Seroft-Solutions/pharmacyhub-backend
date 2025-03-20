@@ -1,80 +1,110 @@
-# Nginx Proxy Manager Configuration
+# PharmacyHub Infrastructure Setup
 
-This directory contains the Docker Compose configuration and related scripts for deploying Nginx Proxy Manager, which serves as a reverse proxy for the PharmacyHub application.
+This directory contains the stable, production-ready infrastructure setup for the PharmacyHub application. The setup includes Nginx Proxy Manager as a reverse proxy and Portainer for container management.
 
-## Overview
+## Components
 
-- **Nginx Proxy Manager**: Used for managing NGINX proxy hosts with an easy-to-use admin interface
-- **MariaDB**: Stores proxy configurations
-- **Portainer**: Web-based container management
+- **Nginx Proxy Manager**: Provides an easy-to-use admin interface for managing Nginx as a reverse proxy
+- **Portainer**: Web-based interface for managing Docker containers
+- **MariaDB**: Backend database for Nginx Proxy Manager
 
-## Automatic Proxy Loading
+## Quick Start
 
-The system has been enhanced to ensure proxy configurations are properly loaded at startup, fixing previous issues where proxies would not load automatically.
+To set up the infrastructure:
 
-### Key Improvements
+```bash
+# Navigate to the infrastructure directory
+cd /opt/PharmacyHub/infrastructure/proxy
 
-1. **Service Startup Order**: Added `depends_on.condition: service_healthy` to ensure the database is fully ready before Nginx Proxy Manager starts
-2. **Database Health Checks**: Improved health checks for MariaDB with better timing and retry parameters
-3. **Configuration Persistence**: Enhanced volume mapping to ensure data persists correctly
-4. **Config.json**: Explicitly creates a `config.json` file with database connection details
-5. **Permission Management**: Sets proper file permissions on all data directories
-6. **Enhanced Startup Process**: Added proper sequence for container restart after config changes
+# Make scripts executable
+chmod +x *.sh
 
-## Usage
+# Run the setup script
+./setup.sh
+```
 
-The infrastructure is automatically deployed by the GitHub Actions workflow, but can also be managed manually:
+Once setup is complete, you can access:
 
-### Manual Steps
+- **Nginx Proxy Manager**: `http://your-server-ip:81`
+  - Default login: `admin@example.com` / `changeme`
+- **Portainer**: `http://your-server-ip:9000`
+  - Set admin credentials on first login
 
-1. **Start Services**:
+## Management
+
+The `manage.sh` script provides easy management of the infrastructure:
+
+```bash
+# Get help
+./manage.sh help
+
+# Start all services
+./manage.sh start
+
+# Stop all services
+./manage.sh stop
+
+# Restart all services
+./manage.sh restart
+
+# Check status
+./manage.sh status
+
+# View logs
+./manage.sh logs
+
+# View logs for a specific service
+./manage.sh logs npm
+
+# Backup
+./manage.sh backup
+
+# Restore from backup
+./manage.sh restore ./backups/backup_20250320_123456.tar.gz
+
+# Complete reset (warning: destroys all data)
+./manage.sh reset
+```
+
+## Configuration
+
+The setup uses the following specific versions to ensure stability:
+
+- **Nginx Proxy Manager**: v2.10.3 (stable)
+- **MariaDB**: v10.6.16
+- **Portainer**: v2.19.4 (Community Edition)
+
+## Troubleshooting
+
+If you experience issues:
+
+1. Check service status:
    ```bash
-   cd /opt/PharmacyHub/infrastructure/proxy
-   docker-compose up -d
+   ./manage.sh status
    ```
 
-2. **Generate Proxy Configurations**:
+2. View logs:
    ```bash
-   ./setup-proxy-configs.sh
+   ./manage.sh logs
    ```
 
-3. **Check Status**:
+3. Restart services:
    ```bash
-   docker ps | grep nginx-proxy-manager
+   ./manage.sh restart
    ```
 
-### Troubleshooting
-
-If proxies are not loading after restart:
-
-1. **Check Database Connection**:
+4. If problems persist, you can perform a complete reset:
    ```bash
-   docker exec npm-db mysqladmin ping -h localhost -u npm -pnpm
+   ./manage.sh reset
    ```
+   **Note**: This will remove all configuration data
 
-2. **Verify Config Files**:
-   ```bash
-   ls -la /opt/PharmacyHub/infrastructure/proxy/data/
-   cat /opt/PharmacyHub/infrastructure/proxy/data/config.json
-   ```
+## Network Configuration
 
-3. **Check Permissions**:
-   ```bash
-   ls -la /opt/PharmacyHub/infrastructure/proxy/data/
-   ```
+The services use a Docker network named `proxy-network` which must be created before the services are started (the setup script handles this automatically).
 
-4. **View Container Logs**:
-   ```bash
-   docker logs nginx-proxy-manager
-   ```
+## Security Notes
 
-5. **Force Regenerate Configurations**:
-   ```bash
-   ./setup-proxy-configs.sh
-   ```
-
-## Additional Information
-
-- Default admin credentials: admin@example.com / changeme (change after first login)
-- Admin interface: http://<server-ip>:81
-- All proxy configurations are stored in `data/nginx/proxy_host/` directory
+- After first login to Nginx Proxy Manager, immediately change the default admin password
+- Configure Nginx Proxy Manager with proper SSL certificates for production use
+- Consider restricting access to the admin interfaces (ports 81 and 9000) to trusted IP addresses
