@@ -5,6 +5,7 @@ import com.pharmacyhub.domain.entity.ExamAttempt;
 import com.pharmacyhub.domain.entity.ExamResult;
 import com.pharmacyhub.domain.entity.UserAnswer;
 import com.pharmacyhub.dto.ExamResultDTO;
+import com.pharmacyhub.dto.request.AnswerSubmissionDTO;
 import com.pharmacyhub.dto.response.ExamAttemptResponseDTO;
 import com.pharmacyhub.dto.response.FlaggedQuestionResponseDTO;
 
@@ -31,12 +32,21 @@ public interface ExamAttemptService {
     ExamResultDTO submitExamAttempt(Long attemptId);
     
     /**
+     * Atomically processes final answers and submits an exam attempt
+     * Handles answer saving and status change in a single transaction
+     * 
+     * @param attemptId ID of the exam attempt
+     * @param finalAnswers List of final answers to save before submission
+     * @return Exam result
+     */
+    ExamResultDTO submitExamWithAnswers(Long attemptId, List<AnswerSubmissionDTO> finalAnswers);
+    
+    /**
      * Get the result for a completed exam
      * @param attemptId the exam attempt ID
      * @return the exam result
      */
     ExamResultDTO getExamResult(Long attemptId);
-    
     /**
      * Flag a question for review later
      * @param attemptId the exam attempt ID

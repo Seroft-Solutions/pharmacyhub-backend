@@ -10,6 +10,7 @@ import com.pharmacyhub.domain.repository.QuestionRepository;
 import com.pharmacyhub.dto.ExamResultDTO;
 import com.pharmacyhub.dto.response.ExamAttemptResponseDTO;
 import com.pharmacyhub.dto.response.FlaggedQuestionResponseDTO;
+import com.pharmacyhub.dto.request.AnswerSubmissionDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,6 +149,63 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         
         // Calculate and save result
         ExamResult result = calculateExamResult(attempt);
+        
+        // Map to DTO
+        return mapToExamResultDTO(result, attempt);
+    }
+    
+    @Override
+    @Transactional
+    public ExamResultDTO submitExamWithAnswers(Long attemptId, List<AnswerSubmissionDTO> finalAnswers) {
+        logger.info("Submitting exam with answers for attempt ID: {}", attemptId);
+        
+        ExamAttempt attempt = examAttemptRepository.findByIdAndNotDeleted(attemptId)
+                .orElseThrow(() -> new EntityNotFoundException("Exam attempt not found with id: " + attemptId));
+        
+        if (attempt.getStatus() != ExamAttempt.AttemptStatus.IN_PROGRESS) {
+            throw new IllegalStateException("Cannot submit an exam that is not in progress");
+        }
+        
+        // Process any final answers if provided
+        if (finalAnswers != null && !finalAnswers.isEmpty()) {
+            logger.info("Processing {} final answers for attempt ID: {}", finalAnswers.size(), attemptId);
+            
+            for (AnswerSubmissionDTO answer : finalAnswers) {
+                Question question = questionRepository.findById(answer.getQuestionId())
+                        .orElseThrow(() -> new EntityNotFoundException("Question not found with id: " + answer.getQuestionId()));
+                
+                // Check if an answer for this question already exists
+                Optional<UserAnswer> existingAnswer = userAnswerRepository.findByAttemptIdAndQuestionId(
+                        attemptId, answer.getQuestionId());
+                
+                if (existingAnswer.isPresent()) {
+                    // Update existing answer
+                    UserAnswer userAnswer = existingAnswer.get();
+                    userAnswer.setSelectedOptionId(answer.getSelectedOptionId());
+                    userAnswer.setTimeSpent(answer.getTimeSpent());
+                    userAnswerRepository.save(userAnswer);
+                } else {
+                    // Save new answer
+                    UserAnswer newAnswer = new UserAnswer();
+                    newAnswer.setAttempt(attempt);
+                    newAnswer.setQuestion(question);
+                    newAnswer.setSelectedOptionId(answer.getSelectedOptionId());
+                    newAnswer.setTimeSpent(answer.getTimeSpent());
+                    userAnswerRepository.save(newAnswer);
+                    attempt.getAnswers().add(newAnswer);
+                }
+            }
+        }
+        
+        // Update attempt status
+        attempt.setStatus(ExamAttempt.AttemptStatus.COMPLETED);
+        attempt.setEndTime(LocalDateTime.now());
+        examAttemptRepository.save(attempt);
+        
+        // Calculate and save result
+        ExamResult result = calculateExamResult(attempt);
+        
+        logger.info("Successfully submitted exam for attempt ID: {}", attemptId);
         
         // Map to DTO
         return mapToExamResultDTO(result, attempt);

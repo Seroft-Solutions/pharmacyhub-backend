@@ -115,20 +115,8 @@ public class ExamAttemptController {
         logger.info("User {} submitting exam attempt {}", userId, attemptId);
         
         try {
-            // Process any final answers if provided
-            if (finalAnswers != null && !finalAnswers.isEmpty()) {
-                for (AnswerSubmissionDTO answer : finalAnswers) {
-                    examAttemptService.saveAnswer(
-                        attemptId, 
-                        answer.getQuestionId(), 
-                        answer.getSelectedOptionId(), 
-                        answer.getTimeSpent()
-                    );
-                }
-            }
-            
-            // Submit the exam and get results
-            ExamResultDTO result = examAttemptService.submitExamAttempt(attemptId);
+            // Use the atomic method to handle both answers and submission in a single transaction
+            ExamResultDTO result = examAttemptService.submitExamWithAnswers(attemptId, finalAnswers);
             
             return ResponseEntity.ok(ApiResponse.<ExamResultDTO>success(result));
         } catch (Exception e) {

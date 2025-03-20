@@ -1,0 +1,245 @@
+name: CRM Backend Deployment
+
+# Force the use of bash shell for all run steps
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches: [ dev, qa, main ]
+  pull_request:
+    branches: [ dev, qa, main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+
+env:
+  DOCKER_IMAGE: syedus06/crm-backend
+  VPS_HOST: '175.111.97.58'
+  VPS_USER: 'ubuntu'
+  VPS_PORT: '50489'
+  CI: 'true'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Determine environment
+        id: set_env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "DEPLOY_ENV=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+            echo "ENV_FILE=.env.${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/heads/dev ]]; then
+            echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
+            echo "ENV_FILE=.env.dev" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=dev" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/heads/qa ]]; then
+            echo "DEPLOY_ENV=qa" >> $GITHUB_ENV
+            echo "ENV_FILE=.env.qa" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=qa" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/heads/main ]]; then
+            echo "DEPLOY_ENV=prod" >> $GITHUB_ENV
+            echo "ENV_FILE=.env.prod" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=main" >> $GITHUB_ENV
+          else
+            echo "Unknown branch, defaulting to dev"
+            echo "DEPLOY_ENV=dev" >> $GITHUB_ENV
+            echo "ENV_FILE=.env.dev" >> $GITHUB_ENV
+            echo "DEPLOY_BRANCH=dev" >> $GITHUB_ENV
+          fi
+          echo "Deploying to ${{ env.DEPLOY_ENV }} environment from $GITHUB_REF"
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+      
+      - name: Build Docker image
+        run: docker build -t ${{ env.DOCKER_IMAGE }}:${{ env.DEPLOY_ENV }} .
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Push Docker image
+        run: docker push ${{ env.DOCKER_IMAGE }}:${{ env.DEPLOY_ENV }}
+      
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Disable host key checking
+          echo "Host ${{ env.VPS_HOST }}" > ~/.ssh/config
+          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+          echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} 'echo "SSH connection successful"'
+
+      - name: Backup existing database
+        run: |
+          echo "Creating database backup before deployment..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
+            if [ -d \"/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/postgres\" ] && [ \"\$(ls -A /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/postgres)\" ]; then
+              cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && 
+              if [ -f ./backup-database.sh ]; then
+                chmod +x ./backup-database.sh && 
+                ./backup-database.sh ${{ env.DEPLOY_ENV }} || echo 'Backup script execution failed'
+              else
+                echo 'Backup script not found, creating manual backup'
+                BACKUP_DIR=\"/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/backups/postgres\"
+                TIMESTAMP=\$(date +\"%Y%m%d_%H%M%S\")
+                DB_NAME=\"crm_${{ env.DEPLOY_ENV }}\"
+                CONTAINER_NAME=\"crm-postgres-${{ env.DEPLOY_ENV }}\"
+                mkdir -p \"\$BACKUP_DIR\"
+                
+                # Check if container is running before attempting backup
+                if docker ps | grep -q \"\$CONTAINER_NAME\"; then
+                  docker exec \$CONTAINER_NAME pg_dump -U postgres \$DB_NAME > \"\$BACKUP_DIR/\${DB_NAME}_pre_deploy_\${TIMESTAMP}.sql\" && 
+                  gzip \"\$BACKUP_DIR/\${DB_NAME}_pre_deploy_\${TIMESTAMP}.sql\"
+                  echo \"Manual backup created at \$BACKUP_DIR/\${DB_NAME}_pre_deploy_\${TIMESTAMP}.sql.gz\"
+                else
+                  echo \"Database container not running, cannot create backup\"
+                fi
+              fi
+            else
+              echo 'No existing database data found, skipping backup'
+            fi
+          "
+
+      - name: Create deployment directories on VPS
+        run: |
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/logs"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/postgres"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/redis"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/keycloak"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/backups/postgres"
+          
+          # Create a permissions setup script to avoid sudo terminal issues
+          cat > setup_permissions.sh << 'EOF'
+          #!/bin/bash
+          ENV="$1"
+          echo "Setting up permissions for $ENV environment"
+          # We'll create this file on the server and run it locally there
+          chown -R ubuntu:ubuntu /home/ubuntu/CRM/$ENV/
+          # These commands will be run by the user directly on the server
+          # later in the deployment process
+          EOF
+          
+          # Copy the permissions script to the server
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} setup_permissions.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/setup_permissions.sh
+          
+          # Make it executable
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /home/ubuntu/setup_permissions.sh"
+          
+          # Run the script
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "/home/ubuntu/setup_permissions.sh ${{ env.DEPLOY_ENV }}"
+      
+      - name: Stop existing containers
+        run: |
+          echo "Stopping any existing containers gracefully to prevent data loss..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
+            if [ -f \"/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/docker-compose.yml\" ]; then
+              cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && 
+              echo 'Stopping containers gracefully...' && 
+              docker compose stop -t 30 || true && 
+              echo 'Taking down containers but preserving volumes...' && 
+              docker compose down --remove-orphans --volumes=false || true && 
+              echo 'Existing containers successfully stopped'
+            else
+              echo 'No existing docker-compose.yml found, skipping container stop'
+            fi
+          "
+      
+      - name: Copy deployment files to VPS
+        run: |
+          # Create a simple directory structure
+          mkdir -p ./deploy_temp
+          
+          # First verify the files exist
+          echo "Verifying source files..."
+          ls -la deploy/docker/
+          ls -la deploy/env/
+          ls -la deploy/scripts/
+          
+          # Copy files with confirmation
+          echo "Copying docker-compose file..."
+          cp deploy/docker/docker-compose.${{ env.DEPLOY_ENV }}.yml ./deploy_temp/
+          
+          # Create a file with the correct name directly in the target directory
+          echo "Creating environment file directly on the server..."
+          cat deploy/env/${{ env.ENV_FILE }} > .env.tmp
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/.env
+          
+          echo "Copying script files..."
+          cp deploy/scripts/*.sh ./deploy_temp/
+          
+          # Verify the copy worked
+          echo "Verifying files in deploy_temp directory:"
+          ls -la ./deploy_temp/
+          
+          # Use scp instead of rsync (which may not be available)
+          echo "Copying files to remote server..."
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/
+          
+          # Verify the files were copied to the server
+          echo "Verifying files on remote server:"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "ls -la /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/"
+      
+      - name: Deploy backend
+        run: |
+          # Rename docker-compose file
+          echo "Renaming docker-compose file..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
+          
+          # Make scripts executable
+          echo "Making scripts executable..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && chmod +x *.sh"
+          
+          # Set environment variables and run deployment
+          echo "Running deployment script with data persistence protection..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && export DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' && export DOCKER_PASSWORD='${{ secrets.DOCKER_PASSWORD }}' && export CI=true && ./deploy.sh ${{ env.DEPLOY_ENV }} || echo 'Deployment script failed'"
+      
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment success..."
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
+            cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && 
+            if docker compose ps | grep -q 'Exit'; then
+              echo 'Some containers failed to start:' && 
+              docker compose ps && 
+              echo 'Deployment verification failed!'
+              exit 1
+            else
+              echo 'All services are running successfully:' && 
+              docker compose ps && 
+              echo 'Deployment completed and verified!'
+            fi
+          "

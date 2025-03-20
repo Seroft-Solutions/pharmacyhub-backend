@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres-local:
+    image: postgres:12.20-alpine3.20
+    container_name: crm-postgres-local
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=crm_local
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+    networks:
+      - local-network
+    restart: always
+
+  redis-local:
+    image: redis:7.2-alpine
+    container_name: crm-redis-local
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_local:/data
+    command: redis-server --appendonly yes --requirepass myredispassword
+    networks:
+      - local-network
+    restart: always
+
+  keycloak-local:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: crm-keycloak-local
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres-local:5432/crm_local
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=postgres
+      - KC_HOSTNAME=localhost
+    volumes:
+      - ../../../themes:/opt/keycloak/providers
+    ports:
+      - "8180:8080"
+    command:
+      - "start-dev"
+      - "--spi-theme-static-max-age=-1"
+      - "--spi-theme-cache-themes=false"
+      - "--spi-theme-cache-templates=false"
+    networks:
+      - local-network
+    depends_on:
+      - postgres-local
+    restart: always
+
+networks:
+  local-network:
+    name: crm-local-network
+    driver: bridge
+
+volumes:
+  postgres_data_local:
+  redis_data_local:

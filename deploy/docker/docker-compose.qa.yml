@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  postgres-qa:
+    image: postgres:12.20-alpine3.20
+    container_name: crm-postgres-qa
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=crm_qa
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${QA_DB_PASSWORD}
+    volumes:
+      - postgres_data_qa:/var/lib/postgresql/data
+      - ${CRM_BASE_PATH}/qa/data/backups/postgres:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - qa-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis-qa:
+    image: redis:7.2-alpine
+    container_name: crm-redis-qa
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data_qa:/data
+    command: redis-server --appendonly yes --requirepass ${QA_REDIS_PASSWORD}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${QA_REDIS_PASSWORD}", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - qa-network
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  keycloak-qa:
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: crm-keycloak-qa
+    environment:
+      - KEYCLOAK_ADMIN=${QA_KEYCLOAK_ADMIN_USER}
+      - KEYCLOAK_ADMIN_PASSWORD=${QA_KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres-qa:5432/crm_qa
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=${QA_DB_PASSWORD}
+      - KC_HOSTNAME=${QA_KEYCLOAK_HOST}
+      - KC_PROXY=edge
+      - KC_PROXY_ADDRESS_FORWARDING=true
+    volumes:
+      - ../../../themes:/opt/keycloak/providers
+      - keycloak_data_qa:/opt/keycloak/data
+    command:
+      - "start"
+      - "--spi-theme-static-max-age=-1"
+      - "--spi-theme-cache-themes=false"
+      - "--spi-theme-cache-templates=false"
+    networks:
+      - qa-network
+      - proxy-network
+    depends_on:
+      postgres-qa:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  crm-backend-qa:
+    image: ${QA_BACKEND_DOCKER_IMAGE}
+    container_name: crm-backend-qa
+    environment:
+      - SPRING_PROFILES_ACTIVE=qa
+      - SERVER_PORT=${QA_SERVER_PORT}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-qa:5432/crm_qa
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=${QA_DB_PASSWORD}
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak-qa:8080
+      - KEYCLOAK_REALM=${QA_KEYCLOAK_REALM}
+      - KEYCLOAK_RESOURCE=${QA_KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CREDENTIALS_SECRET=${QA_KEYCLOAK_CLIENT_SECRET}
+      - REDIS_HOST=redis-qa
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${QA_REDIS_PASSWORD}
+    volumes:
+      - ${CRM_BASE_PATH}/qa/backend/logs:/app/logs
+    networks:
+      - qa-network
+      - proxy-network
+    depends_on:
+      postgres-qa:
+        condition: service_healthy
+      keycloak-qa:
+        condition: service_started
+      redis-qa:
+        condition: service_healthy
+    restart: always
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  qa-network:
+    name: crm-qa-network
+    driver: bridge
+  proxy-network:
+    name: proxy-network
+    external: true
+
+volumes:
+  postgres_data_qa:
+    name: crm_postgres_data_qa
+    driver: local
+    driver_opts:
+      type: none
+      device: ${CRM_BASE_PATH}/qa/data/postgres
+      o: bind
+  keycloak_data_qa:
+    name: crm-keycloak-data-qa
+    driver: local
+    driver_opts:
+      type: none
+      device: ${CRM_BASE_PATH}/qa/data/keycloak
+      o: bind
+  redis_data_qa:
+    name: crm-redis-data-qa
+    driver: local
+    driver_opts:
+      type: none
+      device: ${CRM_BASE_PATH}/qa/data/redis
+      o: bind
