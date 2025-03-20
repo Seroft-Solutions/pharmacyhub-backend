@@ -1,4 +1,4 @@
-name: CRM Backend Deployment
+name: PharmacyHub Backend Deployment
 
 # Force the use of bash shell for all run steps
 defaults:
@@ -23,7 +23,7 @@ on:
           - prod
 
 env:
-  DOCKER_IMAGE: syedus06/crm-backend
+  DOCKER_IMAGE: syedus06/pharmacyhub-backend
   VPS_HOST: '175.111.97.58'
   VPS_USER: 'ubuntu'
   VPS_PORT: '50489'
@@ -105,17 +105,17 @@ jobs:
         run: |
           echo "Creating database backup before deployment..."
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            if [ -d \"/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/postgres\" ] && [ \"\$(ls -A /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/postgres)\" ]; then
-              cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && 
+            if [ -d \"/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/data/postgres\" ] && [ \"\$(ls -A /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/data/postgres)\" ]; then
+              cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && 
               if [ -f ./backup-database.sh ]; then
                 chmod +x ./backup-database.sh && 
                 ./backup-database.sh ${{ env.DEPLOY_ENV }} || echo 'Backup script execution failed'
               else
                 echo 'Backup script not found, creating manual backup'
-                BACKUP_DIR=\"/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/backups/postgres\"
+                BACKUP_DIR=\"/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/data/backups/postgres\"
                 TIMESTAMP=\$(date +\"%Y%m%d_%H%M%S\")
-                DB_NAME=\"crm_${{ env.DEPLOY_ENV }}\"
-                CONTAINER_NAME=\"crm-postgres-${{ env.DEPLOY_ENV }}\"
+                DB_NAME=\"pharmacyhub_${{ env.DEPLOY_ENV }}\"
+                CONTAINER_NAME=\"pharmacyhub-postgres-${{ env.DEPLOY_ENV }}\"
                 mkdir -p \"\$BACKUP_DIR\"
                 
                 # Check if container is running before attempting backup
@@ -134,13 +134,12 @@ jobs:
 
       - name: Create deployment directories on VPS
         run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/logs"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/postgres"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/redis"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/keycloak"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/data/backups/postgres"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/logs"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/data/postgres"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/data/redis"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/data/backups/postgres"
           
           # Create a permissions setup script to avoid sudo terminal issues
           cat > setup_permissions.sh << 'EOF'
@@ -148,7 +147,7 @@ jobs:
           ENV="$1"
           echo "Setting up permissions for $ENV environment"
           # We'll create this file on the server and run it locally there
-          chown -R ubuntu:ubuntu /home/ubuntu/CRM/$ENV/
+          chown -R ubuntu:ubuntu /home/ubuntu/PharmacyHub/$ENV/
           # These commands will be run by the user directly on the server
           # later in the deployment process
           EOF
@@ -166,8 +165,8 @@ jobs:
         run: |
           echo "Stopping any existing containers gracefully to prevent data loss..."
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            if [ -f \"/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/docker-compose.yml\" ]; then
-              cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && 
+            if [ -f \"/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/docker-compose.yml\" ]; then
+              cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && 
               echo 'Stopping containers gracefully...' && 
               docker compose stop -t 30 || true && 
               echo 'Taking down containers but preserving volumes...' && 
@@ -196,7 +195,7 @@ jobs:
           # Create a file with the correct name directly in the target directory
           echo "Creating environment file directly on the server..."
           cat deploy/env/${{ env.ENV_FILE }} > .env.tmp
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/.env
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/.env
           
           echo "Copying script files..."
           cp deploy/scripts/*.sh ./deploy_temp/
@@ -207,31 +206,31 @@ jobs:
           
           # Use scp instead of rsync (which may not be available)
           echo "Copying files to remote server..."
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/
           
           # Verify the files were copied to the server
           echo "Verifying files on remote server:"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "ls -la /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend/"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "ls -la /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/"
       
       - name: Deploy backend
         run: |
           # Rename docker-compose file
           echo "Renaming docker-compose file..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
           
           # Make scripts executable
           echo "Making scripts executable..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && chmod +x *.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && chmod +x *.sh"
           
           # Set environment variables and run deployment
           echo "Running deployment script with data persistence protection..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && export DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' && export DOCKER_PASSWORD='${{ secrets.DOCKER_PASSWORD }}' && export CI=true && ./deploy.sh ${{ env.DEPLOY_ENV }} || echo 'Deployment script failed'"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && export DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' && export DOCKER_PASSWORD='${{ secrets.DOCKER_PASSWORD }}' && export CI=true && ./deploy.sh ${{ env.DEPLOY_ENV }} || echo 'Deployment script failed'"
       
       - name: Verify deployment
         run: |
           echo "Verifying deployment success..."
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            cd /home/ubuntu/CRM/${{ env.DEPLOY_ENV }}/backend && 
+            cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && 
             if docker compose ps | grep -q 'Exit'; then
               echo 'Some containers failed to start:' && 
               docker compose ps && 

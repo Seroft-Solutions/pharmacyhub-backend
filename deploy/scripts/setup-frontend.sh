@@ -12,7 +12,7 @@ fi
 
 # Set environment
 ENV="$1"
-CRM_BASE="/home/ubuntu/CRM"
+CRM_BASE="/home/ubuntu/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BE_ENV_FILE="$ENV_DIR/backend/.env.$ENV"
 FE_DIR="$ENV_DIR/frontend"
@@ -42,13 +42,9 @@ set +a
 # Create frontend environment file
 echo "Creating frontend environment file..."
 cat << EOF > "$FE_ENV_FILE"
-# CRM Frontend Environment Configuration for $ENV
+# PharmacyHub Frontend Environment Configuration for $ENV
 NEXT_PUBLIC_API_BASE_URL=${ENV}_API_BASE_URL
 NODE_ENV=$ENV
-NEXT_PUBLIC_KEYCLOAK_URL=${ENV}_KEYCLOAK_AUTH_URL
-NEXT_PUBLIC_CAL_URL=${ENV}_CALCOM_URL
-NEXT_PUBLIC_CAL_CLIENT_ID=crm-frontend
-CAL_CLIENT_SECRET=cal_client_secret_${ENV}
 EOF
 
 # Create frontend Docker Compose file
@@ -57,9 +53,9 @@ cat << EOF > "$DOCKER_COMPOSE_PATH"
 version: '3.8'
 
 services:
-  crm-frontend-$ENV:
+  pharmacyhub-frontend-$ENV:
     image: \${${ENV}_FRONTEND_DOCKER_IMAGE}
-    container_name: crm-frontend-$ENV
+    container_name: pharmacyhub-frontend-$ENV
     env_file: .env.$ENV
     environment:
       NODE_ENV: $ENV
@@ -81,11 +77,11 @@ services:
 
 networks:
   $ENV-network:
-    name: crm-$ENV-network
+    name: pharmacyhub-$ENV-network
     external: true
   proxy-network:
     name: proxy-network
     external: true
 EOF
 
-echo "Frontend setup for $ENV environment completed successfully!"
+echo "PharmacyHub frontend setup for $ENV environment completed successfully!"

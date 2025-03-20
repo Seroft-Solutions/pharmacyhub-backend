@@ -5,8 +5,8 @@
 # Exit on any error
 set -e
 
-# Base directory for all CRM deployments
-CRM_BASE="/home/ubuntu/CRM"
+# Base directory for all PharmacyHub deployments
+CRM_BASE="/home/ubuntu/PharmacyHub"
 
 # Environment names
 ENVIRONMENTS=("dev" "qa" "prod")
@@ -33,16 +33,16 @@ for ENV in "${ENVIRONMENTS[@]}"; do
   # Data directories with appropriate namespacing
   mkdir -p $ENV_DIR/data/postgres
   mkdir -p $ENV_DIR/data/redis
-  mkdir -p $ENV_DIR/data/keycloak
+  # Keycloak directory removed as it's not needed for PharmacyHub
   mkdir -p $ENV_DIR/data/backups/postgres
   
   # Set proper permissions
   # Add NOPASSWD permission for postgres directory operations if needed
   if ! sudo -n -l | grep -q "NOPASSWD: /usr/bin/chown"; then
     echo "Setting up NOPASSWD permissions for postgres directory management..."
-    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /home/ubuntu/CRM/*/data/postgres" | sudo tee /etc/sudoers.d/crm-postgres
-    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /home/ubuntu/CRM/*/data/postgres" | sudo tee -a /etc/sudoers.d/crm-postgres
-    sudo chmod 440 /etc/sudoers.d/crm-postgres
+    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /home/ubuntu/PharmacyHub/*/data/postgres" | sudo tee /etc/sudoers.d/pharmacyhub-postgres
+    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /home/ubuntu/PharmacyHub/*/data/postgres" | sudo tee -a /etc/sudoers.d/pharmacyhub-postgres
+    sudo chmod 440 /etc/sudoers.d/pharmacyhub-postgres
   fi
   
   # PostgreSQL data - postgres user (UID 999)
@@ -51,7 +51,7 @@ for ENV in "${ENVIRONMENTS[@]}"; do
   
   # Other directories - regular user
   chown -R ubuntu:ubuntu $ENV_DIR/data/redis || true
-  chown -R ubuntu:ubuntu $ENV_DIR/data/keycloak || true
+  # Keycloak directory ownership removed as it's not needed for PharmacyHub
   chown -R ubuntu:ubuntu $ENV_DIR/data/backups || true
   chown -R ubuntu:ubuntu $ENV_DIR/backend/logs || true
   chown -R ubuntu:ubuntu $ENV_DIR/frontend/logs || true
@@ -63,4 +63,4 @@ done
 mkdir -p $CRM_BASE/nginx/logs
 chown -R ubuntu:ubuntu $CRM_BASE/nginx/logs || true
 
-echo "VPS directory setup completed successfully!"
+echo "PharmacyHub VPS directory setup completed successfully!"

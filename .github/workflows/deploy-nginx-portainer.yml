@@ -1,4 +1,4 @@
-name: Deploy Nginx and Portainer
+name: Deploy PharmacyHub Nginx and Portainer
 
 # Force the use of bash shell for all run steps
 defaults:
@@ -50,13 +50,13 @@ jobs:
 
       - name: Create shared infrastructure directory on VPS
         run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy/data"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy/letsencrypt"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy/mysql"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy/data"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy/letsencrypt"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy/mysql"
           
           # Set proper permissions
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod -R 755 /home/ubuntu/CRM/infrastructure/proxy"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod -R 755 /home/ubuntu/PharmacyHub/infrastructure/proxy"
       
       - name: Stop running containers if needed for clean deployment
         run: |
@@ -65,7 +65,7 @@ jobs:
           
           if [ "$CONTAINERS_RUNNING" -gt "0" ]; then
             echo "Existing containers found. Stopping them for clean deployment..."
-            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/infrastructure/proxy && docker-compose down"
+            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/infrastructure/proxy && docker-compose down"
           else
             echo "No existing containers found."
           fi
@@ -73,13 +73,13 @@ jobs:
       - name: Backup existing configuration (if any)
         run: |
           # Check if there are existing configurations to back up
-          EXISTING_CONFIG=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/CRM/infrastructure/proxy/data ] && echo 'exists' || echo 'not_exists'")
+          EXISTING_CONFIG=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/PharmacyHub/infrastructure/proxy/data ] && echo 'exists' || echo 'not_exists'")
           
           if [ "$EXISTING_CONFIG" == "exists" ]; then
             echo "Creating backup of existing configuration..."
             TIMESTAMP=$(date +%Y%m%d%H%M%S)
-            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/backups/$TIMESTAMP && cp -r /home/ubuntu/CRM/infrastructure/proxy/data /home/ubuntu/CRM/infrastructure/backups/$TIMESTAMP/ && cp -r /home/ubuntu/CRM/infrastructure/proxy/letsencrypt /home/ubuntu/CRM/infrastructure/backups/$TIMESTAMP/"
-            echo "Backup created at /home/ubuntu/CRM/infrastructure/backups/$TIMESTAMP"
+            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/backups/$TIMESTAMP && cp -r /home/ubuntu/PharmacyHub/infrastructure/proxy/data /home/ubuntu/PharmacyHub/infrastructure/backups/$TIMESTAMP/ && cp -r /home/ubuntu/PharmacyHub/infrastructure/proxy/letsencrypt /home/ubuntu/PharmacyHub/infrastructure/backups/$TIMESTAMP/"
+            echo "Backup created at /home/ubuntu/PharmacyHub/infrastructure/backups/$TIMESTAMP"
           else
             echo "No existing configuration to back up."
           fi
@@ -87,67 +87,67 @@ jobs:
       - name: Copy Nginx and Portainer files to VPS
         run: |
           # Copy docker-compose file
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/docker-compose.yml ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/docker-compose.yml ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/
 
           # Create data structure for Nginx proxy configurations
-          NGINX_CONFIG_DIR=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/CRM/infrastructure/proxy/data/nginx/proxy_host ] && echo 'exists' || echo 'not_exists'")
+          NGINX_CONFIG_DIR=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/PharmacyHub/infrastructure/proxy/data/nginx/proxy_host ] && echo 'exists' || echo 'not_exists'")
           
           if [ "$NGINX_CONFIG_DIR" == "not_exists" ]; then
             echo "Creating Nginx proxy directories..."
-            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy/data/nginx/proxy_host"
+            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy/data/nginx/proxy_host"
           fi
           
           # Copy Nginx proxy configurations
           echo "Copying Nginx proxy configurations..."
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/data/nginx/proxy_host/*.conf ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/infrastructure/proxy/data/nginx/proxy_host/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/data/nginx/proxy_host/*.conf ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/data/nginx/proxy_host/
           
           # Copy keys.json if it doesn't exist yet
-          KEYS_FILE=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -f /home/ubuntu/CRM/infrastructure/proxy/data/keys.json ] && echo 'exists' || echo 'not_exists'")
+          KEYS_FILE=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -f /home/ubuntu/PharmacyHub/infrastructure/proxy/data/keys.json ] && echo 'exists' || echo 'not_exists'")
           
           if [ "$KEYS_FILE" == "not_exists" ]; then
             echo "Copying keys.json..."
-            scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/data/keys.json ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/infrastructure/proxy/data/
+            scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/data/keys.json ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/data/
           else
             echo "keys.json already exists. Preserving existing file."
           fi
           
           # Copy Let's Encrypt renewal configurations
-          LETSENCRYPT_DIR=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/CRM/infrastructure/proxy/letsencrypt/renewal ] && echo 'exists' || echo 'not_exists'")
+          LETSENCRYPT_DIR=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/PharmacyHub/infrastructure/proxy/letsencrypt/renewal ] && echo 'exists' || echo 'not_exists'")
           
           if [ "$LETSENCRYPT_DIR" == "not_exists" ]; then
             echo "Creating Let's Encrypt renewal directory..."
-            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy/letsencrypt/renewal"
+            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy/letsencrypt/renewal"
           fi
           
           echo "Copying Let's Encrypt renewal configurations..."
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/letsencrypt/renewal/*.conf ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/infrastructure/proxy/letsencrypt/renewal/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/letsencrypt/renewal/*.conf ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/letsencrypt/renewal/
           
           # Create ACME challenge directory
-          ACME_DIR=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/CRM/infrastructure/proxy/data/letsencrypt-acme-challenge ] && echo 'exists' || echo 'not_exists'")
+          ACME_DIR=$(ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "[ -d /home/ubuntu/PharmacyHub/infrastructure/proxy/data/letsencrypt-acme-challenge ] && echo 'exists' || echo 'not_exists'")
           
           if [ "$ACME_DIR" == "not_exists" ]; then
             echo "Creating ACME challenge directory..."
-            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/CRM/infrastructure/proxy/data/letsencrypt-acme-challenge"
+            ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy/data/letsencrypt-acme-challenge"
           fi
           
           # Copy docker-cleanup.sh
           echo "Copying docker cleanup script..."
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/docker-cleanup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/CRM/infrastructure/proxy/
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /home/ubuntu/CRM/infrastructure/proxy/docker-cleanup.sh"
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} ./infrastructure/proxy/docker-cleanup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "chmod +x /home/ubuntu/PharmacyHub/infrastructure/proxy/docker-cleanup.sh"
           
           # Verify files were copied
           echo "Verifying files on remote server:"
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "ls -la /home/ubuntu/CRM/infrastructure/proxy/"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "ls -la /home/ubuntu/PharmacyHub/infrastructure/proxy/"
           
       - name: Deploy Nginx and Portainer
         run: |
           echo "Starting deployment of Nginx Proxy Manager and Portainer..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/CRM/infrastructure/proxy && docker-compose up -d"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/infrastructure/proxy && docker-compose up -d"
           
           # Verify that containers are running
           echo "Verifying container deployment..."
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "docker ps | grep -E 'nginx-proxy-manager|portainer'"
           
           echo "Nginx and Portainer deployment completed successfully!"
-          echo "Nginx Proxy Manager is accessible at: http://${{ env.VPS_HOST }}:81 or https://nginx.crmcup.com"
-          echo "Portainer is accessible at: http://${{ env.VPS_HOST }}:9000 or https://portainer.crmcup.com"
+          echo "Nginx Proxy Manager is accessible at: http://${{ env.VPS_HOST }}:81 or https://nginx.pharmacyhub.pk"
+          echo "Portainer is accessible at: http://${{ env.VPS_HOST }}:9000 or https://portainer.pharmacyhub.pk"

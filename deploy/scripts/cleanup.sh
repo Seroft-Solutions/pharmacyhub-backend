@@ -15,7 +15,7 @@ fi
 # Set environment variables
 ENV="$1"
 ALL_FLAG="$2"
-CRM_BASE="/home/ubuntu/CRM"
+CRM_BASE="/home/ubuntu/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 DOCKER_COMPOSE_PATH="$ENV_DIR/backend/docker-compose.yml"
 FE_DOCKER_COMPOSE_PATH="$ENV_DIR/frontend/docker-compose.yml"
@@ -57,12 +57,11 @@ if [ "$ALL_FLAG" == "--all" ]; then
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
     echo "Removing Docker volumes..."
-    docker volume rm $(docker volume ls -q | grep "crm.*$ENV") || true
+    docker volume rm $(docker volume ls -q | grep "pharmacyhub.*$ENV") || true
     
     echo "Cleaning up data directories..."
     rm -rf "$ENV_DIR/data/postgres/*"
     rm -rf "$ENV_DIR/data/redis/*"
-    rm -rf "$ENV_DIR/data/keycloak/*"
     
     echo "Keeping backup directory for safety."
   else
@@ -70,4 +69,4 @@ if [ "$ALL_FLAG" == "--all" ]; then
   fi
 fi
 
-echo "Cleanup for $ENV environment completed!"
+echo "PharmacyHub cleanup for $ENV environment completed!"

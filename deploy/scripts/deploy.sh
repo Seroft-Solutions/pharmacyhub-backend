@@ -12,7 +12,7 @@ fi
 
 # Set environment variables
 ENV="$1"
-CRM_BASE="/home/ubuntu/CRM"
+CRM_BASE="/home/ubuntu/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BE_DIR="$ENV_DIR/backend"
 ENV_FILE="$BE_DIR/.env"
@@ -31,14 +31,14 @@ mkdir -p "$BE_DIR"
 mkdir -p "$BE_DIR/logs"
 mkdir -p "$ENV_DIR/data/postgres"
 mkdir -p "$ENV_DIR/data/redis"
-mkdir -p "$ENV_DIR/data/keycloak"
+# Keycloak directory removed as it's not needed for PharmacyHub
 mkdir -p "$ENV_DIR/data/backups/postgres"
 
 # Permissions management with safer error handling
 echo "Setting up directory permissions..."
 # For user-owned directories, set permissions directly
 chown -R ubuntu:ubuntu "$ENV_DIR/data/redis" 2>/dev/null || true
-chown -R ubuntu:ubuntu "$ENV_DIR/data/keycloak" 2>/dev/null || true
+# Keycloak directory ownership removed as it's not needed for PharmacyHub
 chown -R ubuntu:ubuntu "$ENV_DIR/data/backups" 2>/dev/null || true
 chown -R ubuntu:ubuntu "$BE_DIR/logs" 2>/dev/null || true
 
@@ -84,8 +84,8 @@ if [ -d "$ENV_DIR/data/postgres" ] && [ "$(ls -A $ENV_DIR/data/postgres)" ]; the
     # Manual backup if script is not available
     BACKUP_DIR="$ENV_DIR/data/backups/postgres"
     TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-    DB_NAME="crm_$ENV"
-    CONTAINER_NAME="crm-postgres-$ENV"
+    DB_NAME="pharmacyhub_$ENV"
+    CONTAINER_NAME="pharmacyhub-postgres-$ENV"
     
     # Check if container is running before attempting backup
     if docker ps | grep -q "$CONTAINER_NAME"; then
@@ -154,7 +154,7 @@ if [ "$CI" != "true" ]; then
   echo "Verifying database is running..."
   max_attempts=30
   counter=0
-  db_container="crm-postgres-$ENV"
+  db_container="pharmacyhub-postgres-$ENV"
 
   while [ $counter -lt $max_attempts ]; do
     if docker compose -f docker-compose.yml exec -T $db_container pg_isready -U postgres; then
@@ -187,17 +187,11 @@ fi
 
 # Display access URLs
 if [ "$ENV" == "dev" ]; then
-  echo "Backend API is now accessible at https://api.dev.crmcup.com"
-  echo "Keycloak is now accessible at https://auth.dev.crmcup.com"
-  echo "Cal.com is now accessible at https://cal.dev.crmcup.com"
+  echo "Backend API is now accessible at https://api.dev.pharmacyhub.pk"
 elif [ "$ENV" == "qa" ]; then
-  echo "Backend API is now accessible at https://api.qa.crmcup.com"
-  echo "Keycloak is now accessible at https://auth.qa.crmcup.com"
-  echo "Cal.com is now accessible at https://cal.qa.crmcup.com"
+  echo "Backend API is now accessible at https://api.qa.pharmacyhub.pk"
 elif [ "$ENV" == "prod" ]; then
-  echo "Backend API is now accessible at https://api.crmcup.com"
-  echo "Keycloak is now accessible at https://auth.crmcup.com"
-  echo "Cal.com is now accessible at https://cal.crmcup.com"
+  echo "Backend API is now accessible at https://api.pharmacyhub.pk"
 fi
 
-echo "Backend deployment for $ENV environment completed successfully!"
+echo "PharmacyHub backend deployment for $ENV environment completed successfully!"

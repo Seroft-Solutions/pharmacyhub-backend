@@ -3,11 +3,11 @@ version: '3.8'
 services:
   postgres-prod:
     image: postgres:12.20-alpine3.20
-    container_name: crm-postgres-prod
+    container_name: pharmacyhub-postgres-prod
     ports:
       - "5434:5432"
     environment:
-      - POSTGRES_DB=crm_prod
+      - POSTGRES_DB=pharmacyhub_prod
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${PROD_DB_PASSWORD}
     volumes:
@@ -34,7 +34,7 @@ services:
 
   redis-prod:
     image: redis:7.2-alpine
-    container_name: crm-redis-prod
+    container_name: pharmacyhub-redis-prod
     ports:
       - "6381:6379"
     volumes:
@@ -59,56 +59,18 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  keycloak-prod:
-    image: quay.io/keycloak/keycloak:25.0.2
-    container_name: crm-keycloak-prod
-    environment:
-      - KEYCLOAK_ADMIN=${PROD_KEYCLOAK_ADMIN_USER}
-      - KEYCLOAK_ADMIN_PASSWORD=${PROD_KEYCLOAK_ADMIN_PASSWORD}
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres-prod:5432/crm_prod
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=${PROD_DB_PASSWORD}
-      - KC_HOSTNAME=${PROD_KEYCLOAK_HOST}
-      - KC_PROXY=edge
-      - KC_PROXY_ADDRESS_FORWARDING=true
-    volumes:
-      - ../../../themes:/opt/keycloak/providers
-      - keycloak_data_prod:/opt/keycloak/data
-    command:
-      - "start"
-      - "--optimized"
-    networks:
-      - prod-network
-      - proxy-network
-    depends_on:
-      postgres-prod:
-        condition: service_healthy
-    restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
+  # Keycloak service removed as it's not needed for PharmacyHub
 
-  crm-backend-prod:
+  pharmacyhub-backend-prod:
     image: ${PROD_BACKEND_DOCKER_IMAGE}
-    container_name: crm-backend-prod
+    container_name: pharmacyhub-backend-prod
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SERVER_PORT=${PROD_SERVER_PORT}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-prod:5432/crm_prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-prod:5432/pharmacyhub_prod
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=${PROD_DB_PASSWORD}
-      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak-prod:8080
-      - KEYCLOAK_REALM=${PROD_KEYCLOAK_REALM}
-      - KEYCLOAK_RESOURCE=${PROD_KEYCLOAK_CLIENT_ID}
-      - KEYCLOAK_CREDENTIALS_SECRET=${PROD_KEYCLOAK_CLIENT_SECRET}
+      # Keycloak environment variables removed as they're not needed for PharmacyHub
       - REDIS_HOST=redis-prod
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${PROD_REDIS_PASSWORD}
@@ -121,8 +83,6 @@ services:
     depends_on:
       postgres-prod:
         condition: service_healthy
-      keycloak-prod:
-        condition: service_started
       redis-prod:
         condition: service_healthy
     restart: always
@@ -142,7 +102,7 @@ services:
 
 networks:
   prod-network:
-    name: crm-prod-network
+    name: pharmacyhub-prod-network
     driver: bridge
   proxy-network:
     name: proxy-network
@@ -150,21 +110,14 @@ networks:
 
 volumes:
   postgres_data_prod:
-    name: crm_postgres_data_prod
+    name: pharmacyhub_postgres_data_prod
     driver: local
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/prod/data/postgres
       o: bind
-  keycloak_data_prod:
-    name: crm-keycloak-data-prod
-    driver: local
-    driver_opts:
-      type: none
-      device: ${CRM_BASE_PATH}/prod/data/keycloak
-      o: bind
   redis_data_prod:
-    name: crm-redis-data-prod
+    name: pharmacyhub-redis-data-prod
     driver: local
     driver_opts:
       type: none

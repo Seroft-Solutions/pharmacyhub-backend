@@ -6,19 +6,19 @@
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "Error: Missing required parameters"
   echo "Usage: ./restore-database.sh <environment> <backup_file>"
-  echo "Example: ./restore-database.sh dev crm_dev_20240106_020000.sql.gz"
+  echo "Example: ./restore-database.sh dev pharmacyhub_dev_20240106_020000.sql.gz"
   exit 1
 fi
 
 # Set environment variables
 ENV="$1"
 BACKUP_FILE="$2"
-CRM_BASE="/home/ubuntu/CRM"
+CRM_BASE="/home/ubuntu/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BACKUP_DIR="$ENV_DIR/data/backups/postgres"
-DB_NAME="crm_$ENV"
+DB_NAME="pharmacyhub_$ENV"
 DOCKER_COMPOSE_FILE="$ENV_DIR/backend/docker-compose.yml"
-CONTAINER_NAME="crm-postgres-$ENV"
+CONTAINER_NAME="pharmacyhub-postgres-$ENV"
 
 # Check if backup file exists
 if [ ! -f "$BACKUP_DIR/$BACKUP_FILE" ]; then

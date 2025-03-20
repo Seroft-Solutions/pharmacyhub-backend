@@ -12,13 +12,13 @@ fi
 
 # Set environment variables
 ENV="$1"
-CRM_BASE="/home/ubuntu/CRM"
+CRM_BASE="/home/ubuntu/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BACKUP_DIR="$ENV_DIR/data/backups/postgres"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-DB_NAME="crm_$ENV"
+DB_NAME="pharmacyhub_$ENV"
 DOCKER_COMPOSE_FILE="$ENV_DIR/backend/docker-compose.yml"
-CONTAINER_NAME="crm-postgres-$ENV"
+CONTAINER_NAME="pharmacyhub-postgres-$ENV"
 
 # Ensure backup directory exists
 mkdir -p "$BACKUP_DIR"
