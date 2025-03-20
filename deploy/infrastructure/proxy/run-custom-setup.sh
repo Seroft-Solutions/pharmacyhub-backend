@@ -32,7 +32,7 @@ wait_for_service() {
   
   while [ $attempts -lt $max_attempts ]; do
     if [ "$service" == "db" ]; then
-      # Use root user with the correct password
+      # Test connection using root user with explicit password
       if docker exec npm-db mysqladmin ping -h localhost -u root -pnpm &> /dev/null; then
         echo -e "${GREEN}Database is ready!${NC}"
         return 0
@@ -57,6 +57,10 @@ wait_for_service() {
 # Stop services to start fresh
 echo -e "${YELLOW}Stopping services...${NC}"
 docker-compose down
+
+# Clean existing data to avoid authorization issues
+echo -e "${YELLOW}Cleaning existing database files...${NC}"
+rm -rf ./mysql/*
 
 # Create required directories
 echo -e "${YELLOW}Creating required directories...${NC}"
@@ -99,6 +103,7 @@ if ! wait_for_service "db"; then
   
   # Try starting the database again
   echo -e "${YELLOW}Restarting database service...${NC}"
+  docker-compose down
   docker-compose up -d db
   
   # Wait again for database
@@ -108,60 +113,55 @@ if ! wait_for_service "db"; then
   fi
 fi
 
-# Initialize database if needed
-echo -e "${YELLOW}Checking and initializing database...${NC}"
-if ! docker exec npm-db mysql -u root -pnpm -e "SHOW DATABASES LIKE 'npm';" | grep -q 'npm'; then
-  echo -e "${YELLOW}Creating npm database...${NC}"
-  docker exec npm-db mysql -u root -pnpm -e "CREATE DATABASE npm;"
-  docker exec npm-db mysql -u root -pnpm -e "GRANT ALL PRIVILEGES ON npm.* TO 'npm'@'%';"
-  docker exec npm-db mysql -u root -pnpm -e "FLUSH PRIVILEGES;"
-fi
+# Initialize database and create npm user
+echo -e "${YELLOW}Initializing database and creating npm user...${NC}"
+# Use root user to create the npm user and database
+docker exec -i npm-db mysql -u root -pnpm << EOF
+CREATE DATABASE IF NOT EXISTS npm;
+CREATE USER IF NOT EXISTS 'npm'@'%' IDENTIFIED BY 'npm';
+GRANT ALL PRIVILEGES ON npm.* TO 'npm'@'%';
+FLUSH PRIVILEGES;
+EOF
 
 # Check if users table exists, if not create basic schema
-if ! docker exec npm-db mysql -u npm -pnpm -e "USE npm; SHOW TABLES LIKE 'users';" | grep -q 'users'; then
-  echo -e "${YELLOW}Initializing database schema...${NC}"
-  
-  # Create SQL schema directly 
-  docker exec npm-db mysql -u npm -pnpm -e "
-  USE npm;
-  
-  CREATE TABLE IF NOT EXISTS hosts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    owner_user_id INT NOT NULL,
-    domain_names JSON NOT NULL,
-    forward_host VARCHAR(100) NOT NULL,
-    forward_port INT NOT NULL,
-    access_list_id INT DEFAULT 0,
-    certificate_id INT DEFAULT 0,
-    ssl_forced BOOLEAN DEFAULT FALSE,
-    caching_enabled BOOLEAN DEFAULT FALSE,
-    block_exploits BOOLEAN DEFAULT FALSE,
-    advanced_config TEXT,
-    meta JSON,
-    allow_websocket_upgrade BOOLEAN DEFAULT TRUE, 
-    http2_support BOOLEAN DEFAULT FALSE,
-    forward_scheme VARCHAR(50) DEFAULT 'http',
-    enabled BOOLEAN DEFAULT TRUE,
-    locations JSON
-  );
-  
-  CREATE TABLE IF NOT EXISTS users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    modified_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    name VARCHAR(100) NOT NULL,
-    nickname VARCHAR(100),
-    email VARCHAR(100) NOT NULL,
-    roles JSON NOT NULL
-  );
-  
-  -- Insert default admin user if not exists
-  INSERT IGNORE INTO users (id, name, nickname, email, roles)
-  VALUES (1, 'Administrator', 'Admin', 'admin@example.com', '[\"admin\"]');
-  "
-fi
+echo -e "${YELLOW}Creating basic schema...${NC}"
+docker exec -i npm-db mysql -u root -pnpm npm << EOF
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  modified_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  name VARCHAR(100) NOT NULL,
+  nickname VARCHAR(100),
+  email VARCHAR(100) NOT NULL,
+  roles JSON NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS hosts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  created_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  modified_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  owner_user_id INT NOT NULL,
+  domain_names JSON NOT NULL,
+  forward_host VARCHAR(100) NOT NULL,
+  forward_port INT NOT NULL,
+  access_list_id INT DEFAULT 0,
+  certificate_id INT DEFAULT 0,
+  ssl_forced BOOLEAN DEFAULT FALSE,
+  caching_enabled BOOLEAN DEFAULT FALSE,
+  block_exploits BOOLEAN DEFAULT FALSE,
+  advanced_config TEXT,
+  meta JSON,
+  allow_websocket_upgrade BOOLEAN DEFAULT TRUE, 
+  http2_support BOOLEAN DEFAULT FALSE,
+  forward_scheme VARCHAR(50) DEFAULT "http",
+  enabled BOOLEAN DEFAULT TRUE,
+  locations JSON
+);
+
+-- Insert default admin user if not exists
+INSERT IGNORE INTO users (id, name, nickname, email, roles)
+VALUES (1, 'Administrator', 'Admin', 'admin@example.com', '["admin"]');
+EOF
 
 # Start Nginx Proxy Manager
 echo -e "${YELLOW}Starting Nginx Proxy Manager...${NC}"
