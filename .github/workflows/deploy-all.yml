@@ -119,21 +119,21 @@ jobs:
           
           # Create environment file directly on the server
           cat deploy/env/${{ env.ENV_FILE }} > .env.tmp
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/.env
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/.env
           
           # Copy files to server
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/${{ env.DEPLOY_ENV }}/backend/
           
           # Make scripts executable
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && chmod +x *.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && chmod +x *.sh"
           
           # Rename docker-compose file
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
       
       - name: Deploy backend
         run: |
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && 
+            cd /opt/PharmacyHub/${{ env.DEPLOY_ENV }}/backend && 
             export DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' && 
             export DOCKER_PASSWORD='${{ secrets.DOCKER_PASSWORD }}' && 
             export CI=true && 
@@ -266,21 +266,21 @@ jobs:
           
           # Create environment file directly on the server
           cat deploy/env/${{ env.ENV_FILE }} > .env.tmp
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend/.env
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} .env.tmp ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend/.env
           
           # Copy files to server
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./deploy_temp/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend/
           
           # Make scripts executable
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend && chmod +x *.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend && chmod +x *.sh"
           
           # Rename docker-compose file
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend && mv -v docker-compose.${{ env.DEPLOY_ENV }}.yml docker-compose.yml"
       
       - name: Deploy frontend
         run: |
           ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "
-            cd /home/ubuntu/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend && 
+            cd /opt/PharmacyHub/${{ env.DEPLOY_ENV }}/frontend && 
             export DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' && 
             export DOCKER_PASSWORD='${{ secrets.DOCKER_PASSWORD }}' && 
             export CI=true && 

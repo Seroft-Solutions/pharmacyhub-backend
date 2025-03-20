@@ -101,19 +101,19 @@ jobs:
           chmod +x ./infrastructure_setup/*.sh
           
           # Copy scripts to server
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./infrastructure_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./infrastructure_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/
 
       - name: Setup VPS directories
         run: |
           echo "Setting up directory structure on VPS..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu && chmod +x setup-vps-directories.sh && ./setup-vps-directories.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt && chmod +x setup-vps-directories.sh && ./setup-vps-directories.sh"
           
           echo "VPS directory structure created successfully!"
 
       - name: Setup Docker networks
         run: |
           echo "Setting up Docker networks on VPS..."
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu && chmod +x setup-networks.sh && ./setup-networks.sh"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt && chmod +x setup-networks.sh && ./setup-networks.sh"
           
           echo "Docker networks created successfully!"
 
@@ -125,13 +125,13 @@ jobs:
           cp -r deploy/infrastructure/proxy/* ./proxy_setup/
           
           # Create base directory on VPS
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /home/ubuntu/PharmacyHub/infrastructure/proxy"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "mkdir -p /opt/PharmacyHub/infrastructure/proxy"
           
           # Copy files to VPS
-          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./proxy_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/home/ubuntu/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} -r ./proxy_setup/* ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           
           # Make scripts executable and start services
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /home/ubuntu/PharmacyHub/infrastructure/proxy && chmod +x *.sh && docker-compose up -d"
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x *.sh && docker-compose up -d"
           
           echo "Nginx Proxy Manager and Portainer deployed successfully!"
 
@@ -143,7 +143,7 @@ jobs:
             docker network ls | grep -E 'proxy-network|pharmacyhub'
             
             echo 'Checking directory structure...'
-            find /home/ubuntu/PharmacyHub -type d -maxdepth 3 | sort
+            find /opt/PharmacyHub -type d -maxdepth 3 | sort
             
             echo 'Checking Nginx and Portainer containers...'
             docker ps | grep -E 'nginx-proxy-manager|portainer'

@@ -15,7 +15,7 @@ fi
 # Set environment variables
 ENV="$1"
 ALL_FLAG="$2"
-CRM_BASE="/home/ubuntu/PharmacyHub"
+CRM_BASE="/opt/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 DOCKER_COMPOSE_PATH="$ENV_DIR/backend/docker-compose.yml"
 FE_DOCKER_COMPOSE_PATH="$ENV_DIR/frontend/docker-compose.yml"

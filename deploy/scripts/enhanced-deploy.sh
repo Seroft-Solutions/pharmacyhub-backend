@@ -12,7 +12,7 @@ fi
 
 # Set environment variables
 ENV="$1"
-CRM_BASE="/home/ubuntu/PharmacyHub"
+CRM_BASE="/opt/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BE_DIR="$ENV_DIR/backend"
 ENV_FILE="$BE_DIR/.env"

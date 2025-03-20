@@ -13,7 +13,7 @@ fi
 # Set environment variables
 ENV="$1"
 BACKUP_FILE="$2"
-CRM_BASE="/home/ubuntu/PharmacyHub"
+CRM_BASE="/opt/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BACKUP_DIR="$ENV_DIR/data/backups/postgres"
 DB_NAME="pharmacyhub_$ENV"

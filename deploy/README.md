@@ -57,7 +57,7 @@ To avoid conflicts, each environment uses different port mappings:
 The deployment creates a standardized directory structure on the VPS:
 
 ```
-/home/ubuntu/CRM/
+/opt/CRM/
 ├── dev/
 │   ├── backend/
 │   │   ├── docker-compose.yml
@@ -84,7 +84,7 @@ To manually deploy to a specific environment:
 ssh ubuntu@175.111.97.58 -p 50489
 
 # Navigate to the environment directory
-cd /home/ubuntu/CRM/dev/backend
+cd /opt/CRM/dev/backend
 
 # Run the deployment script
 ./deploy.sh dev

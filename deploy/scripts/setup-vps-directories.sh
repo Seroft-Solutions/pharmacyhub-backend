@@ -6,7 +6,7 @@
 set -e
 
 # Base directory for all PharmacyHub deployments
-CRM_BASE="/home/ubuntu/PharmacyHub"
+CRM_BASE="/opt/PharmacyHub"
 
 # Environment names
 ENVIRONMENTS=("dev" "qa" "prod")
@@ -40,8 +40,8 @@ for ENV in "${ENVIRONMENTS[@]}"; do
   # Add NOPASSWD permission for postgres directory operations if needed
   if ! sudo -n -l | grep -q "NOPASSWD: /usr/bin/chown"; then
     echo "Setting up NOPASSWD permissions for postgres directory management..."
-    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /home/ubuntu/PharmacyHub/*/data/postgres" | sudo tee /etc/sudoers.d/pharmacyhub-postgres
-    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /home/ubuntu/PharmacyHub/*/data/postgres" | sudo tee -a /etc/sudoers.d/pharmacyhub-postgres
+    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chown -R 999:999 /opt/PharmacyHub/*/data/postgres" | sudo tee /etc/sudoers.d/pharmacyhub-postgres
+    echo "ubuntu ALL=(ALL) NOPASSWD: /usr/bin/chmod 750 /opt/PharmacyHub/*/data/postgres" | sudo tee -a /etc/sudoers.d/pharmacyhub-postgres
     sudo chmod 440 /etc/sudoers.d/pharmacyhub-postgres
   fi
   

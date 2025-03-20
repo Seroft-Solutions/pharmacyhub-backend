@@ -12,7 +12,7 @@ fi
 
 # Set environment variables
 ENV="$1"
-CRM_BASE="/home/ubuntu/PharmacyHub"
+CRM_BASE="/opt/PharmacyHub"
 ENV_DIR="$CRM_BASE/$ENV"
 BACKUP_DIR="$ENV_DIR/data/backups/postgres"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
