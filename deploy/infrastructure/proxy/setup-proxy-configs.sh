@@ -153,4 +153,12 @@ chown -R 1000:1000 /opt/PharmacyHub/infrastructure/proxy/data
 echo "Restarting Nginx Proxy Manager to apply configurations..."
 docker restart nginx-proxy-manager || true
 
+# Wait for the service to be ready after restart
+echo "Waiting for Nginx Proxy Manager to be ready after restart (30 seconds)..."
+sleep 30
+
+# Check container status
+echo "Checking container status:"
+docker ps | grep -E 'nginx-proxy-manager'
+
 echo "Proxy configurations setup complete!"

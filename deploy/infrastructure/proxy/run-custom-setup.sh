@@ -205,8 +205,8 @@ check_container_logs() {
 }
 
 # Wait for containers to be healthy
-echo -e "${YELLOW}Waiting for services to be ready (30 seconds)...${NC}"
-sleep 30
+echo -e "${YELLOW}Waiting for services to be ready (60 seconds)...${NC}"
+sleep 60
 
 # Check container status
 echo -e "${YELLOW}Checking container status:${NC}"

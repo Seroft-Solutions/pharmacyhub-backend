@@ -27,11 +27,11 @@ services:
     networks:
       - proxy-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:81"]
-      interval: 30s
+      test: ["CMD-SHELL", "curl -s -f http://localhost:81 || exit 1"]
+      interval: 45s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 6
+      start_period: 120s
 
   # MariaDB database for Nginx Proxy Manager
   db:
@@ -72,11 +72,11 @@ services:
       - proxy-network
     command: -H unix:///var/run/docker.sock  # Ensure Docker mode
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9000"]
-      interval: 30s
+      test: ["CMD-SHELL", "curl -s -f http://localhost:9000 || exit 1"]
+      interval: 45s
       timeout: 10s
-      retries: 5
-      start_period: 60s
+      retries: 6
+      start_period: 120s
 
 networks:
   proxy-network:
