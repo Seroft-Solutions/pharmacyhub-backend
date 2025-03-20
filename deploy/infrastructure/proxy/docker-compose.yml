@@ -1,9 +1,9 @@
-version: '3.8'
+# Removed version attribute to avoid warnings
 
 services:
   # Nginx Proxy Manager - Reverse Proxy with SSL Support
   npm:
-    image: 'jc21/nginx-proxy-manager:2.12.3'
+    image: 'jc21/nginx-proxy-manager:latest'
     container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
@@ -19,8 +19,6 @@ services:
       DB_MYSQL_NAME: "npm"
     volumes:
       - ./data:/data
-      # Create volume binding for configuration to ensure persistence
-      - ./data/config.json:/app/config/production.json
       - ./data/nginx:/etc/nginx/conf.d
       - ./letsencrypt:/etc/letsencrypt
     depends_on:
@@ -29,16 +27,14 @@ services:
     networks:
       - proxy-network
     healthcheck:
-      # Use wget instead of curl for Alpine-based images
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:81"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 60s
 
   # MariaDB database for Nginx Proxy Manager
   db:
-    # Use the official MariaDB image for better compatibility
     image: 'mariadb:10.6.13'
     container_name: npm-db
     restart: unless-stopped
@@ -52,19 +48,16 @@ services:
     networks:
       - proxy-network
     healthcheck:
-      # Use a more reliable healthcheck command
       test: ["CMD", "mysqladmin", "ping", "--silent", "-h", "localhost", "-u", "root", "-pnpm"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-    # Ensure proper character encoding
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 
   # Portainer - Docker Container Management
   portainer:
-    # Use an updated Portainer version
-    image: portainer/portainer-ce:2.18.4
+    image: portainer/portainer-ce:latest
     container_name: portainer
     restart: unless-stopped
     security_opt:
@@ -78,17 +71,15 @@ services:
     networks:
       - proxy-network
     healthcheck:
-      # Use wget instead of curl
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:9000"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 60s
 
 networks:
   proxy-network:
     name: proxy-network
-    # Leave as external: true as this is used by the GitHub Actions workflow
     external: true
 
 volumes:
