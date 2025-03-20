@@ -134,9 +134,12 @@ jobs:
           # Copy docker-compose and setup scripts
           scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/docker-compose.yml ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/run-custom-setup.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/fix-connection-refused.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/diagnose-proxy-network.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
+          scp -i ~/.ssh/id_rsa -P ${{ env.VPS_PORT }} deploy/infrastructure/proxy/restart-proxy-services.sh ${{ env.VPS_USER }}@${{ env.VPS_HOST }}:/opt/PharmacyHub/infrastructure/proxy/
           
-          # Make script executable
-          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x run-custom-setup.sh"
+          # Make scripts executable
+          ssh -i ~/.ssh/id_rsa -p ${{ env.VPS_PORT }} ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "cd /opt/PharmacyHub/infrastructure/proxy && chmod +x *.sh"
           
           echo "Files transferred successfully. Creating launcher script..."
           

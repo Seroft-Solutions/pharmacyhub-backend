@@ -7,9 +7,9 @@ services:
     container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
-      - '80:80'   # Public HTTP Port
-      - '443:443' # Public HTTPS Port
-      - '81:81'   # Admin Web Port (Default credentials: admin@example.com / changeme)
+      - '0.0.0.0:80:80'   # Public HTTP Port
+      - '0.0.0.0:443:443' # Public HTTPS Port
+      - '0.0.0.0:81:81'   # Admin Web Port (Default credentials: admin@example.com / changeme)
     environment:
       # Database connection settings
       DB_MYSQL_HOST: "db"
@@ -67,7 +67,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - portainer_data:/data
     ports:
-      - "9000:9000"
+      - "0.0.0.0:9000:9000"
     networks:
       - proxy-network
     command: -H unix:///var/run/docker.sock  # Ensure Docker mode
