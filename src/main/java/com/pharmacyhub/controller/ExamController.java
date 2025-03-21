@@ -48,20 +48,17 @@ public class ExamController {
     private final QuestionService questionService;
     private final JsonExamUploadService jsonExamUploadService;
     private final PaymentService paymentService;
-    private final ExamAttemptService examAttemptService;
 
     @Autowired
     public ExamController(
             ExamService examService, 
             QuestionService questionService, 
             JsonExamUploadService jsonExamUploadService,
-            PaymentService paymentService,
-            ExamAttemptService examAttemptService) {
+            PaymentService paymentService) {
         this.examService = examService;
         this.questionService = questionService;
         this.jsonExamUploadService = jsonExamUploadService;
         this.paymentService = paymentService;
-        this.examAttemptService = examAttemptService;
     }
 
     @GetMapping
@@ -437,38 +434,7 @@ public class ExamController {
         }
     }
     
-    @PostMapping("/{id}/start")
-    @Operation(summary = "Start an exam attempt")
-    public ResponseEntity<ApiResponse<Object>> startExam(
-            @PathVariable("id") Long examId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-            
-        // Get exam details
-        Exam exam = examService.findById(examId)
-            .orElseThrow(() -> new EntityNotFoundException("Exam not found with id: " + examId));
-            
-        // Check if the exam is premium
-        if (exam.isPremium()) {
-            String userId = userDetails.getUsername();
-            
-            // Check if the user has purchased this exam
-            boolean hasPurchased = paymentService.hasUserPurchasedExam(examId, userId);
-            
-            if (!hasPurchased) {
-                throw new PaymentRequiredException("Payment required to access this premium exam");
-            }
-        }
-        
-        // Continue with the existing start exam logic
-        String userId = userDetails.getUsername();
-        try {
-            var attempt = examAttemptService.startExam(examId, userId);
-            return ResponseEntity.ok(ApiResponse.success(attempt));
-        } catch (Exception e) {
-            logger.error("Error starting exam: {}", e.getMessage(), e);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
-        }
-    }
+
 
     // Helper methods for mapping between DTO and entity
     private ExamResponseDTO mapToExamResponseDTO(Exam exam) {
