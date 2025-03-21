@@ -1,13 +1,18 @@
 package com.pharmacyhub.controller;
 
+import com.pharmacyhub.domain.entity.Exam;
 import com.pharmacyhub.dto.ExamResultDTO;
 import com.pharmacyhub.dto.response.ApiResponse;
 import com.pharmacyhub.dto.response.ExamAttemptResponseDTO;
 import com.pharmacyhub.dto.request.AnswerSubmissionDTO;
 import com.pharmacyhub.dto.response.FlaggedQuestionResponseDTO;
+import com.pharmacyhub.payment.exception.PaymentRequiredException;
+import com.pharmacyhub.payment.service.PaymentService;
 import com.pharmacyhub.service.ExamAttemptService;
+import com.pharmacyhub.service.ExamService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +33,16 @@ public class ExamAttemptController {
 
     private static final Logger logger = LoggerFactory.getLogger(ExamAttemptController.class);
     private final ExamAttemptService examAttemptService;
+    private final ExamService examService;
+    private final PaymentService paymentService;
 
-    public ExamAttemptController(ExamAttemptService examAttemptService) {
+    public ExamAttemptController(
+            ExamAttemptService examAttemptService,
+            ExamService examService,
+            PaymentService paymentService) {
         this.examAttemptService = examAttemptService;
+        this.examService = examService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/{examId}/start")
@@ -43,11 +55,34 @@ public class ExamAttemptController {
         String userId = auth.getName();
         logger.info("User {} attempting to start exam {}", userId, examId);
         
-        ExamAttemptResponseDTO attempt = examAttemptService.startExam(examId, userId);
-        
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.<ExamAttemptResponseDTO>success(attempt, 201));
+        // Check if the exam is premium and if the user has purchased it
+        try {
+            Exam exam = examService.findById(examId)
+                .orElseThrow(() -> new EntityNotFoundException("Exam not found with ID: " + examId));
+            
+            if (exam.isPremium()) {
+                boolean hasPurchased = paymentService.hasUserPurchasedExam(examId, userId);
+                
+                if (!hasPurchased) {
+                    throw new PaymentRequiredException(
+                        "Payment required to access this premium exam"
+                    );
+                }
+            }
+            
+            ExamAttemptResponseDTO attempt = examAttemptService.startExam(examId, userId);
+            
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ApiResponse.<ExamAttemptResponseDTO>success(attempt, 201));
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (PaymentRequiredException e) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error starting exam: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
     }
 
     @GetMapping("/attempts/user")

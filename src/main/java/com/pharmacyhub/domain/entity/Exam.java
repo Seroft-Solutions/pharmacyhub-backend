@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +59,16 @@ public class Exam {
 
     @Column(nullable = false)
     private boolean deleted = false;
+    
+    // New fields for premium exams
+    @Column(nullable = false)
+    private boolean premium = false;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price = BigDecimal.ZERO;
+    
+    @Column(name = "custom_price", nullable = false)
+    private boolean customPrice = false;
 
     // Helper method to add question
     public void addQuestion(Question question) {

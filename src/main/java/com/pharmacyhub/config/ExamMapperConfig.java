@@ -84,7 +84,9 @@ public class ExamMapperConfig {
             ExamRequestDTO source = context.getSource();
             Exam destination = context.getDestination();
             
-            destination.setId(source.getId());
+            if (source.getId() != null) {
+                destination.setId(source.getId());
+            }
             destination.setTitle(source.getTitle());
             destination.setDescription(source.getDescription());
             destination.setDuration(source.getDuration());

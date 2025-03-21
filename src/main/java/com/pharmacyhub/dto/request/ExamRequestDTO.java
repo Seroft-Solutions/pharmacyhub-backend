@@ -1,26 +1,23 @@
 package com.pharmacyhub.dto.request;
 
 import com.pharmacyhub.domain.entity.Exam;
-import com.pharmacyhub.dto.BaseDTO;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.PositiveOrZero;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Request DTO for creating or updating an exam
- */
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExamRequestDTO implements BaseDTO {
-    
+public class ExamRequestDTO {
     private Long id;
     
     @NotBlank(message = "Title is required")
@@ -28,60 +25,53 @@ public class ExamRequestDTO implements BaseDTO {
     
     private String description;
     
-    @NotNull(message = "Duration in minutes is required")
-    @Min(value = 1, message = "Duration must be at least 1 minute")
+    @NotNull(message = "Duration is required")
+    @PositiveOrZero(message = "Duration must be positive or zero")
     private Integer duration;
     
     @NotNull(message = "Total marks is required")
-    @Min(value = 1, message = "Total marks must be at least 1")
+    @PositiveOrZero(message = "Total marks must be positive or zero")
     private Integer totalMarks;
     
     @NotNull(message = "Passing marks is required")
-    @Min(value = 0, message = "Passing marks cannot be negative")
+    @PositiveOrZero(message = "Passing marks must be positive or zero")
     private Integer passingMarks;
     
-    private Exam.ExamStatus status = Exam.ExamStatus.DRAFT;
+    private Exam.ExamStatus status;
     
-    private List<String> tags = new ArrayList<>();
+    private List<String> tags;
     
-    @Valid
-    private List<QuestionDTO> questions = new ArrayList<>();
+    private List<QuestionDTO> questions;
     
-    @Data
+    // Premium exam fields
+    private Boolean isPremium;
+    private BigDecimal price;
+    private Boolean isCustomPrice;
+    
+    // Nested class for Question DTOs
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class QuestionDTO {
         private Long id;
-        
-        @NotNull(message = "Question number is required")
         private Integer questionNumber;
-        
-        @NotBlank(message = "Question text is required")
         private String questionText;
-        
-        @Valid
-        private List<OptionDTO> options = new ArrayList<>();
-        
         private String correctAnswer;
         private String explanation;
-        
-        @NotNull(message = "Marks value is required")
-        @Min(value = 1, message = "Marks must be at least 1")
         private Integer marks;
+        private List<OptionDTO> options;
     }
     
-    @Data
+    // Nested class for Option DTOs
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class OptionDTO {
         private Long id;
-        
-        @NotBlank(message = "Option key is required")
         private String optionKey;
-        
-        @NotBlank(message = "Option text is required")
         private String optionText;
-        
-        private Boolean isCorrect = false;
+        private Boolean isCorrect;
     }
 }

@@ -32,6 +32,11 @@ public class JsonExamUploadRequestDTO {
     // Paper-specific metadata fields
     private Map<String, Object> metadata;
     
+    // Premium exam fields
+    private Boolean isPremium = false;
+    private Double price = 0.0;
+    private Boolean isCustomPrice = false;
+    
     // The JSON content as a string (will be parsed by the service)
     @NotBlank(message = "JSON content is required")
     private String jsonContent;

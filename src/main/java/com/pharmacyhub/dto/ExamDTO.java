@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,8 @@ public class ExamDTO {
     private Integer passingMarks;
     private Exam.ExamStatus status;
     private List<QuestionDTO> questions = new ArrayList<>();
+    private boolean premium;
+    private BigDecimal price;
     
     @Getter
     @Setter

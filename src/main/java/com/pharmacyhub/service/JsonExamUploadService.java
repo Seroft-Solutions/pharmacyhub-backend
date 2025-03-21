@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,11 @@ public class JsonExamUploadService
             exam.setTitle(requestDTO.getTitle());
             exam.setDescription(requestDTO.getDescription());
             exam.setDuration(requestDTO.getDuration());
+            
+            // Set premium fields
+            exam.setPremium(requestDTO.getIsPremium() != null ? requestDTO.getIsPremium() : false);
+            exam.setPrice(requestDTO.getPrice() != null ? BigDecimal.valueOf(requestDTO.getPrice()) : BigDecimal.ZERO);
+            exam.setCustomPrice(requestDTO.getIsCustomPrice() != null ? requestDTO.getIsCustomPrice() : false);
 
             // We'll calculate totalMarks based on questions (default 1 mark per question)
             int totalMarks = jsonData.size();

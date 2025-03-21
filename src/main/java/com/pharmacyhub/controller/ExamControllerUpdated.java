@@ -40,9 +40,9 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/exams")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Exams", description = "API endpoints for exam management")
-public class ExamController {
+public class ExamControllerUpdated {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExamControllerUpdated.class);
 
     private final ExamService examService;
     private final QuestionService questionService;
@@ -51,7 +51,7 @@ public class ExamController {
     private final ExamAttemptService examAttemptService;
 
     @Autowired
-    public ExamController(
+    public ExamControllerUpdated(
             ExamService examService, 
             QuestionService questionService, 
             JsonExamUploadService jsonExamUploadService,
@@ -208,7 +208,6 @@ public class ExamController {
             info.setExamId(exam.getId());
             info.setPremium(exam.isPremium());
             info.setPrice(exam.getPrice());
-            info.setCustomPrice(exam.isCustomPrice());
             
             // Check if the user has already purchased this exam
             if (exam.isPremium() && userDetails != null) {
@@ -485,8 +484,19 @@ public class ExamController {
         // Set premium fields
         dto.setPremium(exam.isPremium());
         dto.setPrice(exam.getPrice());
-        dto.setCustomPrice(exam.isCustomPrice());
         dto.setPurchased(false); // Default value, will be updated in mapToExamResponseDTOWithPurchaseCheck
+        
+        // Set difficulty - derive from tags if possible, otherwise use default MEDIUM
+        if (exam.getTags() != null) {
+            // Look for a difficulty tag (easy, medium, hard)
+            for (String tag : exam.getTags()) {
+                String lowercaseTag = tag.toLowerCase();
+                if (lowercaseTag.equals("easy") || lowercaseTag.equals("medium") || lowercaseTag.equals("hard")) {
+                    dto.setDifficulty(lowercaseTag.toUpperCase());
+                    break;
+                }
+            }
+        }
         
         // Map questions if present (but don't include them for list operations)
         if (exam.getQuestions() != null && !exam.getQuestions().isEmpty()) {
@@ -538,6 +548,8 @@ public class ExamController {
         dto.setCorrectAnswer(question.getCorrectAnswer());
         dto.setExplanation(question.getExplanation());
         dto.setMarks(question.getMarks());
+        dto.setTopic(question.getTopic());
+        dto.setDifficulty(question.getDifficulty() != null ? question.getDifficulty() : "MEDIUM");
         
         // Map options
         if (question.getOptions() != null) {
@@ -570,7 +582,9 @@ public class ExamController {
         // Don't include the correct answer in the response for security
         dto.setExplanation(question.getExplanation());
         dto.setPoints(question.getMarks());
-        
+        dto.setTopic(question.getTopic());
+        dto.setDifficulty(question.getDifficulty());
+        dto.setCorrectAnswer(question.getCorrectAnswer().replaceAll("\\([A-D]\\)\\s.*", "$1").replaceAll("[^A-D]", ""));
         // Map options without revealing which is correct
         if (question.getOptions() != null) {
             List<QuestionResponseDTO.OptionDTO> optionDTOs = question.getOptions().stream()
@@ -608,7 +622,6 @@ public class ExamController {
         // Set premium fields
         exam.setPremium(dto.getIsPremium() != null ? dto.getIsPremium() : false);
         exam.setPrice(dto.getPrice());
-        exam.setCustomPrice(dto.getIsCustomPrice() != null ? dto.getIsCustomPrice() : false);
         
         // Questions will be added/updated separately
         return exam;
