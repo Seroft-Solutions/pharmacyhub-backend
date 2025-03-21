@@ -7,7 +7,7 @@ defaults:
 
 on:
   push:
-    branches: [ dev, qa]
+    branches: [ dev, qa, main]
   pull_request:
     branches: [ dev, qa, main ]
   workflow_dispatch:
