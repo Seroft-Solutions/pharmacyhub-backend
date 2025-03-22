@@ -17,4 +17,5 @@ public class PremiumExamInfoDTO {
     private BigDecimal price;
     private boolean purchased;
     private boolean customPrice;
+    private boolean universalAccess;
 }

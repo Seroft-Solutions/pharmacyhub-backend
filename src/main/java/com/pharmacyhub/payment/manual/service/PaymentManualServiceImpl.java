@@ -42,6 +42,7 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         paymentRequest.setSenderNumber(request.getSenderNumber());
         paymentRequest.setTransactionId(request.getTransactionId());
         paymentRequest.setNotes(request.getNotes());
+        paymentRequest.setScreenshotData(request.getScreenshotData());
         paymentRequest.setStatus(PaymentManualRequest.PaymentStatus.PENDING);
         paymentRequest.setCreatedAt(LocalDateTime.now());
         
@@ -118,9 +119,30 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     @Override
     @Transactional(readOnly = true)
     public boolean hasUserApprovedRequest(String userId, Long examId) {
-        return !repository.findByUserIdAndExamIdAndStatus(
+        // If examId is null, check if the user has any approved manual payment request
+        if (examId == null) {
+            List<PaymentManualRequest> approvedRequests = repository.findByUserIdAndStatus(
+                userId, PaymentManualRequest.PaymentStatus.APPROVED
+            );
+            boolean hasAnyApproved = !approvedRequests.isEmpty();
+            
+            if (hasAnyApproved) {
+                log.info("User {} has at least one approved manual payment request", userId);
+            }
+            
+            return hasAnyApproved;
+        }
+        
+        // Check for a specific exam
+        boolean hasSpecificApproved = !repository.findByUserIdAndExamIdAndStatus(
             userId, examId, PaymentManualRequest.PaymentStatus.APPROVED
         ).isEmpty();
+        
+        if (hasSpecificApproved) {
+            log.info("User {} has an approved manual payment request for exam {}", userId, examId);
+        }
+        
+        return hasSpecificApproved;
     }
     
     /**
@@ -135,6 +157,7 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         dto.setTransactionId(request.getTransactionId());
         dto.setNotes(request.getNotes());
         dto.setAttachmentUrl(request.getAttachmentUrl());
+        dto.setScreenshotData(request.getScreenshotData());
         dto.setStatus(request.getStatus().toString());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setProcessedAt(request.getProcessedAt());

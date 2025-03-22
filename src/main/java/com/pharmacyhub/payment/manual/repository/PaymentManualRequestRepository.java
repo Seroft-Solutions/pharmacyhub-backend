@@ -34,6 +34,14 @@ public interface PaymentManualRequestRepository extends JpaRepository<PaymentMan
     );
     
     /**
+     * Find all requests for a specific user and status
+     * Used for checking if a user has any approved payment request
+     */
+    List<PaymentManualRequest> findByUserIdAndStatus(
+        String userId, PaymentManualRequest.PaymentStatus status
+    );
+    
+    /**
      * Find all requests with a specific status
      */
     List<PaymentManualRequest> findByStatus(PaymentManualRequest.PaymentStatus status);

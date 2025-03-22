@@ -23,4 +23,6 @@ public class ManualPaymentSubmitDTO {
     private String transactionId;
     
     private String notes;
+    
+    private String screenshotData;
 }

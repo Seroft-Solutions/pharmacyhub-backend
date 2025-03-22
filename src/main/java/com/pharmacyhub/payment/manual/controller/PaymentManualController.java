@@ -68,9 +68,9 @@ public class PaymentManualController {
             @AuthenticationPrincipal UserDetails userDetails) {
         
         String userId = userDetails.getUsername();
-        boolean hasAccess = paymentManualService.hasUserApprovedRequest(userId, examId);
+        boolean hasManualAccess = paymentManualService.hasUserApprovedRequest(userId, examId);
         
-        Map<String, Boolean> response = Collections.singletonMap("hasAccess", hasAccess);
+        Map<String, Boolean> response = Collections.singletonMap("hasAccess", hasManualAccess);
         return ResponseEntity.ok(response);
     }
     

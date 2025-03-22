@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -162,10 +163,40 @@ public class PaymentServiceImpl implements PaymentService {
     
     @Override
     public boolean hasUserPurchasedExam(Long examId, String userId) {
-        // Check if user has a successful payment for this exam
+        // First, check if the user has purchased any premium exam (for the "one payment unlocks all" feature)
+        if (hasUserPurchasedAnyExam(userId)) {
+            return true;
+        }
+        
+        // If not, check if user has a successful payment specifically for this exam
         return paymentRepository.findByUserIdAndItemTypeAndItemId(userId, "EXAM", examId)
             .map(payment -> PaymentStatus.COMPLETED.equals(payment.getStatus()))
             .orElse(false);
+    }
+    
+    @Override
+    public boolean hasUserPurchasedAnyExam(String userId) {
+        // Check if the user has any completed payment for any exam
+        List<Payment> userPayments = paymentRepository.findByUserIdAndItemTypeAndStatus(
+            userId, "EXAM", PaymentStatus.COMPLETED);
+        
+        boolean hasPurchased = !userPayments.isEmpty();
+        
+        // Log the result for debugging
+        if (hasPurchased) {
+            log.info("User {} has purchased at least one premium exam. Number of premium exams purchased: {}", 
+                   userId, userPayments.size());
+            
+            // Log the exam IDs for reference
+            String examIds = userPayments.stream()
+                .map(payment -> String.valueOf(payment.getItemId()))
+                .collect(Collectors.joining(", "));
+            log.info("User {} has purchased these exams: {}", userId, examIds);
+        } else {
+            log.info("User {} has not purchased any premium exams yet", userId);
+        }
+        
+        return hasPurchased;
     }
     
     @Override

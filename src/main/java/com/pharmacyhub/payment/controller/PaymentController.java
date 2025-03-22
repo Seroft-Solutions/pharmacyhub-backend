@@ -8,6 +8,7 @@ import com.pharmacyhub.payment.dto.PaymentInitResponse;
 import com.pharmacyhub.payment.dto.PaymentResult;
 import com.pharmacyhub.payment.entity.Payment;
 import com.pharmacyhub.payment.service.PaymentService;
+import com.pharmacyhub.payment.manual.service.PaymentManualService;
 import com.pharmacyhub.service.ExamService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,13 @@ import java.util.stream.Collectors;
 public class PaymentController {
     
     private final PaymentService paymentService;
+    private final PaymentManualService paymentManualService;
     private final ExamService examService;
     
     @Autowired
-    public PaymentController(PaymentService paymentService, ExamService examService) {
+    public PaymentController(PaymentService paymentService, PaymentManualService paymentManualService, ExamService examService) {
         this.paymentService = paymentService;
+        this.paymentManualService = paymentManualService;
         this.examService = examService;
     }
     
@@ -107,15 +110,73 @@ public class PaymentController {
      * Check if user has access to a premium exam
      */
     @GetMapping("/exams/{examId}/access")
-    public ResponseEntity<Map<String, Boolean>> checkExamAccess(
+    public ResponseEntity<Map<String, Object>> checkExamAccess(
             @PathVariable Long examId,
             @AuthenticationPrincipal UserDetails userDetails) {
         
         String userId = userDetails.getUsername();
         
-        boolean hasAccess = paymentService.hasUserPurchasedExam(examId, userId);
+        // COMPREHENSIVE APPROACH: CHECK ALL PAYMENT METHODS
         
-        Map<String, Boolean> response = Collections.singletonMap("hasAccess", hasAccess);
+        // 1. Check online payments
+        boolean hasPurchasedThisExam = paymentService.hasUserPurchasedExam(examId, userId);
+        boolean hasPurchasedAnyExam = paymentService.hasUserPurchasedAnyExam(userId);
+        
+        // 2. Check manual payments
+        boolean hasApprovedThisExamManualPayment = paymentManualService.hasUserApprovedRequest(userId, examId);
+        boolean hasApprovedAnyManualPayment = paymentManualService.hasUserApprovedRequest(userId, null);
+        
+        // Determine overall access status
+        boolean hasDirectAccess = hasPurchasedThisExam || hasApprovedThisExamManualPayment;
+        boolean hasUniversalAccess = hasPurchasedAnyExam || hasApprovedAnyManualPayment;
+        boolean hasAccess = hasDirectAccess || hasUniversalAccess;
+        
+        // Return detailed response with all access information
+        Map<String, Object> response = Map.of(
+            "hasAccess", hasAccess,
+            "hasDirectAccess", hasDirectAccess,
+            "hasUniversalAccess", hasUniversalAccess,
+            "hasPurchasedThisExam", hasPurchasedThisExam,
+            "hasPurchasedAnyExam", hasPurchasedAnyExam,
+            "hasApprovedThisExamManualPayment", hasApprovedThisExamManualPayment,
+            "hasApprovedAnyManualPayment", hasApprovedAnyManualPayment
+        );
+        
+        // Log for troubleshooting
+        log.info("Access check for user {} on exam {}: direct={}, universal={}, access={}",
+                userId, examId, hasDirectAccess, hasUniversalAccess, hasAccess);
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Check if user has universal premium access ("pay once, access all" feature)
+     */
+    @GetMapping("/premium/access")
+    public ResponseEntity<Map<String, Object>> checkUniversalAccess(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        String userId = userDetails.getUsername();
+        
+        // Check if user has purchased any premium exam (online)
+        boolean hasPurchasedAnyExam = paymentService.hasUserPurchasedAnyExam(userId);
+        
+        // Check if user has any approved manual payment request
+        boolean hasApprovedAnyManualPayment = paymentManualService.hasUserApprovedRequest(userId, null);
+        
+        // Combined universal access flag
+        boolean hasUniversalAccess = hasPurchasedAnyExam || hasApprovedAnyManualPayment;
+        
+        Map<String, Object> response = Map.of(
+            "hasUniversalAccess", hasUniversalAccess,
+            "hasPurchasedAnyExam", hasPurchasedAnyExam,
+            "hasApprovedAnyManualPayment", hasApprovedAnyManualPayment
+        );
+        
+        // Log for troubleshooting
+        log.info("Universal access check for user {}: online={}, manual={}, combined={}",
+                userId, hasPurchasedAnyExam, hasApprovedAnyManualPayment, hasUniversalAccess);
+        
         return ResponseEntity.ok(response);
     }
     

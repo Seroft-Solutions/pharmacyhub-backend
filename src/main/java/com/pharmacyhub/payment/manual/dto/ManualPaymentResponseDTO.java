@@ -21,6 +21,7 @@ public class ManualPaymentResponseDTO {
     private String transactionId;
     private String notes;
     private String attachmentUrl;
+    private String screenshotData;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime processedAt;

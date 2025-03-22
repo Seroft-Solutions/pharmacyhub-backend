@@ -41,6 +41,13 @@ public interface PaymentService {
     boolean hasUserPurchasedExam(Long examId, String userId);
     
     /**
+     * Check if a user has purchased any premium exam, granting access to all premium exams
+     * @param userId User ID to check
+     * @return true if the user has purchased any premium exam, false otherwise
+     */
+    boolean hasUserPurchasedAnyExam(String userId);
+    
+    /**
      * Get payment history for a user
      * @param userId User ID
      * @return List of payment records

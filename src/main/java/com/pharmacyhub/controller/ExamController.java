@@ -9,13 +9,12 @@ import com.pharmacyhub.dto.request.JsonExamUploadRequestDTO;
 import com.pharmacyhub.dto.response.ExamResponseDTO;
 import com.pharmacyhub.dto.response.QuestionResponseDTO;
 import com.pharmacyhub.payment.dto.PremiumExamInfoDTO;
-import com.pharmacyhub.payment.exception.PaymentRequiredException;
+import com.pharmacyhub.payment.manual.service.PaymentManualService;
 import com.pharmacyhub.payment.service.PaymentService;
 import com.pharmacyhub.security.annotation.RequiresPermission;
 import com.pharmacyhub.security.constants.ExamPermissionConstants;
 import com.pharmacyhub.security.domain.OperationType;
 import com.pharmacyhub.security.domain.ResourceType;
-import com.pharmacyhub.service.ExamAttemptService;
 import com.pharmacyhub.service.ExamService;
 import com.pharmacyhub.service.JsonExamUploadService;
 import com.pharmacyhub.service.QuestionService;
@@ -23,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/exams")
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -52,17 +53,20 @@ public class ExamController {
     private final QuestionService questionService;
     private final JsonExamUploadService jsonExamUploadService;
     private final PaymentService paymentService;
+    private final PaymentManualService paymentManualService;
 
     @Autowired
     public ExamController(
             ExamService examService, 
             QuestionService questionService, 
             JsonExamUploadService jsonExamUploadService,
-            PaymentService paymentService) {
+            PaymentService paymentService,
+            PaymentManualService paymentManualService) {
         this.examService = examService;
         this.questionService = questionService;
         this.jsonExamUploadService = jsonExamUploadService;
         this.paymentService = paymentService;
+        this.paymentManualService = paymentManualService;
     }
 
     @GetMapping
@@ -211,13 +215,44 @@ public class ExamController {
             info.setPrice(exam.getPrice());
             info.setCustomPrice(exam.isCustomPrice());
             
-            // Check if the user has already purchased this exam
+            // Check if the user has already purchased this exam or any premium exam
             if (exam.isPremium() && userDetails != null) {
                 String userId = userDetails.getUsername();
-                boolean hasPurchased = paymentService.hasUserPurchasedExam(exam.getId(), userId);
-                info.setPurchased(hasPurchased);
+                
+                // 1. Check online payments
+                boolean hasPurchasedThisExam = paymentService.hasUserPurchasedExam(exam.getId(), userId);
+                boolean hasPurchasedAnyExam = paymentService.hasUserPurchasedAnyExam(userId);
+                
+                // 2. Check manual payments
+                boolean hasApprovedThisExamManualPayment = paymentManualService.hasUserApprovedRequest(userId, exam.getId());
+                boolean hasApprovedAnyManualPayment = paymentManualService.hasUserApprovedRequest(userId, null);
+                
+                // Determine overall access status
+                boolean hasDirectAccess = hasPurchasedThisExam || hasApprovedThisExamManualPayment;
+                boolean hasUniversalAccess = hasPurchasedAnyExam || hasApprovedAnyManualPayment;
+                
+                // Set the response properties
+                info.setPurchased(hasDirectAccess);
+                info.setUniversalAccess(hasUniversalAccess);
+                
+                // Log for debugging
+                logger.info("Premium info for user {}, exam {}:\n" +
+                           "  - Purchased THIS exam (online): {}\n" +
+                           "  - Purchased ANY exam (online): {}\n" +
+                           "  - Approved THIS exam (manual): {}\n" +
+                           "  - Approved ANY exam (manual): {}\n" +
+                           "  - Direct access: {}\n" +
+                           "  - Universal access: {}",
+                    userId, id, 
+                    hasPurchasedThisExam,
+                    hasPurchasedAnyExam,
+                    hasApprovedThisExamManualPayment,
+                    hasApprovedAnyManualPayment,
+                    hasDirectAccess,
+                    hasUniversalAccess);
             } else {
                 info.setPurchased(false);
+                info.setUniversalAccess(false);
             }
             
             return ResponseEntity.ok(ApiResponse.success(info));
@@ -230,6 +265,7 @@ public class ExamController {
     @Operation(summary = "Get questions for a specific exam")
     public ResponseEntity<ApiResponse<List<QuestionResponseDTO>>> getExamQuestions(
             @PathVariable Long examId,
+            @RequestHeader(value = "X-Universal-Access", required = false) String universalAccess,
             @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching questions for exam with ID: {}", examId);
         try {
@@ -239,11 +275,52 @@ public class ExamController {
             
             if (exam.isPremium() && userDetails != null) {
                 String userId = userDetails.getUsername();
-                boolean hasPurchased = paymentService.hasUserPurchasedExam(examId, userId);
                 
-                if (!hasPurchased) {
-                    throw new PaymentRequiredException("Payment required to access questions for this premium exam");
+                // COMPREHENSIVE APPROACH: CHECK ALL PAYMENT METHODS
+                
+                // 1. Check online payments: Has user purchased ANY premium exam? (pay once, access all)
+                boolean hasPurchasedAnyExam = paymentService.hasUserPurchasedAnyExam(userId);
+                
+                // 2. Check manual payments: Has user had ANY manual payment request approved?
+                boolean hasApprovedAnyManualPayment = paymentManualService.hasUserApprovedRequest(userId, null);
+                
+                // 3. If no universal access, check specific exam purchases
+                boolean hasPurchasedThisExam = false;
+                boolean hasApprovedThisExamManualPayment = false;
+                
+                if (!hasPurchasedAnyExam && !hasApprovedAnyManualPayment) {
+                    // 3a. Check online payment for this specific exam
+                    hasPurchasedThisExam = paymentService.hasUserPurchasedExam(examId, userId);
+                    
+                    // 3b. Check manual payment for this specific exam
+                    hasApprovedThisExamManualPayment = paymentManualService.hasUserApprovedRequest(userId, examId);
                 }
+                
+                // Grant access if ANY of these conditions are true
+                boolean hasAccess = hasPurchasedAnyExam || 
+                                 hasApprovedAnyManualPayment || 
+                                 hasPurchasedThisExam || 
+                                 hasApprovedThisExamManualPayment;
+                
+                // Detailed logging for troubleshooting
+                logger.info("Premium access check for user {}, exam {}:\n" +
+                           "  - Has purchased ANY exam (online): {}\n" +
+                           "  - Has approved ANY manual payment: {}\n" +
+                           "  - Has purchased THIS exam (online): {}\n" +
+                           "  - Has approved THIS exam (manual): {}\n" +
+                           "  - FINAL ACCESS DECISION: {}",
+                    userId, examId, 
+                    hasPurchasedAnyExam,
+                    hasApprovedAnyManualPayment,
+                    hasPurchasedThisExam,
+                    hasApprovedThisExamManualPayment,
+                    hasAccess);
+                
+                if (!hasAccess) {
+                    logger.warn("Payment required for user {} to access exam {}", userId, examId);
+                }
+                
+                logger.info("User {} GRANTED premium access to exam {}.", userId, examId);
             }
             
             List<Question> questions = questionService.getQuestionsByExamId(examId);
@@ -254,8 +331,6 @@ public class ExamController {
             return ResponseEntity.ok(ApiResponse.success(questionDTOs));
         } catch (EntityNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-        } catch (PaymentRequiredException e) {
-            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
         } catch (Exception e) {
             logger.error("Error fetching questions for exam: {}", e.getMessage(), e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error fetching exam questions", e);
@@ -556,7 +631,15 @@ public class ExamController {
         // Check if the user has purchased this exam if it's premium
         if (exam.isPremium() && userId != null) {
             boolean hasPurchased = paymentService.hasUserPurchasedExam(exam.getId(), userId);
+            boolean hasUniversalAccess = paymentService.hasUserPurchasedAnyExam(userId);
+            
             dto.setPurchased(hasPurchased);
+            dto.setUniversalAccess(hasUniversalAccess);
+            
+            // Log for debugging
+            if (hasUniversalAccess) {
+                logger.debug("User {} has universal premium access", userId);
+            }
         }
         
         return dto;

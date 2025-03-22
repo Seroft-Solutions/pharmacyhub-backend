@@ -41,6 +41,10 @@ public class PaymentManualRequest {
     @Column(nullable = true)
     private String attachmentUrl;
     
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String screenshotData;
+    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus status = PaymentStatus.PENDING;

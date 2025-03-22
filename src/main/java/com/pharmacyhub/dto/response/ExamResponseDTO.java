@@ -69,6 +69,9 @@ public class ExamResponseDTO {
     @Schema(description = "Flag indicating if the user has purchased this exam", example = "false")
     private boolean purchased;
     
+    @Schema(description = "Flag indicating if the user has universal access to all premium exams", example = "false")
+    private boolean universalAccess;
+    
     @Schema(description = "Flag indicating if the exam has a custom price", example = "false")
     private boolean customPrice;
     
