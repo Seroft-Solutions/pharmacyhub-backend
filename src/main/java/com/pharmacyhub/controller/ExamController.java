@@ -385,6 +385,23 @@ public class ExamController {
         }
     }
 
+    @PostMapping("/papers/upload/json")
+    @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
+    @Operation(summary = "Upload and create a paper from JSON data")
+    public ResponseEntity<ApiResponse<ExamResponseDTO>> uploadJsonPaper(
+            @Valid @RequestBody JsonExamUploadRequestDTO requestDTO) {
+        logger.info("Uploading JSON paper: {}", requestDTO.getTitle());
+        try {
+            Exam createdExam = jsonExamUploadService.processJsonAndCreateExam(requestDTO);
+            ExamResponseDTO responseDTO = mapToExamResponseDTO(createdExam);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(responseDTO, 201));
+        } catch (Exception e) {
+            logger.error("Error uploading JSON paper: {}", e.getMessage(), e);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        }
+    }
+
     @PutMapping("/{id}")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.EDIT_EXAM)
     @Operation(summary = "Update an existing exam")
