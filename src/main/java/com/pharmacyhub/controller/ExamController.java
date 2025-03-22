@@ -1,6 +1,7 @@
 package com.pharmacyhub.controller;
 
 import com.pharmacyhub.domain.entity.Exam;
+import com.pharmacyhub.domain.entity.Option;
 import com.pharmacyhub.domain.entity.Question;
 import com.pharmacyhub.dto.response.ApiResponse;
 import com.pharmacyhub.dto.request.ExamRequestDTO;
@@ -32,6 +33,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/exams")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Exams", description = "API endpoints for exam management")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Exams", description = "Manage exams, questions, and exam-taking processes")
 public class ExamController {
 
     private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
@@ -316,7 +320,40 @@ public class ExamController {
 
     @PostMapping
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
-    @Operation(summary = "Create a new exam")
+    @Operation(
+        summary = "Create a new exam",
+        description = "Creates a new exam with questions and options. Requires CREATE_EXAM permission.",
+        responses = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "201", 
+                description = "Exam successfully created",
+                content = @io.swagger.v3.oas.annotations.media.Content(
+                    mediaType = "application/json",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ExamResponseDTO.class)
+                )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "400", 
+                description = "Invalid input data",
+                content = @io.swagger.v3.oas.annotations.media.Content(
+                    mediaType = "application/json",
+                    schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ApiResponse.class)
+                )
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "403", 
+                description = "Forbidden - insufficient permissions"
+            )
+        }
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "Exam data to create",
+        required = true,
+        content = @io.swagger.v3.oas.annotations.media.Content(
+            mediaType = "application/json",
+            schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = ExamRequestDTO.class)
+        )
+    )
     public ResponseEntity<ApiResponse<ExamResponseDTO>> createExam(@Valid @RequestBody ExamRequestDTO requestDTO) {
         logger.info("Creating new exam");
         try {
@@ -577,23 +614,87 @@ public class ExamController {
         
         return dto;
     }
-    
+
     private Exam mapToExamEntity(ExamRequestDTO dto) {
         Exam exam = new Exam();
+        // Don't set the ID for a new exam
+        // If the exam has an ID > 0, it's an existing exam being updated
+        if (dto.getId() != null && dto.getId() > 0) {
+            exam.setId(dto.getId());
+        }
         exam.setTitle(dto.getTitle());
         exam.setDescription(dto.getDescription());
         exam.setDuration(dto.getDuration());
         exam.setTotalMarks(dto.getTotalMarks());
         exam.setPassingMarks(dto.getPassingMarks());
-        exam.setStatus(dto.getStatus() != null ? dto.getStatus() : Exam.ExamStatus.DRAFT);
-        exam.setTags(dto.getTags());
-        
-        // Set premium fields
+        exam.setStatus(dto.getStatus() != null ? dto.getStatus() : Exam.ExamStatus.PUBLISHED);
+        exam.setTags(dto.getTags() != null ? dto.getTags() : new ArrayList<>());
+
+        // Premium fields
         exam.setPremium(dto.getIsPremium() != null ? dto.getIsPremium() : false);
-        exam.setPrice(dto.getPrice());
+        exam.setPrice(dto.getPrice() != null ? dto.getPrice() : BigDecimal.ZERO);
         exam.setCustomPrice(dto.getIsCustomPrice() != null ? dto.getIsCustomPrice() : false);
-        
-        // Questions will be added/updated separately
+
+        // Map questions from DTO to entity
+        if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
+            List<Question> questionEntities = new ArrayList<>();
+
+            for (ExamRequestDTO.QuestionDTO questionDTO : dto.getQuestions()) {
+                Question question = new Question();
+                // Don't set the ID for new questions to avoid detached entity errors
+                // If the question has an ID > 0, it's an existing question being updated
+                if (questionDTO.getId() != null && questionDTO.getId() > 0) {
+                    question.setId(questionDTO.getId());
+                }
+                question.setQuestionNumber(questionDTO.getQuestionNumber());
+                
+                // Validate questionText is not null or empty
+                String questionText = questionDTO.getQuestionText();
+                if (questionText == null || questionText.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Question text is required for question number " + questionDTO.getQuestionNumber());
+                }
+                question.setQuestionText(questionText);
+                
+                // Validate correctAnswer is not null or empty
+                String correctAnswer = questionDTO.getCorrectAnswer();
+                if (correctAnswer == null || correctAnswer.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Correct answer is required for question number " + questionDTO.getQuestionNumber());
+                }
+                question.setCorrectAnswer(correctAnswer);
+                
+                question.setExplanation(questionDTO.getExplanation());
+                question.setMarks(questionDTO.getMarks());
+                question.setExam(exam); // Set parent
+
+                // Map options
+                if (questionDTO.getOptions() != null && !questionDTO.getOptions().isEmpty()) {
+                    List<Option> optionEntities = new ArrayList<>();
+                    for (ExamRequestDTO.OptionDTO optionDTO : questionDTO.getOptions()) {
+                        Option option = new Option();
+                        // Don't set the ID for new options to avoid detached entity errors
+                        // If the option has an ID > 0, it's an existing option being updated
+                        if (optionDTO.getId() != null && optionDTO.getId() > 0) {
+                            option.setId(optionDTO.getId());
+                        }
+                        option.setOptionLabel(optionDTO.getOptionKey()); // label = optionKey
+                        option.setOptionText(optionDTO.getOptionText()); // text = optionText
+                        option.setIsCorrect(optionDTO.getIsCorrect() != null ? optionDTO.getIsCorrect() : false);
+                        option.setDeleted(false);
+                        option.setQuestion(question); // Set back-reference
+
+                        optionEntities.add(option);
+                    }
+                    question.setOptions(optionEntities);
+                }
+
+                questionEntities.add(question);
+            }
+
+            exam.setQuestions(questionEntities);
+        }
+
         return exam;
     }
+
+
 }

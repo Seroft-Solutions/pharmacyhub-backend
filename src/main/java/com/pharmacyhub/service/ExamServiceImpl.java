@@ -192,27 +192,87 @@ public class ExamServiceImpl implements ExamService {
         existingExam.setTotalMarks(exam.getTotalMarks());
         existingExam.setPassingMarks(exam.getPassingMarks());
         existingExam.setStatus(exam.getStatus());
+        existingExam.setTags(exam.getTags());
+        existingExam.setPremium(exam.isPremium());
+        existingExam.setPrice(exam.getPrice());
+        existingExam.setCustomPrice(exam.isCustomPrice());
         
         // Save the updated exam
         Exam updatedExam = examRepository.save(existingExam);
         
         // Update questions if provided
         if (exam.getQuestions() != null) {
+            logger.info("Updating questions for exam ID: {}", id);
+            
             // Get existing questions
             List<Question> existingQuestions = questionRepository.findByExamIdAndDeletedFalse(id);
-            
-            // Mark all existing questions as deleted
-            for (Question question : existingQuestions) {
-                question.setDeleted(true);
+            Map<Long, Question> existingQuestionsMap = new HashMap<>();
+            for (Question q : existingQuestions) {
+                existingQuestionsMap.put(q.getId(), q);
             }
-            questionRepository.saveAll(existingQuestions);
             
-            // Add new questions
+            // Process incoming questions
+            List<Question> questionsToSave = new ArrayList<>();
             for (Question question : exam.getQuestions()) {
+                // Set the parent exam
                 question.setExam(updatedExam);
-                question.setId(null); // Ensure new questions are created
+                
+                // Check if this is an existing question or a new one
+                if (question.getId() != null && question.getId() > 0 && existingQuestionsMap.containsKey(question.getId())) {
+                    // This is an existing question - update its properties
+                    Question existingQuestion = existingQuestionsMap.get(question.getId());
+                    existingQuestion.setQuestionNumber(question.getQuestionNumber());
+                    existingQuestion.setQuestionText(question.getQuestionText());
+                    existingQuestion.setCorrectAnswer(question.getCorrectAnswer());
+                    existingQuestion.setExplanation(question.getExplanation());
+                    existingQuestion.setMarks(question.getMarks());
+                    existingQuestion.setTopic(question.getTopic());
+                    existingQuestion.setDifficulty(question.getDifficulty());
+                    existingQuestion.setType(question.getType());
+                    
+                    // Update options
+                    if (question.getOptions() != null) {
+                        // First, soft delete all existing options
+                        existingQuestion.getOptions().forEach(option -> option.setDeleted(true));
+                        
+                        // Then add new options
+                        for (var option : question.getOptions()) {
+                            // Create a new option to avoid detached entity issues
+                            option.setQuestion(existingQuestion);
+                            option.setDeleted(false);
+                        }
+                        existingQuestion.setOptions(question.getOptions());
+                    }
+                    
+                    questionsToSave.add(existingQuestion);
+                    // Remove from map to track which questions were processed
+                    existingQuestionsMap.remove(question.getId());
+                } else {
+                    // This is a new question - ensure it doesn't have an ID
+                    question.setId(null);
+                    
+                    // Set back-references for options
+                    if (question.getOptions() != null) {
+                        for (var option : question.getOptions()) {
+                            option.setId(null); // Ensure option gets a new ID
+                            option.setQuestion(question);
+                            option.setDeleted(false);
+                        }
+                    }
+                    
+                    questionsToSave.add(question);
+                }
             }
-            questionRepository.saveAll(exam.getQuestions());
+            
+            // Mark any remaining existing questions as deleted
+            for (Question unusedQuestion : existingQuestionsMap.values()) {
+                unusedQuestion.setDeleted(true);
+                questionsToSave.add(unusedQuestion);
+            }
+            
+            // Save all questions in a single operation
+            logger.info("Saving {} questions for exam ID: {}", questionsToSave.size(), id);
+            questionRepository.saveAll(questionsToSave);
         }
         
         return updatedExam;

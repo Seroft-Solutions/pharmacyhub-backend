@@ -38,6 +38,19 @@ spring:
     throw-exception-if-no-handler-found: true
   web.resources.add-mappings: false
 
+# OpenAPI configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    disable-swagger-default-url: true
+  paths-to-match: /api/**
+  show-actuator: false
+  cache.disabled: true
+
 server:
   port: 8080
   servlet:
