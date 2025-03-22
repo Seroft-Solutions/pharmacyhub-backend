@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,9 +80,51 @@ public class UserController
     profileDTO.setActive(user.isActive());
     profileDTO.setRegistered(user.isRegistered());
     
-    // You can add more user details as needed
+    // Add roles based on userType
+    List<String> roles = new ArrayList<>();
+    
+    // Map UserType to roles
+    UserType userType = user.getUserType();
+    switch (userType) {
+        case ADMIN:
+            roles.add("ADMIN");
+            break;
+        case SUPER_ADMIN:
+            roles.add("SUPER_ADMIN");
+            roles.add("ADMIN"); // Super admin also has admin privileges
+            break;
+        case PHARMACIST:
+            roles.add("PHARMACIST");
+            break;
+        // Add other role mappings as needed
+        default:
+            roles.add("USER"); // Everyone gets basic user role
+            break;
+    }
+    
+    // Set the roles directly in the response
+    profileDTO.setRoles(roles);
+    
+    // Set permissions based on user type
+    List<String> permissions = new ArrayList<>();
+    
+    // Admin permissions
+    if (userType == UserType.ADMIN || userType == UserType.SUPER_ADMIN) {
+        permissions.add("manage_users");
+        permissions.add("manage_exams");
+        permissions.add("view_reports");
+        permissions.add("manage_notifications");
+        permissions.add("view_past_papers");
+        permissions.add("view_model_papers");
+        permissions.add("view_subject_papers");
+        permissions.add("view_practice_exams");
+    }
+    // Set permissions in the response
+    profileDTO.setPermissions(permissions);
+    
+    // Include userType in the metadata for backward compatibility
     Map<String, Object> metadata = new HashMap<>();
-    metadata.put("userType", user.getUserType());
+    metadata.put("userType", userType);
     
     return ResponseEntity.ok(
         ApiResponse.success(profileDTO, HttpStatus.OK.value(), metadata)

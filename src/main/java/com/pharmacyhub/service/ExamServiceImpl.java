@@ -155,7 +155,7 @@ public class ExamServiceImpl implements ExamService {
             throw new IllegalArgumentException("An exam with this title already exists");
         }
         
-        exam.setStatus(Exam.ExamStatus.DRAFT);
+        exam.setStatus(Exam.ExamStatus.PUBLISHED);
         
         // Save the exam
         Exam savedExam = examRepository.save(exam);
