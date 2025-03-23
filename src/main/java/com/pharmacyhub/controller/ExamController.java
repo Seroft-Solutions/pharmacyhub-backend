@@ -628,7 +628,7 @@ public class ExamController {
     private ExamResponseDTO mapToExamResponseDTOWithPurchaseCheck(Exam exam, String userId) {
         ExamResponseDTO dto = mapToExamResponseDTO(exam);
         
-        // Check if the user has purchased this exam if it's premium
+        // Handle premium exams with logged-in user
         if (exam.isPremium() && userId != null) {
             boolean hasPurchased = paymentService.hasUserPurchasedExam(exam.getId(), userId);
             boolean hasUniversalAccess = paymentService.hasUserPurchasedAnyExam(userId);
@@ -636,10 +636,16 @@ public class ExamController {
             dto.setPurchased(hasPurchased);
             dto.setUniversalAccess(hasUniversalAccess);
             
+            // Set the payment status
+            String paymentStatus = paymentService.getUserPaymentStatusForExam(exam.getId(), userId);
+            dto.setPaymentStatus(paymentStatus);
+            
             // Log for debugging
-            if (hasUniversalAccess) {
-                logger.debug("User {} has universal premium access", userId);
-            }
+            logger.debug("User {} exam {} - purchase: {}, universal access: {}, status: {}", 
+                      userId, exam.getId(), hasPurchased, hasUniversalAccess, paymentStatus);
+        } else {
+            // Set default payment status for non-premium exams
+            dto.setPaymentStatus("NOT_REQUIRED");
         }
         
         return dto;

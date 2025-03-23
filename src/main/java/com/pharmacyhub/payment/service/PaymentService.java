@@ -60,4 +60,12 @@ public interface PaymentService {
      * @return Payment details
      */
     PaymentDetails getPaymentDetailsByTransaction(String transactionId);
+    
+    /**
+     * Get payment status for a specific exam and user
+     * @param examId Exam ID to check
+     * @param userId User ID to check
+     * @return Payment status as a string: PAID, PENDING, FAILED, NOT_PAID, or UNKNOWN
+     */
+    String getUserPaymentStatusForExam(Long examId, String userId);
 }

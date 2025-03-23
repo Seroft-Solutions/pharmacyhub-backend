@@ -75,6 +75,9 @@ public class ExamResponseDTO {
     @Schema(description = "Flag indicating if the exam has a custom price", example = "false")
     private boolean customPrice;
     
+    @Schema(description = "Payment status for the current user: PAID, PENDING, FAILED, NOT_PAID, or NOT_REQUIRED", example = "PAID")
+    private String paymentStatus;
+    
     // Nested class for Question DTOs
     @Getter
     @Setter

@@ -10,6 +10,7 @@ import com.pharmacyhub.payment.dto.PaymentGatewayResponse;
 import com.pharmacyhub.payment.dto.PaymentInitResponse;
 import com.pharmacyhub.payment.dto.PaymentResult;
 import com.pharmacyhub.payment.dto.PaymentWebhookResult;
+import java.util.Optional;
 import com.pharmacyhub.payment.entity.Payment;
 import com.pharmacyhub.payment.entity.Payment.PaymentMethod;
 import com.pharmacyhub.payment.entity.Payment.PaymentStatus;
@@ -202,6 +203,35 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<Payment> getUserPaymentHistory(String userId) {
         return paymentRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+    
+    @Override
+    public String getUserPaymentStatusForExam(Long examId, String userId) {
+        // First check if the user has universal access (purchased any premium exam)
+        if (hasUserPurchasedAnyExam(userId)) {
+            return "PAID";
+        }
+        
+        // Check for specific exam payment status
+        Optional<Payment> payment = paymentRepository.findByUserIdAndItemTypeAndItemId(userId, "EXAM", examId);
+        
+        if (payment.isPresent()) {
+            PaymentStatus status = payment.get().getStatus();
+            
+            switch (status) {
+                case COMPLETED:
+                    return "PAID";
+                case PENDING:
+                    return "PENDING";
+                case FAILED:
+                    return "FAILED";
+                default:
+                    return "UNKNOWN";
+            }
+        }
+        
+        // No payment record found
+        return "NOT_PAID";
     }
     
     @Override
