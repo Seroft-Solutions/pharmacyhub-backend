@@ -630,18 +630,53 @@ public class ExamController {
         
         // Handle premium exams with logged-in user
         if (exam.isPremium() && userId != null) {
-            boolean hasPurchased = paymentService.hasUserPurchasedExam(exam.getId(), userId);
-            boolean hasUniversalAccess = paymentService.hasUserPurchasedAnyExam(userId);
+            // ONLY use manual payment service - ignore online payments as requested
+            
+            // Check if ANY exam has been approved via manual payment (universal access)
+            boolean hasApprovedAnyManualRequest = paymentManualService.hasUserApprovedRequest(userId, null);
+            
+            // Check if THIS specific exam has been approved
+            boolean hasApprovedThisExamManualRequest = paymentManualService.hasUserApprovedRequest(userId, exam.getId());
+            
+            // Check if THIS exam has a pending manual payment
+            boolean hasPendingThisExamManualRequest = paymentManualService.hasUserPendingRequest(userId, exam.getId());
+            
+            // Check if ANY exam has a pending manual payment
+            boolean hasAnyPendingManualRequest = paymentManualService.hasUserAnyPendingRequest(userId);
+            
+            // Set purchase status (specific purchase or universal access)
+            boolean hasPurchased = hasApprovedThisExamManualRequest || hasApprovedAnyManualRequest;
+            boolean hasUniversalAccess = hasApprovedAnyManualRequest;
             
             dto.setPurchased(hasPurchased);
             dto.setUniversalAccess(hasUniversalAccess);
             
-            // Set the payment status
-            String paymentStatus = paymentService.getUserPaymentStatusForExam(exam.getId(), userId);
+            // Log purchase status
+            logger.debug("Purchase status for user {}, exam {}: manual specific={}, manual universal={}",
+                      userId, exam.getId(), hasApprovedThisExamManualRequest, hasApprovedAnyManualRequest);
+            
+            // Determine the overall payment status
+            String paymentStatus;
+            
+            // PAID takes precedence over PENDING over NOT_PAID
+            if (hasApprovedAnyManualRequest) {
+                // If ANY exam is paid, all exams should show as PAID
+                paymentStatus = "PAID";
+            } else if (hasAnyPendingManualRequest) {
+                // If ANY exam has a pending request, all exams should show as PENDING
+                paymentStatus = "PENDING";
+            } else {
+                paymentStatus = "NOT_PAID";
+            }
+            
+            // Log payment status details
+            logger.debug("Payment status for user {}, exam {}: manual this exam pending={}, any manual pending={}, manual approved={}, final status={}",
+                      userId, exam.getId(), hasPendingThisExamManualRequest, hasAnyPendingManualRequest, hasApprovedThisExamManualRequest, paymentStatus);
+            
             dto.setPaymentStatus(paymentStatus);
             
-            // Log for debugging
-            logger.debug("User {} exam {} - purchase: {}, universal access: {}, status: {}", 
+            // Final debugging log 
+            logger.debug("FINAL STATUS - User {} exam {} - purchase: {}, universal access: {}, payment status: {}", 
                       userId, exam.getId(), hasPurchased, hasUniversalAccess, paymentStatus);
         } else {
             // Set default payment status for non-premium exams

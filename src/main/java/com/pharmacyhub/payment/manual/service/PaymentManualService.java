@@ -70,4 +70,11 @@ public interface PaymentManualService {
      * @return true if there is an approved request, false otherwise
      */
     boolean hasUserApprovedRequest(String userId, Long examId);
+    
+    /**
+     * Checks if a user has any pending manual payment request
+     * @param userId the user ID
+     * @return true if user has any pending request, false otherwise
+     */
+    boolean hasUserAnyPendingRequest(String userId);
 }

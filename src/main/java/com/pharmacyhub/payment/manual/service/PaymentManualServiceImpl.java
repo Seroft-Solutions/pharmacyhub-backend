@@ -118,6 +118,14 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
+    public boolean hasUserAnyPendingRequest(String userId) {
+        return !repository.findByUserIdAndStatus(
+            userId, PaymentManualRequest.PaymentStatus.PENDING
+        ).isEmpty();
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
     public boolean hasUserApprovedRequest(String userId, Long examId) {
         // If examId is null, check if the user has any approved manual payment request
         if (examId == null) {
