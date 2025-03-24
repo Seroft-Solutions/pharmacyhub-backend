@@ -173,6 +173,7 @@ public class AuthController extends BaseController
                 .userAgent(request.getUserAgent())
                 .platform(request.getPlatform())
                 .language(request.getLanguage())
+                .metadata(buildMetadataJson(request))
                 .build();
             
             LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
@@ -221,5 +222,45 @@ public class AuthController extends BaseController
         return ipAddress;
     }
 
-
+    /**
+     * Build a JSON string from the device-specific fields
+     */
+    private String buildMetadataJson(LoginRequestDTO request) {
+        // Using a more direct approach with StringBuilder
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        
+        // Add screen dimensions if available
+        if (request.getScreenWidth() != null && request.getScreenHeight() != null) {
+            json.append("\"screen\":{");
+            json.append("\"width\":\"" + request.getScreenWidth() + "\",");
+            json.append("\"height\":\"" + request.getScreenHeight() + "\"");
+            json.append("},");
+        }
+        
+        // Add color depth if available
+        if (request.getColorDepth() != null) {
+            json.append("\"colorDepth\":\"" + request.getColorDepth() + "\",");
+        }
+        
+        // Add timezone if available
+        if (request.getTimezone() != null) {
+            json.append("\"timezone\":\"" + request.getTimezone() + "\",");
+        }
+        
+        // Add platform and language
+        if (request.getPlatform() != null) {
+            json.append("\"platform\":\"" + request.getPlatform() + "\",");
+        }
+        
+        if (request.getLanguage() != null) {
+            json.append("\"language\":\"" + request.getLanguage() + "\",");
+        }
+        
+        // Add timestamp
+        json.append("\"timestamp\":" + System.currentTimeMillis());
+        
+        json.append("}");
+        return json.toString();
+    }
 }

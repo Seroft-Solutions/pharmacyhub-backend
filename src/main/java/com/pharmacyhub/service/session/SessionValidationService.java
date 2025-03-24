@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service for validating login sessions and preventing account sharing
@@ -179,25 +180,51 @@ public class SessionValidationService {
             session.setOtpVerified(!requiresOtp);
             // Keep existing metadata or update if provided
             if (request.getMetadata() != null) {
-                session.setMetadata(request.getMetadata());
+                session.setMetadata(ensureValidJson(request.getMetadata()));
             }
+            
+            // Use standard repository save for updates
+            return loginSessionRepository.save(session);
         } else {
-            // Create new session
-            session = LoginSession.builder()
-                .user(user)
-                .deviceId(request.getDeviceId())
-                .ipAddress(request.getIpAddress())
-                .country(country)
-                .userAgent(request.getUserAgent())
-                .loginTime(ZonedDateTime.now())
-                .lastActive(ZonedDateTime.now())
-                .active(true)
-                .requiresOtp(requiresOtp)
-                .otpVerified(!requiresOtp)
-                .metadata(request.getMetadata())
-                .build();
+            // Create new session using UUID
+            UUID sessionId = UUID.randomUUID();
+            ZonedDateTime now = ZonedDateTime.now();
+            String metadata = ensureValidJson(request.getMetadata());
+            
+            // Use our custom repository method that handles JSON properly
+            loginSessionRepository.saveLoginSessionWithJsonMetadata(
+                sessionId,
+                user.getId(),
+                request.getDeviceId(),
+                request.getIpAddress(),
+                country,
+                request.getUserAgent(),
+                now,  // loginTime
+                now,  // lastActive
+                true, // active
+                metadata,
+                requiresOtp,
+                !requiresOtp  // otpVerified
+            );
+            
+            // Now retrieve the saved session
+            return loginSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Failed to save login session"));
+        }
+    }
+    
+    /**
+     * Ensures that the provided string is valid JSON
+     * 
+     * @param jsonString String that should be JSON
+     * @return Valid JSON string
+     */
+    private String ensureValidJson(String jsonString) {
+        if (jsonString == null || jsonString.isEmpty()) {
+            return "{}";
         }
         
-        return loginSessionRepository.save(session);
+        // Already handled by JsonbConverter, just pass it through
+        return jsonString;
     }
 }

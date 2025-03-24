@@ -38,9 +38,19 @@ public interface PaymentManualService {
     /**
      * Get all payment requests for a user
      * @param userId User ID
+     * @param includeScreenshots Whether to include screenshot data in the response
      * @return List of payment requests
      */
-    List<ManualPaymentResponseDTO> getUserRequests(String userId);
+    List<ManualPaymentResponseDTO> getUserRequests(String userId, boolean includeScreenshots);
+    
+    /**
+     * Get all payment requests for a user (includes screenshots)
+     * @param userId User ID
+     * @return List of payment requests
+     */
+    default List<ManualPaymentResponseDTO> getUserRequests(String userId) {
+        return getUserRequests(userId, true);
+    }
     
     /**
      * Get all payment requests (admin)

@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +61,7 @@ public class ExamServiceImpl implements ExamService {
     
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "examDetails", key = "#id")
     public Optional<Exam> findById(Long id) {
         return examRepository.findByIdAndDeletedFalse(id);
     }
@@ -412,5 +414,18 @@ public class ExamServiceImpl implements ExamService {
         if (exam.getPassingMarks() > exam.getTotalMarks()) {
             throw new IllegalArgumentException("Passing marks cannot be greater than total marks");
         }
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "examTitles", key = "#ids.toString()")
+    public List<Exam> findByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        return examRepository.findAllById(ids).stream()
+            .filter(exam -> !exam.isDeleted())
+            .collect(Collectors.toList());
     }
 }

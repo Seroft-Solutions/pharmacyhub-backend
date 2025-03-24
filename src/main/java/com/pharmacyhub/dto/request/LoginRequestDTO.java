@@ -37,4 +37,16 @@ public class LoginRequestDTO implements BaseDTO {
     
     @JsonProperty("language")
     private String language;
+    
+    @JsonProperty("screenWidth")
+    private String screenWidth;
+    
+    @JsonProperty("screenHeight")
+    private String screenHeight;
+    
+    @JsonProperty("colorDepth")
+    private String colorDepth;
+    
+    @JsonProperty("timezone")
+    private String timezone;
 }

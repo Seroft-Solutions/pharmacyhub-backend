@@ -195,7 +195,7 @@ public class SessionManagementService {
      */
     @Transactional
     public void updateLastActive(UUID sessionId) {
-        loginSessionRepository.updateLastActive(sessionId);
+        loginSessionRepository.updateLastActive(sessionId, ZonedDateTime.now());
     }
     
     /**

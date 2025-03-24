@@ -10,11 +10,14 @@ import com.pharmacyhub.service.ExamService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,7 +52,16 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         PaymentManualRequest saved = repository.save(paymentRequest);
         log.info("Manual payment request submitted: {}", saved.getId());
         
-        return mapToResponseDTO(saved);
+        // Use a simple Map for the single exam title
+        Map<Long, String> examTitles = new HashMap<>();
+        try {
+            examService.findById(request.getExamId())
+                .ifPresent(exam -> examTitles.put(exam.getId(), exam.getTitle()));
+        } catch (Exception e) {
+            log.warn("Could not retrieve exam title for submission", e);
+        }
+        
+        return mapToResponseDTO(saved, examTitles, true);
     }
     
     @Override
@@ -65,7 +77,16 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         PaymentManualRequest saved = repository.save(request);
         log.info("Manual payment request approved: {}", saved.getId());
         
-        return mapToResponseDTO(saved);
+        // Use a simple Map for the single exam title
+        Map<Long, String> examTitles = new HashMap<>();
+        try {
+            examService.findById(request.getExamId())
+                .ifPresent(exam -> examTitles.put(exam.getId(), exam.getTitle()));
+        } catch (Exception e) {
+            log.warn("Could not retrieve exam title", e);
+        }
+        
+        return mapToResponseDTO(saved, examTitles, true);
     }
     
     @Override
@@ -81,35 +102,106 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         PaymentManualRequest saved = repository.save(request);
         log.info("Manual payment request rejected: {}", saved.getId());
         
-        return mapToResponseDTO(saved);
+        // Use a simple Map for the single exam title
+        Map<Long, String> examTitles = new HashMap<>();
+        try {
+            examService.findById(request.getExamId())
+                .ifPresent(exam -> examTitles.put(exam.getId(), exam.getTitle()));
+        } catch (Exception e) {
+            log.warn("Could not retrieve exam title", e);
+        }
+        
+        return mapToResponseDTO(saved, examTitles, true);
     }
     
     @Override
     @Transactional(readOnly = true)
-    public List<ManualPaymentResponseDTO> getUserRequests(String userId) {
-        return repository.findByUserId(userId).stream()
-            .map(this::mapToResponseDTO)
+    @Cacheable(value = "userPaymentRequests", key = "#userId + '-' + #includeScreenshots")
+    public List<ManualPaymentResponseDTO> getUserRequests(String userId, boolean includeScreenshots) {
+        List<PaymentManualRequest> userRequests = repository.findByUserId(userId);
+        
+        // First, collect all exam IDs we need to look up
+        List<Long> examIds = userRequests.stream()
+            .map(PaymentManualRequest::getExamId)
+            .distinct()
+            .collect(Collectors.toList());
+        
+        // Bulk fetch all needed exams in a single query
+        Map<Long, String> examTitles = new HashMap<>();
+        if (!examIds.isEmpty()) {
+            try {
+                // This fetches all exams in one go
+                examService.findByIds(examIds).forEach(exam -> {
+                    examTitles.put(exam.getId(), exam.getTitle());
+                });
+            } catch (Exception e) {
+                log.warn("Error fetching exam titles: {}", e.getMessage());
+            }
+        }
+        
+        // Now map the requests to DTOs with the bulk-loaded exam titles
+        return userRequests.stream()
+            .map(request -> mapToResponseDTO(request, examTitles, includeScreenshots))
             .collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<ManualPaymentResponseDTO> getAllRequests() {
-        return repository.findAll().stream()
-            .map(this::mapToResponseDTO)
+        List<PaymentManualRequest> allRequests = repository.findAll();
+        
+        // Bulk fetch all exam titles
+        List<Long> examIds = allRequests.stream()
+            .map(PaymentManualRequest::getExamId)
+            .distinct()
+            .collect(Collectors.toList());
+        
+        Map<Long, String> examTitles = new HashMap<>();
+        if (!examIds.isEmpty()) {
+            try {
+                examService.findByIds(examIds).forEach(exam -> {
+                    examTitles.put(exam.getId(), exam.getTitle());
+                });
+            } catch (Exception e) {
+                log.warn("Error fetching exam titles: {}", e.getMessage());
+            }
+        }
+        
+        return allRequests.stream()
+            .map(request -> mapToResponseDTO(request, examTitles, false))
             .collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<ManualPaymentResponseDTO> getRequestsByStatus(PaymentManualRequest.PaymentStatus status) {
-        return repository.findByStatus(status).stream()
-            .map(this::mapToResponseDTO)
+        List<PaymentManualRequest> statusRequests = repository.findByStatus(status);
+        
+        // Bulk fetch all exam titles
+        List<Long> examIds = statusRequests.stream()
+            .map(PaymentManualRequest::getExamId)
+            .distinct()
+            .collect(Collectors.toList());
+        
+        Map<Long, String> examTitles = new HashMap<>();
+        if (!examIds.isEmpty()) {
+            try {
+                examService.findByIds(examIds).forEach(exam -> {
+                    examTitles.put(exam.getId(), exam.getTitle());
+                });
+            } catch (Exception e) {
+                log.warn("Error fetching exam titles: {}", e.getMessage());
+            }
+        }
+        
+        return statusRequests.stream()
+            .map(request -> mapToResponseDTO(request, examTitles, false))
             .collect(Collectors.toList());
     }
     
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "pendingRequestCheck", key = "#userId + '-' + #examId")
     public boolean hasUserPendingRequest(String userId, Long examId) {
         return !repository.findByUserIdAndExamIdAndStatus(
             userId, examId, PaymentManualRequest.PaymentStatus.PENDING
@@ -118,6 +210,7 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "anyPendingRequestCheck", key = "#userId")
     public boolean hasUserAnyPendingRequest(String userId) {
         return !repository.findByUserIdAndStatus(
             userId, PaymentManualRequest.PaymentStatus.PENDING
@@ -126,6 +219,7 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "approvedRequestCheck", key = "#userId + '-' + #examId")
     public boolean hasUserApprovedRequest(String userId, Long examId) {
         // If examId is null, check if the user has any approved manual payment request
         if (examId == null) {
@@ -155,8 +249,9 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     /**
      * Maps a PaymentManualRequest entity to a ManualPaymentResponseDTO
+     * with optional screenshot data and pre-loaded exam titles
      */
-    private ManualPaymentResponseDTO mapToResponseDTO(PaymentManualRequest request) {
+    private ManualPaymentResponseDTO mapToResponseDTO(PaymentManualRequest request, Map<Long, String> examTitles, boolean includeScreenshots) {
         ManualPaymentResponseDTO dto = new ManualPaymentResponseDTO();
         dto.setId(request.getId());
         dto.setUserId(request.getUserId());
@@ -165,21 +260,31 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         dto.setTransactionId(request.getTransactionId());
         dto.setNotes(request.getNotes());
         dto.setAttachmentUrl(request.getAttachmentUrl());
-        dto.setScreenshotData(request.getScreenshotData());
+        
+        // Only include screenshot data if specifically requested
+        if (includeScreenshots) {
+            dto.setScreenshotData(request.getScreenshotData());
+        }
+        
         dto.setStatus(request.getStatus().toString());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setProcessedAt(request.getProcessedAt());
         dto.setAdminNotes(request.getAdminNotes());
         
-        // Try to get exam title
-        try {
-            String examTitle = examService.findById(request.getExamId())
-                .map(exam -> exam.getTitle())
-                .orElse("Unknown Exam");
-            dto.setExamTitle(examTitle);
-        } catch (Exception e) {
-            log.warn("Could not retrieve exam title for ID: {}", request.getExamId(), e);
-            dto.setExamTitle("Unknown Exam");
+        // Use pre-loaded exam title if available
+        if (examTitles != null && examTitles.containsKey(request.getExamId())) {
+            dto.setExamTitle(examTitles.get(request.getExamId()));
+        } else {
+            // Fall back to individual lookup if not in pre-loaded map
+            try {
+                String examTitle = examService.findById(request.getExamId())
+                    .map(Exam::getTitle)
+                    .orElse("Unknown Exam");
+                dto.setExamTitle(examTitle);
+            } catch (Exception e) {
+                log.warn("Could not retrieve exam title for ID: {}", request.getExamId(), e);
+                dto.setExamTitle("Unknown Exam");
+            }
         }
         
         return dto;

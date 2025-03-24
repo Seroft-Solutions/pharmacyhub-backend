@@ -50,10 +50,13 @@ public class PaymentManualController {
     @GetMapping("/requests")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ManualPaymentResponseDTO>> getUserRequests(
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) String includeScreenshots) {
         
         String userId = userDetails.getUsername();
-        List<ManualPaymentResponseDTO> requests = paymentManualService.getUserRequests(userId);
+        boolean includeImageData = "true".equalsIgnoreCase(includeScreenshots);
+        
+        List<ManualPaymentResponseDTO> requests = paymentManualService.getUserRequests(userId, includeImageData);
         
         return ResponseEntity.ok(requests);
     }

@@ -115,6 +115,17 @@ public interface LoginSessionRepository extends JpaRepository<LoginSession, UUID
      */
     @Modifying
     @Transactional
-    @Query("UPDATE LoginSession ls SET ls.lastActive = CURRENT_TIMESTAMP WHERE ls.id = :sessionId")
-    void updateLastActive(UUID sessionId);
+    @Query("UPDATE LoginSession ls SET ls.lastActive = :now WHERE ls.id = :sessionId")
+    void updateLastActive(UUID sessionId, ZonedDateTime now);
+    
+    /**
+     * Save login session with JSON metadata
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO login_sessions (id, user_id, device_id, ip_address, country, user_agent, login_time, last_active, active, metadata, requires_otp, otp_verified) " +
+            "VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, CAST(?10 AS jsonb), ?11, ?12)", nativeQuery = true)
+    void saveLoginSessionWithJsonMetadata(UUID id, Long userId, String deviceId, String ipAddress, String country, 
+                                     String userAgent, ZonedDateTime loginTime, ZonedDateTime lastActive, 
+                                     boolean active, String metadata, boolean requiresOtp, boolean otpVerified);
 }

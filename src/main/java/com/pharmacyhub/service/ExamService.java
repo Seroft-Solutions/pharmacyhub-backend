@@ -29,6 +29,11 @@ public interface ExamService {
     Optional<Exam> findById(Long id);
     
     /**
+     * Find exams by multiple IDs
+     */
+    List<Exam> findByIds(List<Long> ids);
+    
+    /**
      * Find exams by status
      */
     List<Exam> findByStatus(Exam.ExamStatus status);
