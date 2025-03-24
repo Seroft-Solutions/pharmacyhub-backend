@@ -48,7 +48,7 @@ public class Exam {
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
     
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "exam_tags", joinColumns = @JoinColumn(name = "exam_id"))
     @Column(name = "tag")
     private List<String> tags = new ArrayList<>();

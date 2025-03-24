@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Exams", description = "API endpoints for exam management")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Exams", description = "Manage exams, questions, and exam-taking processes")
+@org.springframework.transaction.annotation.Transactional
 public class ExamController {
 
     private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
@@ -180,6 +181,7 @@ public class ExamController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get exam by ID")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<ExamResponseDTO>> getExamById(
             @PathVariable Long id,
             @AuthenticationPrincipal UserDetails userDetails) {
