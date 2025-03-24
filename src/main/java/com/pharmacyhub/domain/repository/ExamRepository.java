@@ -24,15 +24,15 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
     List<Exam> findByStatusAndDeletedFalse(Exam.ExamStatus status);
     
     /**
-     * Find a non-deleted exam by ID
+     * Find a non-deleted exam by ID with eager loading of tags
      */
-    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.id = ?1")
+    @Query("SELECT e FROM Exam e LEFT JOIN FETCH e.tags WHERE e.deleted = false AND e.id = ?1")
     Optional<Exam> findByIdAndDeletedFalse(Long id);
     
     /**
-     * Find a non-deleted exam by ID (aliased method)
+     * Find a non-deleted exam by ID (aliased method) with eager loading of tags
      */
-    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.id = ?1")
+    @Query("SELECT e FROM Exam e LEFT JOIN FETCH e.tags WHERE e.deleted = false AND e.id = ?1")
     Optional<Exam> findByIdAndNotDeleted(Long id);
     
     /**
@@ -42,9 +42,9 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
     List<Exam> findByStatus(Exam.ExamStatus status);
     
     /**
-     * Find a non-deleted exam by ID and status
+     * Find a non-deleted exam by ID and status with eager loading of tags
      */
-    @Query("SELECT e FROM Exam e WHERE e.deleted = false AND e.id = ?1 AND e.status = ?2")
+    @Query("SELECT e FROM Exam e LEFT JOIN FETCH e.tags WHERE e.deleted = false AND e.id = ?1 AND e.status = ?2")
     Optional<Exam> findByIdAndStatus(Long id, Exam.ExamStatus status);
     
     /**
@@ -66,9 +66,9 @@ public interface ExamRepository extends JpaRepository<Exam, Long> {
     Double getAverageDuration();
     
     /**
-     * Find all non-deleted exams that have a specific tag
+     * Find all non-deleted exams that have a specific tag with eager loading of tags
      */
-    @Query("SELECT e FROM Exam e JOIN e.tags t WHERE t = ?1 AND e.deleted = false")
+    @Query("SELECT DISTINCT e FROM Exam e LEFT JOIN FETCH e.tags t WHERE t = ?1 AND e.deleted = false")
     List<Exam> findByTagsContainingAndDeletedFalse(String tag);
     
     /**

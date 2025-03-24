@@ -16,10 +16,10 @@ public class RBACCacheConfig {
 
     @Bean
     @Primary
-    public CacheManager cacheManager() {
+    public CacheManager rbacCacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(Arrays.asList(
-            // Existing caches
+            // RBAC caches
             new ConcurrentMapCache("userPermissions"),
             new ConcurrentMapCache("userRoles"),
             new ConcurrentMapCache("roleHierarchy"),
@@ -33,7 +33,17 @@ public class RBACCacheConfig {
             
             // User permission caches
             new ConcurrentMapCache("userHasPermission"),
-            new ConcurrentMapCache("userHasRole")
+            new ConcurrentMapCache("userHasRole"),
+            
+            // Payment caches (added from CacheConfig to prevent conflicts)
+            new ConcurrentMapCache("userPaymentRequests"),
+            new ConcurrentMapCache("pendingRequestCheck"),
+            new ConcurrentMapCache("anyPendingRequestCheck"),
+            new ConcurrentMapCache("approvedRequestCheck"),
+            
+            // Exam caches (added from CacheConfig to prevent conflicts)
+            new ConcurrentMapCache("examTitles"),
+            new ConcurrentMapCache("examDetails")
         ));
         return cacheManager;
     }

@@ -12,6 +12,8 @@ import java.util.Arrays;
 
 /**
  * Configuration for application caching
+ * Note: The actual cache manager bean is now defined in RBACCacheConfig as rbacCacheManager to avoid conflicts.
+ * This class is kept for documentation purposes.
  */
 @Configuration
 @EnableCaching
@@ -19,20 +21,5 @@ public class CacheConfig {
 
     private static final int CACHE_TTL_SECONDS = 300; // 5 minutes TTL for caches
     
-    @Bean
-    public CacheManager cacheManager() {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(Arrays.asList(
-            // Payment caches
-            new ConcurrentMapCache("userPaymentRequests"),
-            new ConcurrentMapCache("pendingRequestCheck"),
-            new ConcurrentMapCache("anyPendingRequestCheck"),
-            new ConcurrentMapCache("approvedRequestCheck"),
-            
-            // Exam caches
-            new ConcurrentMapCache("examTitles"),
-            new ConcurrentMapCache("examDetails")
-        ));
-        return cacheManager;
-    }
+    // Cache definitions have been moved to RBACCacheConfig to avoid bean conflicts
 }
