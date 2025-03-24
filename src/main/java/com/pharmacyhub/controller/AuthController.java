@@ -10,6 +10,11 @@ import com.pharmacyhub.dto.response.ApiError;
 import com.pharmacyhub.dto.response.AuthResponseDTO;
 import com.pharmacyhub.dto.response.TokensDTO;
 import com.pharmacyhub.dto.response.UserResponseDTO;
+import com.pharmacyhub.dto.session.LoginValidationRequestDTO;
+import com.pharmacyhub.dto.session.LoginValidationResultDTO;
+import com.pharmacyhub.dto.session.LoginValidationResultDTO.LoginStatus;
+import com.pharmacyhub.entity.session.LoginSession;
+import com.pharmacyhub.service.session.SessionValidationService;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.Role;
@@ -17,6 +22,7 @@ import com.pharmacyhub.security.service.AuthenticationService;
 import com.pharmacyhub.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +49,8 @@ public class AuthController extends BaseController
     private AuthenticationService authenticationService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SessionValidationService sessionValidationService;
     
     @Value("${pharmacyhub.security.jwt.token-validity-in-seconds:18000}")
     private long tokenValidityInSeconds;
@@ -99,7 +107,9 @@ public class AuthController extends BaseController
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate user and generate JWT token")
-    public ResponseEntity<ApiResponse<AuthResponseDTO>> login(@Valid @RequestBody LoginRequestDTO request) {
+    public ResponseEntity<ApiResponse<AuthResponseDTO>> login(
+            @Valid @RequestBody LoginRequestDTO request,
+            HttpServletRequest httpRequest) {
         // Authenticate the user
         User authenticatedUser = authenticationService.authenticateUser(request.getEmailAddress(), request.getPassword());
 
@@ -146,9 +156,69 @@ public class AuthController extends BaseController
                 .user(userResponse)
                 .tokens(tokens)
                 .build();
+        
+        // Validate session if device information is provided
+        if (request.getDeviceId() != null) {
+            // Get client IP if not provided
+            String ipAddress = request.getDeviceId();
+            if (ipAddress == null || ipAddress.isBlank()) {
+                ipAddress = getClientIpAddress(httpRequest);
+            }
+            
+            // Validate login session
+            LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
+                .userId(authenticatedUser.getId())
+                .deviceId(request.getDeviceId())
+                .ipAddress(ipAddress)
+                .userAgent(request.getUserAgent())
+                .platform(request.getPlatform())
+                .language(request.getLanguage())
+                .build();
+            
+            LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
+            
+            // Add session ID to response if available
+            if (validationResult.getSessionId() != null) {
+                response = AuthResponseDTO.builder()
+                    .user(userResponse)
+                    .tokens(tokens)
+                    .sessionId(validationResult.getSessionId())
+                    .validationStatus(validationResult.getStatus().toString())
+                    .build();
+            }
+        }
 
         logger.info("Login successful for user: {}", authenticatedUser.getUsername());
         return successResponse(response);
+    }
+    
+    /**
+     * Get client IP address from request
+     */
+    private String getClientIpAddress(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        
+        // For multiple IP addresses, take the first one
+        if (ipAddress != null && ipAddress.contains(",")) {
+            ipAddress = ipAddress.split(",")[0].trim();
+        }
+        
+        return ipAddress;
     }
 
 

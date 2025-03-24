@@ -1,8 +1,6 @@
-package com.pharmacyhub.dto.request;
+package com.pharmacyhub.dto.session;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pharmacyhub.dto.BaseDTO;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,24 +8,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Login request DTO with device identification for anti-sharing protection
+ * DTO for validating login attempts with device information
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDTO implements BaseDTO {
+public class LoginValidationRequestDTO {
     
-    @NotBlank(message = "Email address is required")
-    @Email(message = "Please provide a valid email address")
-    private String emailAddress;
+    @NotBlank(message = "User ID is required")
+    @JsonProperty("userId")
+    private Long userId;
     
-    @NotBlank(message = "Password is required")
-    private String password;
-    
-    // Anti-sharing protection fields
+    @NotBlank(message = "Device ID is required")
     @JsonProperty("deviceId")
     private String deviceId;
+    
+    @JsonProperty("ipAddress")
+    private String ipAddress;
     
     @JsonProperty("userAgent")
     private String userAgent;
@@ -37,4 +35,7 @@ public class LoginRequestDTO implements BaseDTO {
     
     @JsonProperty("language")
     private String language;
+    
+    @JsonProperty("metadata")
+    private String metadata;
 }
