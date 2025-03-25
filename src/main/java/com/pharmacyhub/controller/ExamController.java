@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Tag(name = "Exams", description = "API endpoints for exam management")
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Exams", description = "Manage exams, questions, and exam-taking processes")
-@org.springframework.transaction.annotation.Transactional
 public class ExamController {
 
     private static final Logger logger = LoggerFactory.getLogger(ExamController.class);
@@ -73,24 +72,38 @@ public class ExamController {
     @GetMapping
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.READ, permissionName = ExamPermissionConstants.VIEW_EXAMS)
     @Operation(summary = "Get all exams - Admin/Instructor only")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getAllExams(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching all exams");
         List<Exam> exams = examService.findAllActive();
-        List<ExamResponseDTO> examResponseDTOs = exams.stream()
-                .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                .collect(Collectors.toList());
+        
+        // Process each exam separately to avoid lazy loading issues
+        List<ExamResponseDTO> examResponseDTOs = new ArrayList<>();
+        for (Exam exam : exams) {
+            // Map basic exam info without accessing lazy collections
+            ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+            examResponseDTOs.add(dto);
+        }
+        
         return ResponseEntity.ok(ApiResponse.success(examResponseDTOs));
     }
 
     @GetMapping("/published")
     @Operation(summary = "Get all published exams - Public access")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getAllPublishedExams(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching all published exams");
         try {
             List<Exam> publishedExams = examService.findAllPublished();
-            List<ExamResponseDTO> examResponseDTOs = publishedExams.stream()
-                    .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                    .collect(Collectors.toList());
+            
+            // Process each exam separately to avoid lazy loading issues
+            List<ExamResponseDTO> examResponseDTOs = new ArrayList<>();
+            for (Exam exam : publishedExams) {
+                // Map basic exam info without accessing lazy collections
+                ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+                examResponseDTOs.add(dto);
+            }
+            
             logger.info("Successfully fetched {} published exams", examResponseDTOs.size());
             return ResponseEntity.ok(ApiResponse.success(examResponseDTOs));
         } catch (Exception e) {
@@ -101,6 +114,7 @@ public class ExamController {
     
     @GetMapping("/papers/model")
     @Operation(summary = "Get model papers")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getModelPapers(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching model papers");
         
@@ -110,15 +124,20 @@ public class ExamController {
                       exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("MODEL")))
                 .collect(Collectors.toList());
         
-        List<ExamResponseDTO> examDTOs = exams.stream()
-                .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                .collect(Collectors.toList());
+        // Process each exam separately to avoid lazy loading issues
+        List<ExamResponseDTO> examDTOs = new ArrayList<>();
+        for (Exam exam : exams) {
+            // Map basic exam info without accessing lazy collections
+            ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+            examDTOs.add(dto);
+        }
                 
         return ResponseEntity.ok(ApiResponse.success(examDTOs));
     }
 
     @GetMapping("/papers/past")
     @Operation(summary = "Get past papers")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getPastPapers(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching past papers");
         
@@ -128,15 +147,20 @@ public class ExamController {
                       exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("PAST")))
                 .collect(Collectors.toList());
         
-        List<ExamResponseDTO> examDTOs = exams.stream()
-                .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                .collect(Collectors.toList());
+        // Process each exam separately to avoid lazy loading issues
+        List<ExamResponseDTO> examDTOs = new ArrayList<>();
+        for (Exam exam : exams) {
+            // Map basic exam info without accessing lazy collections
+            ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+            examDTOs.add(dto);
+        }
                 
         return ResponseEntity.ok(ApiResponse.success(examDTOs));
     }
     
     @GetMapping("/papers/subject")
     @Operation(summary = "Get subject papers")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getSubjectPapers(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching subject papers");
         
@@ -146,15 +170,20 @@ public class ExamController {
                       exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("SUBJECT")))
                 .collect(Collectors.toList());
         
-        List<ExamResponseDTO> examDTOs = exams.stream()
-                .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                .collect(Collectors.toList());
+        // Process each exam separately to avoid lazy loading issues
+        List<ExamResponseDTO> examDTOs = new ArrayList<>();
+        for (Exam exam : exams) {
+            // Map basic exam info without accessing lazy collections
+            ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+            examDTOs.add(dto);
+        }
                 
         return ResponseEntity.ok(ApiResponse.success(examDTOs));
     }
     
     @GetMapping("/papers/practice")
     @Operation(summary = "Get practice papers")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getPracticePapers(@AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching practice papers");
         
@@ -164,15 +193,20 @@ public class ExamController {
                       exam.getTags().stream().anyMatch(tag -> tag.equalsIgnoreCase("PRACTICE")))
                 .collect(Collectors.toList());
         
-        List<ExamResponseDTO> examDTOs = exams.stream()
-                .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                .collect(Collectors.toList());
+        // Process each exam separately to avoid lazy loading issues
+        List<ExamResponseDTO> examDTOs = new ArrayList<>();
+        for (Exam exam : exams) {
+            // Map basic exam info without accessing lazy collections
+            ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+            examDTOs.add(dto);
+        }
                 
         return ResponseEntity.ok(ApiResponse.success(examDTOs));
     }
 
     @GetMapping("/stats")
     @Operation(summary = "Get exam statistics")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<Map<String, Object>>> getExamStats() {
         logger.info("Fetching exam statistics");
         Map<String, Object> stats = examService.getExamStats();
@@ -190,10 +224,23 @@ public class ExamController {
             Exam exam = examService.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Exam not found with ID: " + id));
             
+            // Get the questions separately to avoid LazyInitializationException
+            List<Question> questions = questionService.findByExamId(id);
+            
+            // First map basic exam info
             ExamResponseDTO examResponseDTO = mapToExamResponseDTOWithPurchaseCheck(
                 exam, 
                 userDetails != null ? userDetails.getUsername() : null
             );
+            
+            // Then manually map the questions if needed
+            if (questions != null && !questions.isEmpty()) {
+                List<ExamResponseDTO.QuestionDTO> questionDTOs = questions.stream()
+                        .filter(q -> !q.isDeleted())
+                        .map(this::mapToQuestionDTO)
+                        .collect(Collectors.toList());
+                examResponseDTO.setQuestions(questionDTOs);
+            }
             
             return ResponseEntity.ok(ApiResponse.success(examResponseDTO));
         } catch (EntityNotFoundException e) {
@@ -265,6 +312,7 @@ public class ExamController {
 
     @GetMapping("/{examId}/questions")
     @Operation(summary = "Get questions for a specific exam")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<QuestionResponseDTO>>> getExamQuestions(
             @PathVariable Long examId,
             @RequestHeader(value = "X-Universal-Access", required = false) String universalAccess,
@@ -342,6 +390,7 @@ public class ExamController {
     @PutMapping("/{examId}/questions/{questionId}")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.MANAGE_QUESTIONS)
     @Operation(summary = "Update a specific question in an exam")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<QuestionResponseDTO>> updateQuestion(
             @PathVariable Long examId,
             @PathVariable Long questionId,
@@ -371,6 +420,7 @@ public class ExamController {
     @DeleteMapping("/{examId}/questions/{questionId}")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.DELETE, permissionName = ExamPermissionConstants.MANAGE_QUESTIONS)
     @Operation(summary = "Delete a specific question from an exam")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<Void>> deleteQuestion(
             @PathVariable Long examId,
             @PathVariable Long questionId) {
@@ -397,6 +447,7 @@ public class ExamController {
 
     @PostMapping
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
+    @org.springframework.transaction.annotation.Transactional
     @Operation(
         summary = "Create a new exam",
         description = "Creates a new exam with questions and options. Requires CREATE_EXAM permission.",
@@ -448,6 +499,7 @@ public class ExamController {
     @PostMapping("/upload-json")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
     @Operation(summary = "Upload and create an exam from JSON data")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<ExamResponseDTO>> uploadJsonExam(
             @Valid @RequestBody JsonExamUploadRequestDTO requestDTO) {
         logger.info("Uploading JSON exam: {}", requestDTO.getTitle());
@@ -465,6 +517,7 @@ public class ExamController {
     @PostMapping("/papers/upload/json")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.CREATE, permissionName = ExamPermissionConstants.CREATE_EXAM)
     @Operation(summary = "Upload and create a paper from JSON data")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<ExamResponseDTO>> uploadJsonPaper(
             @Valid @RequestBody JsonExamUploadRequestDTO requestDTO) {
         logger.info("Uploading JSON paper: {}", requestDTO.getTitle());
@@ -482,6 +535,7 @@ public class ExamController {
     @PutMapping("/{id}")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.EDIT_EXAM)
     @Operation(summary = "Update an existing exam")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<ExamResponseDTO>> updateExam(
             @PathVariable Long id, 
             @Valid @RequestBody ExamRequestDTO requestDTO) {
@@ -502,6 +556,7 @@ public class ExamController {
     @DeleteMapping("/{id}")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.DELETE, permissionName = ExamPermissionConstants.DELETE_EXAM)
     @Operation(summary = "Delete an exam (Admin only)")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<Void>> deleteExam(@PathVariable Long id) {
         logger.info("Deleting exam with ID: {}", id);
         try {
@@ -518,20 +573,28 @@ public class ExamController {
     @GetMapping("/status/{status}")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.READ, permissionName = ExamPermissionConstants.VIEW_EXAMS)
     @Operation(summary = "Get exams by status")
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<List<ExamResponseDTO>>> getExamsByStatus(
             @PathVariable Exam.ExamStatus status,
             @AuthenticationPrincipal UserDetails userDetails) {
         logger.info("Fetching exams with status: {}", status);
         List<Exam> exams = examService.findByStatus(status);
-        List<ExamResponseDTO> examResponseDTOs = exams.stream()
-                .map(exam -> mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null))
-                .collect(Collectors.toList());
+        
+        // Process each exam separately to avoid lazy loading issues
+        List<ExamResponseDTO> examResponseDTOs = new ArrayList<>();
+        for (Exam exam : exams) {
+            // Map basic exam info without accessing lazy collections
+            ExamResponseDTO dto = mapToExamResponseDTOWithPurchaseCheck(exam, userDetails != null ? userDetails.getUsername() : null);
+            examResponseDTOs.add(dto);
+        }
+        
         return ResponseEntity.ok(ApiResponse.success(examResponseDTOs));
     }
 
     @PostMapping("/{id}/publish")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.PUBLISH_EXAM)
     @Operation(summary = "Publish an exam")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<ExamResponseDTO>> publishExam(@PathVariable Long id) {
         logger.info("Publishing exam with ID: {}", id);
         try {
@@ -551,6 +614,7 @@ public class ExamController {
     @PostMapping("/{id}/archive")
     @RequiresPermission(resource = ResourceType.PHARMACY, operation = OperationType.UPDATE, permissionName = ExamPermissionConstants.UNPUBLISH_EXAM)
     @Operation(summary = "Archive an exam")
+    @org.springframework.transaction.annotation.Transactional
     public ResponseEntity<ApiResponse<ExamResponseDTO>> archiveExam(@PathVariable Long id) {
         logger.info("Archiving exam with ID: {}", id);
         try {
@@ -597,28 +661,25 @@ public class ExamController {
             }
         }
         
-        // Map questions if present (but don't include them for list operations)
-        if (exam.getQuestions() != null && !exam.getQuestions().isEmpty()) {
-            List<ExamResponseDTO.QuestionDTO> questionDTOs = exam.getQuestions().stream()
-                    .filter(q -> !q.isDeleted())
-                    .map(this::mapToQuestionDTO)
-                    .collect(Collectors.toList());
-            dto.setQuestions(questionDTOs);
-        }
-        
-        // Set additional fields that might be used by frontend
-        dto.setAttemptCount(0); // Replace with actual count when available
-        dto.setAverageScore(0.0); // Replace with actual average when available
-        
-        // Calculate the number of questions - this is crucial for the frontend
-        // Don't rely on getQuestionCount() method to calculate this explicitly
+        // Get a count of questions directly from the question service rather than accessing the potentially
+        // detached collection to avoid LazyInitializationException
         int questionCount = 0;
-        if (exam.getQuestions() != null) {
-            questionCount = (int) exam.getQuestions().stream()
-                    .filter(q -> !q.isDeleted())
-                    .count();
+        try {
+            questionCount = questionService.countQuestionsByExamId(exam.getId()).intValue();
+            
+            // Set some default values for additional fields
+            dto.setAttemptCount(0); // Replace with actual count when available
+            dto.setAverageScore(0.0); // Replace with actual average when available
+            dto.setQuestionCount(questionCount);
+            
+            // Explicitly don't try to access questions collection here to avoid LazyInitializationException
+            // Only set questions in dto when we explicitly load them separately
+            
+        } catch (Exception e) {
+            logger.warn("Error getting question count for exam {}: {}", exam.getId(), e.getMessage());
+            // Default to 0 questions if we can't get the count
+            dto.setQuestionCount(0);
         }
-        dto.setQuestionCount(questionCount);
         
         // Log the data for debugging
         logger.debug("Mapped exam with ID {} to DTO: title={}, questions={}, duration={}", 
@@ -628,6 +689,7 @@ public class ExamController {
     }
     
     private ExamResponseDTO mapToExamResponseDTOWithPurchaseCheck(Exam exam, String userId) {
+        // Create a basic DTO without accessing lazy collections to avoid LazyInitializationException
         ExamResponseDTO dto = mapToExamResponseDTO(exam);
         
         // Handle premium exams with logged-in user
@@ -699,25 +761,31 @@ public class ExamController {
         dto.setTopic(question.getTopic());
         dto.setDifficulty(question.getDifficulty() != null ? question.getDifficulty() : "MEDIUM");
         
-        // Map options
-        if (question.getOptions() != null) {
-            List<ExamResponseDTO.OptionDTO> optionDTOs = question.getOptions().stream()
-                    .filter(option -> !option.isDeleted())
-                    .map(option -> {
+        // Map options - use a separate query to get options if the collection is detached
+        List<ExamResponseDTO.OptionDTO> optionDTOs = new ArrayList<>();
+        
+        try {
+            if (question.getOptions() != null) {
+                for (var option : question.getOptions()) {
+                    if (!option.isDeleted()) {
                         ExamResponseDTO.OptionDTO optionDTO = new ExamResponseDTO.OptionDTO();
                         optionDTO.setId(option.getId());
                         optionDTO.setLabel(option.getLabel()); // Frontend expects 'label'
                         optionDTO.setText(option.getText());  // Frontend expects 'text'
                         optionDTO.setIsCorrect(option.getIsCorrect());
-                        return optionDTO;
-                    })
-                    .collect(Collectors.toList());
-            dto.setOptions(optionDTOs);
+                        optionDTOs.add(optionDTO);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // If we get a LazyInitializationException, log it and continue with an empty options list
+            logger.warn("Could not load options for question {}: {}", question.getId(), e.getMessage());
         }
         
+        dto.setOptions(optionDTOs);
+        
         // Log the mapping for debugging purposes
-        logger.debug("Mapped question {} to DTO with {} options", question.getId(), 
-                (question.getOptions() != null ? question.getOptions().size() : 0));
+        logger.debug("Mapped question {} to DTO with {} options", question.getId(), optionDTOs.size());
         
         return dto;
     }
@@ -734,26 +802,31 @@ public class ExamController {
         dto.setDifficulty(question.getDifficulty());
         dto.setCorrectAnswer(question.getCorrectAnswer().replaceAll("\\([A-D]\\)\\s.*", "$1").replaceAll("[^A-D]", ""));
         
-        // Map options without revealing which is correct
-        if (question.getOptions() != null) {
-            List<QuestionResponseDTO.OptionDTO> optionDTOs = question.getOptions().stream()
-                    .filter(option -> !option.isDeleted())
-                    .map(option -> {
+        // Map options without revealing which is correct - handle potential lazy loading issues
+        List<QuestionResponseDTO.OptionDTO> optionDTOs = new ArrayList<>();
+        
+        try {
+            if (question.getOptions() != null) {
+                for (var option : question.getOptions()) {
+                    if (!option.isDeleted()) {
                         QuestionResponseDTO.OptionDTO optionDTO = new QuestionResponseDTO.OptionDTO();
                         optionDTO.setId(option.getId());
                         optionDTO.setLabel(option.getLabel()); // This matches frontend's expected 'label' property
                         optionDTO.setText(option.getText()); // This matches frontend's expected 'text' property
                         // Don't include isCorrect flag for security
-                        return optionDTO;
-                    })
-                    .collect(Collectors.toList());
-            dto.setOptions(optionDTOs);
+                        optionDTOs.add(optionDTO);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // If we get a LazyInitializationException, log it and continue with an empty options list
+            logger.warn("Could not load options for question {}: {}", question.getId(), e.getMessage());
         }
         
+        dto.setOptions(optionDTOs);
+        
         // Log the mapping for debugging purposes
-        logger.debug("Mapped question ID {} with {} options", 
-            question.getId(), 
-            question.getOptions() != null ? question.getOptions().size() : 0);
+        logger.debug("Mapped question ID {} with {} options", question.getId(), optionDTOs.size());
         
         return dto;
     }
