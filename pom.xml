@@ -12,7 +12,7 @@
   <groupId>com.pharmacy.hub</groupId>
   <artifactId>pharmacy-hub</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <n>PharmacyHub</n>
+  <name>PharmacyHub</name>
   <description>Pharmacy Hub</description>
   <properties>
     <java.version>17</java.version>

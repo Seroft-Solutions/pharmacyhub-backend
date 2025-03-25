@@ -293,6 +293,7 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
         
         int totalQuestions = questions.size();
         int correctCount = 0;
+        int incorrectCount = 0; // Added declaration and initialization of incorrectCount
         int totalTimeSpent = 0;
         
         // Map of questionId to Question for quick lookup
@@ -325,17 +326,27 @@ public class ExamAttemptServiceImpl implements ExamAttemptService {
                 isCorrect = userAnswerId != null && userAnswerId.equals(question.getCorrectAnswer());
                 if (isCorrect) {
                     correctCount++;
+                } else if (userAnswerId != null) {
+                    // Count as incorrect answer only if option was selected (not empty)
+                    incorrectCount++;
                 }
             }
         }
         
-        int totalAnswered = userAnswers.size();
-        int incorrectCount = totalAnswered - correctCount;
-        int unansweredCount = totalQuestions - totalAnswered;
+        // Calculate unanswered questions
+        int unansweredCount = totalQuestions - correctCount - incorrectCount;
         
-        // Calculate score as a percentage
-        double score = (double) correctCount / totalQuestions * 100;
-        boolean isPassed = score >= exam.getPassingMarks();
+        // Calculate score with negative marking
+        // Each correct answer: +1 mark
+        // Each incorrect answer: -0.25 mark
+        // Unanswered questions: 0 marks
+        double rawScore = correctCount * 1.0 - incorrectCount * 0.25;
+        
+        // Convert to percentage
+        double score = (rawScore / totalQuestions) * 100;
+        
+        // Check if passed - minimum passing mark is 40
+        boolean isPassed = score >= Math.max(40, exam.getPassingMarks());
         
         // Create and save result
         ExamResult result = new ExamResult();
