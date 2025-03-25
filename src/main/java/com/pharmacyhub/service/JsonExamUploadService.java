@@ -69,14 +69,30 @@ public class JsonExamUploadService
             int totalMarks = jsonData.size();
             exam.setTotalMarks(totalMarks);
 
-            // Set passing marks if provided, otherwise use default (60% of total)
+            // Set passing marks if provided, otherwise use default based on paper type
             if (requestDTO.getPassingMarks() != null)
             {
                 exam.setPassingMarks(requestDTO.getPassingMarks());
+                logger.info("Using provided passing marks value of {} for {} paper: {}", 
+                    requestDTO.getPassingMarks(), 
+                    requestDTO.getPaperType(), 
+                    exam.getTitle());
             }
             else
             {
-                exam.setPassingMarks((int) Math.ceil(totalMarks * 0.6));
+                // For model papers, use 40% as passing mark
+                if ("MODEL".equalsIgnoreCase(requestDTO.getPaperType()))
+                {
+                    exam.setPassingMarks((int) Math.ceil(totalMarks * 0.4));
+                    logger.info("Setting 40% passing marks ({} of {}) for MODEL paper: {}", 
+                        exam.getPassingMarks(), totalMarks, exam.getTitle());
+                }
+                else
+                {
+                    exam.setPassingMarks((int) Math.ceil(totalMarks * 0.6));
+                    logger.info("Setting 60% passing marks ({} of {}) for {} paper: {}", 
+                        exam.getPassingMarks(), totalMarks, requestDTO.getPaperType(), exam.getTitle());
+                }
             }
 
             // Set status
