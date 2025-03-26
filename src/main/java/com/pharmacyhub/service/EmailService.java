@@ -88,7 +88,7 @@ public class EmailService
    */
   public void sendPasswordResetEmail(String emailAddress, String token, String ipAddress, String userAgent) throws MessagingException
   {
-    String resetUrl = "https://pharmacyhub.pk/reset-password?token=" + token;
+    String resetUrl = "http://localhost:8080/reset-password?token=" + token;
     String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     String subject = "Password Reset Request - Pharmacy Hub";
