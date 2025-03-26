@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.pharmacyhub.dto.UserDTO;
 import com.pharmacyhub.dto.PHUserDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,10 +23,12 @@ import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.constants.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.mail.MessagingException;
+import com.pharmacyhub.service.AuthService;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final RolesRepository rolesRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -109,6 +113,9 @@ public class UserService {
     @Autowired
     private TokenService tokenService;
     
+    @Autowired
+    private AuthService authService;
+    
     public PHUserDTO saveUserAndSendVerification(UserDTO userDTO) throws MessagingException {
         // Check if user already exists
         Optional<User> existingUser = userRepository.findByEmailAddress(userDTO.getEmailAddress());
@@ -116,31 +123,33 @@ public class UserService {
             return null;
         }
 
+        // Generate verification token first using the specialized method
+        String verificationToken = tokenService.generateEmailVerificationToken("email-verification");
+
         // Create new user
         User user = new User();
         user.setEmailAddress(userDTO.getEmailAddress());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
-        
-        // Generate verification token
-        String verificationToken = tokenService.generateToken(null, "email-verification");
-        user.setVerificationToken(verificationToken);
+        user.setVerificationToken(verificationToken); // Still store the token in the user entity for backward compatibility
         user.setVerified(false);
         user.setActive(true);
         user.setRegistered(true);
         user.setAccountNonLocked(true);
         user.setOpenToConnect(true);
 
-        // Save user first to get ID
+        // Save user to get an ID
         user = userRepository.save(user);
         
         // Update the token with the user ID
         tokenService.updateTokenUserId(verificationToken, user.getId());
         
-        // Send verification email
-        emailService.sendVerificationEmail(user.getEmailAddress(), verificationToken, 
-                                          userDTO.getIpAddress(), userDTO.getUserAgent());
+        // Send verification email asynchronously
+        authService.sendVerificationEmail(user.getEmailAddress(), verificationToken, 
+        userDTO.getIpAddress(), userDTO.getUserAgent());
+    // Log that the email will be sent asynchronously
+    logger.info("Verification email for user {} will be sent asynchronously", user.getEmailAddress());
 
         // Convert to DTO and return
         return UserDTO.builder()
