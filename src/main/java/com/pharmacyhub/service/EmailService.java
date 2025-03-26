@@ -3,6 +3,8 @@ package com.pharmacyhub.service;
 import com.pharmacyhub.entity.Otp;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -20,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class EmailService
 {
+  private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+  
   @Autowired
   private JavaMailSender mailSender;
   @Autowired
@@ -91,31 +95,47 @@ public class EmailService
    */
   public void sendPasswordResetEmail(String emailAddress, String token, String ipAddress, String userAgent) throws MessagingException
   {
-    String resetUrl = frontendUrl + "/reset-password?token=" + token;
+    logger.info("Sending password reset email to: {}", emailAddress);
+    
+    String resetUrl = frontendUrl + "/reset-password/" + token;
     String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
     String subject = "Password Reset Request - Pharmacy Hub";
     String body = prepareHtmlContent("${resetUrl}", resetUrl, "PasswordResetEmail.html");
     
     // Replace device information placeholders
-    body = body.replace("${ipAddress}", ipAddress);
-    body = body.replace("${userAgent}", userAgent);
+    body = body.replace("${ipAddress}", ipAddress != null ? ipAddress : "Unknown");
+    body = body.replace("${userAgent}", userAgent != null ? userAgent : "Unknown");
     body = body.replace("${timestamp}", timestamp);
     
+    // Add logging for debugging
+    logger.debug("Password reset email details:\nTo: {}\nReset URL: {}\nIP: {}\nAgent: {}", 
+               emailAddress, resetUrl, ipAddress, userAgent);
+    
     emailSender(emailAddress, subject, body);
+    
+    logger.info("Password reset email sent successfully to: {}", emailAddress);
   }
 
 
   private void emailSender(String emailAddress, String subject, String body) throws MessagingException
   {
-    MimeMessage message = mailSender.createMimeMessage();
+    logger.debug("Preparing to send email to: {}, subject: {}", emailAddress, subject);
+    
+    try {
+      MimeMessage message = mailSender.createMimeMessage();
 
       MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
       helper.setTo(emailAddress);
       helper.setSubject(subject);
       helper.setText(body, true);
 
-    mailSender.send(message);
+      mailSender.send(message);
+      logger.debug("Email sent successfully to: {}", emailAddress);
+    } catch (Exception e) {
+      logger.error("Failed to send email to: {}, error: {}", emailAddress, e.getMessage(), e);
+      throw e; // Re-throw the exception to be handled by the caller
+    }
   }
 
   public String prepareHtmlContent(String key, String value, String template)

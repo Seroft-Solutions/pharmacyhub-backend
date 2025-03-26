@@ -436,33 +436,42 @@ public class AuthService {
      * @throws Exception if password reset fails
      */
     public boolean completePasswordReset(String token, String newPassword, String confirmPassword) throws Exception {
+        // Add detailed logging
+        logger.info("Processing password reset for token: {}", token);
+        
         // Validate passwords match
         if (!newPassword.equals(confirmPassword)) {
+            logger.warn("Password reset failed: passwords do not match");
             throw new IllegalArgumentException("Passwords do not match.");
         }
         
         // Validate token
         Long userId = tokenService.validateToken(token, "reset-password");
         if (userId == null) {
+            logger.warn("Password reset failed: invalid or expired token: {}", token);
             throw new IllegalArgumentException("Invalid or expired token.");
         }
         
         // Find user
         User user = userService.findById(userId);
         if (user == null) {
+            logger.warn("Password reset failed: user not found for ID: {}", userId);
             throw new IllegalArgumentException("User not found.");
         }
+        
+        logger.info("Resetting password for user: {}", user.getEmailAddress());
         
         // Update password
         user.setPassword(authenticationService.encodePassword(newPassword));
         userService.saveUser(user);
         
-        // Invalidate token
+        // Invalidate token - do this AFTER successful password update
         tokenService.invalidateToken(token);
         
         // Invalidate all existing sessions for security
         sessionValidationService.invalidateAllSessions(userId);
         
+        logger.info("Password reset successfully completed for user: {}", user.getEmailAddress());
         return true;
     }
     

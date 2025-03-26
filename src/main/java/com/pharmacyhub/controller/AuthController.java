@@ -200,13 +200,33 @@ public class AuthController extends BaseController {
             userAgent = httpRequest.getHeader("User-Agent");
         }
         
-        // Start async process - don't wait for it to complete
-        authService.requestPasswordResetAsync(request.getEmailAddress(), ipAddress, userAgent);
+        // Use synchronous method to avoid duplicate emails
+        try {
+            authService.requestPasswordReset(request.getEmailAddress(), ipAddress, userAgent);
+        } catch (Exception e) {
+            // Log the error but still return success for security
+            logger.error("Error processing password reset", e);
+        }
         
         // For security reasons, always return success immediately
         return successResponse("If an account exists with that email, a password reset link will be sent.");
     }
 
+    @RequestMapping(value = "/password/validate-token/{token}", method = {RequestMethod.GET, RequestMethod.POST})
+    @Operation(summary = "Validate a password reset token")
+    public ResponseEntity<ApiResponse<Boolean>> validatePasswordResetToken(@PathVariable String token) {
+        try {
+            // Use the token service to validate the token
+            Long userId = tokenService.validateToken(token, "reset-password");
+            
+            // Return true if token is valid, false otherwise
+            return successResponse(userId != null);
+        } catch (Exception e) {
+            logger.error("Failed to validate password reset token", e);
+            return errorResponse(HttpStatus.BAD_REQUEST, "Invalid or expired token");
+        }
+    }
+    
     @PostMapping("/reset-password")
     @Operation(summary = "Reset password using token")
     public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody PasswordResetCompleteDTO request) {

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -40,9 +41,11 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -312,6 +315,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleMethodNotAllowed(
             HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
         
+        // Convert HttpMethod objects to strings to avoid serialization issues
+        Set<String> supportedMethods = ex.getSupportedHttpMethods() != null ?
+                ex.getSupportedHttpMethods().stream()
+                        .map(HttpMethod::name)
+                        .collect(Collectors.toSet()) :
+                Collections.emptySet();
+        
         ApiErrorResponse errorResponse = ApiErrorResponse.builder()
                 .status(HttpStatus.METHOD_NOT_ALLOWED.value())
                 .errorCode(ErrorConstants.CODE_METHOD_NOT_ALLOWED)
@@ -319,7 +329,7 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         
-        errorResponse.addDetail("supportedMethods", ex.getSupportedHttpMethods());
+        errorResponse.addDetail("supportedMethods", supportedMethods);
         
         LogUtils.logException(log, request, ex);
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
