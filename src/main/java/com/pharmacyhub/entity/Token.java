@@ -25,7 +25,7 @@ public class Token {
     @Column(nullable = false, unique = true, length = 512)
     private String token;
     
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long userId;
     
     @Column(nullable = false, length = 100)

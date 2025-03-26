@@ -30,14 +30,55 @@ public class TokenService {
     private int tokenExpirationMinutes;
     
     /**
+     * Generate a new token specifically for email verification during registration
+     * This token will initially have a null userId and be updated after user is saved
+     *
+     * @param purpose Token purpose (should be "email-verification")
+     * @return Generated token
+     */
+    @Transactional
+    public String generateEmailVerificationToken(String purpose) {
+        if (!"email-verification".equals(purpose)) {
+            logger.warn("Invalid purpose used for email verification token: {}", purpose);
+            throw new IllegalArgumentException("This method should only be used for email-verification tokens");
+        }
+        
+        // Generate a secure token without special characters that might cause URL issues
+        String token = generateSecureUrlSafeToken();
+        
+        // Calculate expiration time
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(tokenExpirationMinutes);
+        
+        // Create and save token entity with null userId
+        Token tokenEntity = Token.builder()
+                .token(token)
+                .userId(null)  // Will be updated after user is saved
+                .purpose(purpose)
+                .expirationTime(expirationTime)
+                .createdAt(LocalDateTime.now())
+                .build();
+        
+        // Save the token to the database
+        tokenRepository.save(tokenEntity);
+        
+        logger.info("Generated {} token for new user registration, expires at: {}", purpose, expirationTime);
+        return token;
+    }
+    
+    /**
      * Generate a new token for a user
      *
-     * @param userId User ID
+     * @param userId User ID (can be null for pre-registration tokens)
      * @param purpose Token purpose (e.g., "verify-email", "reset-password")
      * @return Generated token
      */
     @Transactional
     public String generateToken(Long userId, String purpose) {
+        // For email verification during registration, use specialized method
+        if (userId == null && "email-verification".equals(purpose)) {
+            return generateEmailVerificationToken(purpose);
+        }
+        
         // Generate a secure token without special characters that might cause URL issues
         String token = generateSecureUrlSafeToken();
         
@@ -103,6 +144,12 @@ public class TokenService {
             logger.warn("Token expired at: {}", tokenEntity.getExpirationTime());
             // Clean up expired token
             tokenRepository.delete(tokenEntity);
+            return null;
+        }
+        
+        // Check if user ID is present
+        if (tokenEntity.getUserId() == null) {
+            logger.warn("Token has no associated user ID: {}", token);
             return null;
         }
         
