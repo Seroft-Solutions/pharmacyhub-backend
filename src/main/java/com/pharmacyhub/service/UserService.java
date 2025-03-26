@@ -23,7 +23,6 @@ import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.constants.RoleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.mail.MessagingException;
-import com.pharmacyhub.service.AuthService;
 
 @Service
 @RequiredArgsConstructor
@@ -113,9 +112,6 @@ public class UserService {
     @Autowired
     private TokenService tokenService;
     
-    @Autowired
-    private AuthService authService;
-    
     public PHUserDTO saveUserAndSendVerification(UserDTO userDTO) throws MessagingException {
         // Check if user already exists
         Optional<User> existingUser = userRepository.findByEmailAddress(userDTO.getEmailAddress());
@@ -146,7 +142,7 @@ public class UserService {
         tokenService.updateTokenUserId(verificationToken, user.getId());
         
         // Send verification email asynchronously
-        authService.sendVerificationEmail(user.getEmailAddress(), verificationToken, 
+        emailService.sendVerificationEmailAsync(user.getEmailAddress(), verificationToken, 
         userDTO.getIpAddress(), userDTO.getUserAgent());
     // Log that the email will be sent asynchronously
     logger.info("Verification email for user {} will be sent asynchronously", user.getEmailAddress());

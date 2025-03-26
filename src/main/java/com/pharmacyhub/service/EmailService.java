@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
+import org.springframework.scheduling.annotation.Async;
 
 @Service
 public class EmailService
@@ -82,6 +84,30 @@ public class EmailService
     body = body.replace("${timestamp}", timestamp);
     
     emailSender(emailAddress, subject, body);
+  }
+  
+  /**
+   * Asynchronously sends a verification email with a verification token and device information
+   * 
+   * @param emailAddress User's email address
+   * @param token Verification token
+   * @param ipAddress IP address from which the request was made
+   * @param userAgent User agent information
+   * @return CompletableFuture with result of operation
+   */
+  @Async
+  public CompletableFuture<Boolean> sendVerificationEmailAsync(String emailAddress, String token, String ipAddress, String userAgent) {
+      return CompletableFuture.supplyAsync(() -> {
+          try {
+              // Send verification email with device tracking information
+              sendVerificationEmail(emailAddress, token, ipAddress, userAgent);
+              logger.info("Verification email sent asynchronously to: {}", emailAddress);
+              return true;
+          } catch (Exception e) {
+              logger.error("Failed to send verification email asynchronously to: {}", emailAddress, e);
+              return false;
+          }
+      });
   }
 
   /**

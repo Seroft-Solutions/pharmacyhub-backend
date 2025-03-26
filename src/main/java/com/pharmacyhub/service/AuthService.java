@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import jakarta.mail.MessagingException;
 
 /**
  * Service for handling authentication-related operations
@@ -379,47 +378,6 @@ public class AuthService {
      * @return True if password reset email was sent successfully
      * @throws Exception if email sending fails
      */
-    /**
-     * Asynchronously send verification email
-     * 
-     * @param email The email address
-     * @param token The verification token
-     * @param ipAddress The IP address
-     * @param userAgent The user agent
-     * @return CompletableFuture with result of operation
-     */
-    @Async
-    public CompletableFuture<Boolean> sendVerificationEmailAsync(String email, String token, String ipAddress, String userAgent) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                // Send verification email with device tracking information
-                emailService.sendVerificationEmail(email, token, ipAddress, userAgent);
-                logger.info("Verification email sent asynchronously to: {}", email);
-                return true;
-            } catch (Exception e) {
-                logger.error("Failed to send verification email asynchronously to: {}", email, e);
-                return false;
-            }
-        });
-    }
-    
-    /**
-     * Send verification email - non-blocking version
-     * 
-     * @param email The email address
-     * @param token The verification token
-     * @param ipAddress The IP address
-     * @param userAgent The user agent
-     * @return True to indicate request was accepted
-     */
-    public boolean sendVerificationEmail(String email, String token, String ipAddress, String userAgent) {
-        // Start the async process but don't wait for it to complete
-        sendVerificationEmailAsync(email, token, ipAddress, userAgent);
-        
-        // Return true immediately - the actual email sending will happen in background
-        return true;
-    }
-    
     /**
      * Asynchronously process password reset request
      * 
