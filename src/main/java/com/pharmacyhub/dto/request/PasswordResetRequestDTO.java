@@ -16,8 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PasswordResetRequestDTO {
     
-    @NotBlank(message = "Email address is required")
-    @Email(message = "Please provide a valid email address")
     private String emailAddress;
     
     // Device information
