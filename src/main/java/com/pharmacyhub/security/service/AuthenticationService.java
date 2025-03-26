@@ -55,10 +55,10 @@ public class AuthenticationService {
     @Autowired
     private UserRoleService userRoleService;
     
-    @Value("${google.oauth.client-id}")
+    @Value("${google.oauth.client-id:1}")
     private String googleClientId;
     
-    @Value("${google.oauth.client-secret:}")
+    @Value("${google.oauth.client-secret:1}")
     private String googleClientSecret;
     
     @Value("${google.oauth.default-user-role:ROLE_USER}")
