@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Login Detected - PharmacyHub Account</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f9fafb;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+        }
+        .title {
+            color: #1e40af;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+            margin-top: 0;
+        }
+        .alert-box {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .details-box {
+            background-color: #f3f4f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .detail-label {
+            width: 140px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .detail-value {
+            flex: 1;
+            color: #1f2937;
+        }
+        .action-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: 500;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- <img src="logo.png" alt="PharmacyHub Logo" class="logo"> -->
+            <h1 class="title">PharmacyHub Security Alert</h1>
+            <p class="subtitle">New login detected to your account</p>
+        </div>
+        
+        <div class="content">
+            <p>Hello,</p>
+            <p>We detected a recent login to your PharmacyHub account. If this was you, you can ignore this email.</p>
+            
+            <div class="alert-box">
+                <p><strong>Important:</strong> If you did not log in at this time, someone else may have access to your account. Please review the details below and take immediate action to secure your account.</p>
+            </div>
+            
+            <h2>Login Details:</h2>
+            <div class="details-box">
+                <div class="detail-row">
+                    <div class="detail-label">Date/Time:</div>
+                    <div class="detail-value">${timestamp}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Location:</div>
+                    <div class="detail-value">${location}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Device:</div>
+                    <div class="detail-value">${device}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Browser/App:</div>
+                    <div class="detail-value">${userAgent}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">IP Address:</div>
+                    <div class="detail-value">${ipAddress}</div>
+                </div>
+            </div>
+            
+            <p>If you don't recognize this activity, please take immediate action to secure your account:</p>
+            
+            <div style="text-align: center;">
+                <a href="${securityUrl}" class="action-button">Review Account Security</a>
+            </div>
+            
+            <div class="warning">
+                <p><strong>Security Tips:</strong></p>
+                <ul>
+                    <li>Use a strong, unique password for your PharmacyHub account</li>
+                    <li>Enable two-factor authentication for additional security</li>
+                    <li>Never share your login credentials with anyone</li>
+                    <li>Be cautious of phishing attempts that ask for your login information</li>
+                </ul>
+            </div>
+            
+            <p>If you need any assistance or have questions about your account security, please <a href="${frontendUrl}/contact">contact our support team</a>.</p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 PharmacyHub. All rights reserved.</p>
+            <p>This is an automated security notification. Please do not reply to this email.</p>
+            <p>
+                <a href="${frontendUrl}/terms">Terms of Service</a> |
+                <a href="${frontendUrl}/privacy">Privacy Policy</a> |
+                <a href="${frontendUrl}/contact">Contact Us</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

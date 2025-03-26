@@ -89,6 +89,8 @@ clientApp:
 pharmacyhub:
   seeder:
     engine: false
+  frontend:
+    url: http://localhost:3000  # Frontend URL configuration
   test:
     data:
       pharmacist: 1-10

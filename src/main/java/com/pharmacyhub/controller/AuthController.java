@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.pharmacyhub.service.AuthService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -62,9 +63,15 @@ public class AuthController extends BaseController {
     private EmailService emailService;
     @Autowired
     private TokenService tokenService;
+    
+    @Autowired
+    private AuthService authService;
 
     @Value("${pharmacyhub.security.jwt.token-validity-in-seconds:18000}")
     private long tokenValidityInSeconds;
+    
+    @Value("${pharmacyhub.frontend.url}")
+    private String frontendUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -114,7 +121,7 @@ public class AuthController extends BaseController {
 
                 // Redirect to verification success page
                 return ResponseEntity.status(HttpStatus.FOUND)
-                        .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-successful")
+                        .header(HttpHeaders.LOCATION, frontendUrl + "/verification-successful")
                         .body(response);
             } else {
                 ApiResponse<String> response = ApiResponse.<String>builder()
@@ -124,7 +131,7 @@ public class AuthController extends BaseController {
 
                 // Redirect to verification failed page
                 return ResponseEntity.status(HttpStatus.FOUND)
-                        .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-failed")
+                        .header(HttpHeaders.LOCATION, frontendUrl + "/verification-failed")
                         .body(response);
             }
         } catch (Exception e) {
@@ -135,7 +142,7 @@ public class AuthController extends BaseController {
                     .build();
 
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .header(HttpHeaders.LOCATION, "https://pharmacyhub.pk/verification-failed")
+                    .header(HttpHeaders.LOCATION, frontendUrl + "/verification-failed")
                     .body(response);
         }
     }
@@ -155,20 +162,6 @@ public class AuthController extends BaseController {
 
         // For security reasons, always return success even if user doesn't exist
         try {
-            // Find user
-            User user = userService.findByEmail(request.getEmailAddress());
-            if (user == null) {
-                return successResponse("If an account exists with that email, a verification link has been sent.");
-            }
-
-            // If user is already verified, return success but don't send email
-            if (user.isVerified()) {
-                return successResponse("Your account is already verified. You can log in now.");
-            }
-
-            // Generate a verification token
-            String token = tokenService.generateToken(user.getId(), "email-verification");
-
             // Get device information
             String ipAddress = request.getIpAddress();
             if (ipAddress == null || ipAddress.isBlank()) {
@@ -179,11 +172,11 @@ public class AuthController extends BaseController {
             if (userAgent == null || userAgent.isBlank()) {
                 userAgent = httpRequest.getHeader("User-Agent");
             }
-
-            // Send verification email with device tracking information
-            emailService.sendVerificationEmail(user.getEmailAddress(), token, ipAddress, userAgent);
-
-            return successResponse("Verification email has been sent. Please check your inbox.");
+            
+            // Use the auth service
+            authService.resendVerificationEmail(request.getEmailAddress(), ipAddress, userAgent);
+            
+            return successResponse("If an account exists with that email, a verification link has been sent.");
         } catch (Exception e) {
             logger.error("Failed to send verification email", e);
             // Still return success for security (don't confirm if email exists)
@@ -196,17 +189,6 @@ public class AuthController extends BaseController {
     public ResponseEntity<ApiResponse<String>> forgotPassword(
             @Valid @RequestBody PasswordResetRequestDTO request,
             HttpServletRequest httpRequest) {
-
-        // Check if user exists
-        User user = userService.findByEmail(request.getEmailAddress());
-        if (user == null) {
-            // For security reasons, always return success even if user doesn't exist
-            return successResponse("If an account exists with that email, a password reset link has been sent.");
-        }
-
-        // Generate a password reset token
-        String token = tokenService.generateToken(user.getId(), "reset-password");
-
         // Get device information
         String ipAddress = request.getIpAddress();
         if (ipAddress == null || ipAddress.isBlank()) {
@@ -217,49 +199,37 @@ public class AuthController extends BaseController {
         if (userAgent == null || userAgent.isBlank()) {
             userAgent = httpRequest.getHeader("User-Agent");
         }
-
-        try {
-            // Send password reset email with device tracking information
-            emailService.sendPasswordResetEmail(user.getEmailAddress(), token, ipAddress, userAgent);
-            return successResponse("Password reset instructions have been sent to your email.");
-        } catch (Exception e) {
-            logger.error("Failed to send password reset email", e);
-            return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send password reset email. Please try again later.");
-        }
+        
+        // Start async process - don't wait for it to complete
+        authService.requestPasswordResetAsync(request.getEmailAddress(), ipAddress, userAgent);
+        
+        // For security reasons, always return success immediately
+        return successResponse("If an account exists with that email, a password reset link will be sent.");
     }
 
     @PostMapping("/reset-password")
     @Operation(summary = "Reset password using token")
     public ResponseEntity<ApiResponse<String>> resetPassword(@Valid @RequestBody PasswordResetCompleteDTO request) {
-        // Validate passwords match
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            return errorResponse(HttpStatus.BAD_REQUEST, "Passwords do not match.");
-        }
-
-        // Validate token
-        Long userId = tokenService.validateToken(request.getToken(), "reset-password");
-        if (userId == null) {
-            return errorResponse(HttpStatus.BAD_REQUEST, "Invalid or expired token.");
-        }
-
         try {
-            // Find user
-            User user = userService.findById(userId);
-            if (user == null) {
-                return errorResponse(HttpStatus.NOT_FOUND, "User not found.");
+            // Validate passwords match
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                return errorResponse(HttpStatus.BAD_REQUEST, "Passwords do not match.");
             }
-
-            // Update password
-            user.setPassword(authenticationService.encodePassword(request.getNewPassword()));
-            userService.saveUser(user);
-
-            // Invalidate token
-            tokenService.invalidateToken(request.getToken());
-
-            // Invalidate all existing sessions for security
-            sessionValidationService.invalidateAllSessions(userId);
-
-            return successResponse("Password has been reset successfully. Please log in with your new password.");
+            
+            // Use the auth service
+            boolean success = authService.completePasswordReset(
+                request.getToken(), 
+                request.getNewPassword(), 
+                request.getConfirmPassword()
+            );
+            
+            if (success) {
+                return successResponse("Password has been reset successfully. Please log in with your new password.");
+            } else {
+                return errorResponse(HttpStatus.BAD_REQUEST, "Failed to reset password. Please try again.");
+            }
+        } catch (IllegalArgumentException e) {
+            return errorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (Exception e) {
             logger.error("Failed to reset password", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to reset password. Please try again later.");
@@ -273,107 +243,9 @@ public class AuthController extends BaseController {
             HttpServletRequest httpRequest) {
 
         try {
-            logger.info("Received social login callback with code: {}",
-                request.getCode() != null ? "[PRESENT]" : "[MISSING]");
-
-            // Get device information
-            String ipAddress = request.getIpAddress();
-            if (ipAddress == null || ipAddress.isBlank()) {
-                ipAddress = getClientIpAddress(httpRequest);
-            }
-
-            String userAgent = request.getUserAgent();
-            if (userAgent == null || userAgent.isBlank()) {
-                userAgent = httpRequest.getHeader("User-Agent");
-            }
-
-            // Process the social login - this integrates with your OAuth provider
-            // This would need to be customized for your specific OAuth integration
-            User authenticatedUser = authenticationService.processSocialLogin(
-                request.getCode(),
-                request.getCallbackUrl()
-            );
-
-            // If this is a new user, they should be marked as verified automatically
-            // since their email is verified by the OAuth provider
-            if (!authenticatedUser.isVerified()) {
-                authenticatedUser.setVerified(true);
-                userService.saveUser(authenticatedUser);
-            }
-
-            // Generate JWT token
-            String token = authenticationService.generateToken(authenticatedUser);
-
-            // Get user roles
-            Set<Role> userRoles = authenticatedUser.getRoles();
-            List<String> roleNames = userRoles.stream()
-                                              .map(Role::getName)
-                                              .collect(Collectors.toList());
-
-            // Get user permissions
-            Set<String> permissionNames = new HashSet<>();
-            for (Role userRole : userRoles) {
-                if (userRole.getPermissions() != null) {
-                    userRole.getPermissions().stream()
-                            .map(Permission::getName)
-                            .forEach(permissionNames::add);
-                }
-            }
-
-            // Create user response DTO
-            UserResponseDTO userResponse = UserResponseDTO.builder()
-                    .id(authenticatedUser.getId().toString())
-                    .email(authenticatedUser.getEmailAddress())
-                    .firstName(authenticatedUser.getFirstName())
-                    .lastName(authenticatedUser.getLastName())
-                    .active(authenticatedUser.isEnabled())
-                    .createdAt(LocalDateTime.now().toString())
-                    .updatedAt(LocalDateTime.now().toString())
-                    .roles(roleNames)
-                    .build();
-
-            // Create tokens DTO
-            TokensDTO tokens = TokensDTO.builder()
-                    .accessToken(token)
-                    .tokenType("Bearer")
-                    .expiresIn(tokenValidityInSeconds)
-                    .build();
-
-            // Create response DTO
-            AuthResponseDTO response = AuthResponseDTO.builder()
-                    .user(userResponse)
-                    .tokens(tokens)
-                    .build();
-
-            // Validate session if device information is provided
-            if (request.getDeviceId() != null) {
-                // Create validation request
-                LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
-                    .userId(authenticatedUser.getId())
-                    .deviceId(request.getDeviceId())
-                    .ipAddress(ipAddress)
-                    .userAgent(userAgent)
-                    .platform(request.getPlatform())
-                    .language(request.getLanguage())
-                    .metadata(buildMetadataJson(request))
-                    .build();
-
-                LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
-
-                // Add session ID to response if available
-                if (validationResult.getSessionId() != null) {
-                    response = AuthResponseDTO.builder()
-                        .user(userResponse)
-                        .tokens(tokens)
-                        .sessionId(validationResult.getSessionId())
-                        .validationStatus(validationResult.getStatus().toString())
-                        .build();
-                }
-            }
-
-            logger.info("Social login successful for user: {}", authenticatedUser.getEmailAddress());
+            // Use the auth service to handle social login
+            AuthResponseDTO response = authService.socialLogin(request, httpRequest);
             return successResponse(response);
-
         } catch (Exception e) {
             logger.error("Social login error", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process social login: " + e.getMessage());
@@ -386,83 +258,9 @@ public class AuthController extends BaseController {
             @Valid @RequestBody LoginRequestDTO request,
             HttpServletRequest httpRequest) {
         try {
-            // Authenticate the user - this will throw UnverifiedAccountException if account is not verified
-            User authenticatedUser = authenticationService.authenticateUser(request.getEmailAddress(), request.getPassword());
-
-            // Generate JWT token
-            String token = authenticationService.generateToken(authenticatedUser);
-
-            // Get user roles
-            Set<Role> userRoles = authenticatedUser.getRoles();
-            List<String> roleNames = userRoles.stream()
-                                          .map(Role::getName)
-                                          .collect(Collectors.toList());
-
-            // Get user permissions
-            Set<String> permissionNames = new HashSet<>();
-            for (Role userRole : userRoles) {
-                if (userRole.getPermissions() != null) {
-                    userRole.getPermissions().stream()
-                            .map(Permission::getName)
-                            .forEach(permissionNames::add);
-                }
-            }
-
-            // Create user response DTO
-            UserResponseDTO userResponse = UserResponseDTO.builder()
-                    .id(authenticatedUser.getId().toString())
-                    .email(authenticatedUser.getEmailAddress())
-                    .firstName(authenticatedUser.getFirstName())
-                    .lastName(authenticatedUser.getLastName())
-                    .active(authenticatedUser.isEnabled())
-                    .createdAt(LocalDateTime.now().toString())
-                    .updatedAt(LocalDateTime.now().toString())
-                    .roles(roleNames)
-                    .build();
-
-            // Create tokens DTO
-            TokensDTO tokens = TokensDTO.builder()
-                    .accessToken(token)
-                    .tokenType("Bearer")
-                    .expiresIn(tokenValidityInSeconds) // Use the configured token validity
-                    .build();
-
-            // Create response DTO
-            AuthResponseDTO response = AuthResponseDTO.builder()
-                    .user(userResponse)
-                    .tokens(tokens)
-                    .build();
-
-            // Validate session if device information is provided
-            if (request.getDeviceId() != null) {
-                // Get client IP from request since LoginRequestDTO doesn't have ipAddress field
-                String ipAddress = getClientIpAddress(httpRequest);
-
-                // Validate login session
-                LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
-                    .userId(authenticatedUser.getId())
-                    .deviceId(request.getDeviceId())
-                    .ipAddress(ipAddress)
-                    .userAgent(request.getUserAgent())
-                    .platform(request.getPlatform())
-                    .language(request.getLanguage())
-                    .metadata(buildMetadataJson(request))
-                    .build();
-
-                LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
-
-                // Add session ID to response if available
-                if (validationResult.getSessionId() != null) {
-                    response = AuthResponseDTO.builder()
-                        .user(userResponse)
-                        .tokens(tokens)
-                        .sessionId(validationResult.getSessionId())
-                        .validationStatus(validationResult.getStatus().toString())
-                        .build();
-                }
-            }
-
-            logger.info("Login successful for user: {}", authenticatedUser.getUsername());
+            // Use the auth service to handle login
+            AuthResponseDTO response = authService.login(request, httpRequest);
+            logger.info("Login processed successfully");
             return successResponse(response);
         } catch (UnverifiedAccountException ex) {
             logger.warn("Login attempt to unverified account: {}", request.getEmailAddress());
@@ -479,32 +277,17 @@ public class AuthController extends BaseController {
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) String sessionId) {
         try {
-            // Extract user ID from JWT token
-            String token = authHeader.replace("Bearer ", "");
-            Long userId = authenticationService.getUserIdFromToken(token);
-
-            if (userId == null) {
-                return errorResponse(HttpStatus.UNAUTHORIZED, "Invalid token");
-            }
-
-            if (sessionId != null && !sessionId.isEmpty()) {
-                // Invalidate specific session if session ID is provided
-                try {
-                    UUID sessionUUID = UUID.fromString(sessionId);
-                    boolean invalidated = sessionValidationService.invalidateSession(sessionUUID);
-                    if (!invalidated) {
-                        logger.warn("Session not found or already inactive: {}", sessionId);
-                    }
-                } catch (IllegalArgumentException e) {
-                    logger.error("Invalid session UUID: {}", sessionId, e);
-                    return errorResponse(HttpStatus.BAD_REQUEST, "Invalid session ID format");
-                }
+            // Use the auth service
+            boolean success = authService.logout(authHeader, sessionId);
+            
+            if (success) {
+                return successResponse("Logged out successfully");
             } else {
-                // Default behavior: Invalidate all sessions for the user
-                sessionValidationService.invalidateAllSessions(userId);
+                return errorResponse(HttpStatus.BAD_REQUEST, "Failed to logout. Please try again.");
             }
-
-            return successResponse("Logged out successfully");
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid session UUID: {}", sessionId, e);
+            return errorResponse(HttpStatus.BAD_REQUEST, "Invalid session ID format");
         } catch (Exception e) {
             logger.error("Error during logout", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing logout");
@@ -517,31 +300,17 @@ public class AuthController extends BaseController {
             @RequestHeader("Authorization") String authHeader,
             @RequestParam String currentSessionId) {
         try {
-            // Extract user ID from JWT token
-            String token = authHeader.replace("Bearer ", "");
-            Long userId = authenticationService.getUserIdFromToken(token);
-
-            if (userId == null) {
-                return errorResponse(HttpStatus.UNAUTHORIZED, "Invalid token");
-            }
-
-            // Validate session ID format
-            UUID sessionUUID;
-            try {
-                sessionUUID = UUID.fromString(currentSessionId);
-            } catch (IllegalArgumentException e) {
-                logger.error("Invalid session UUID: {}", currentSessionId, e);
-                return errorResponse(HttpStatus.BAD_REQUEST, "Invalid session ID format");
-            }
-
-            // Invalidate all sessions except the current one
-            int invalidatedCount = sessionValidationService.invalidateOtherSessions(userId, sessionUUID);
+            // Use the auth service
+            int invalidatedCount = authService.forceLogout(authHeader, currentSessionId);
 
             if (invalidatedCount > 0) {
                 return successResponse(String.format("Successfully logged out from %d other device(s)", invalidatedCount));
             } else {
                 return successResponse("No other active sessions found");
             }
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid session UUID: {}", currentSessionId, e);
+            return errorResponse(HttpStatus.BAD_REQUEST, "Invalid session ID format");
         } catch (Exception e) {
             logger.error("Error during force logout", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing force logout request");

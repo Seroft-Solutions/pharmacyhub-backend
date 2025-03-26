@@ -105,6 +105,40 @@ public class EmailService
     emailSender(emailAddress, subject, body);
   }
 
+  /**
+   * Sends a login notification email for security purposes
+   * 
+   * @param emailAddress User's email address
+   * @param ipAddress IP address from which the login was made
+   * @param userAgent User agent information
+   * @param location Approximate location based on IP (if available)
+   * @param device Device name or type
+   * @param loginTime Time of the login attempt
+   * @throws MessagingException If there's an error sending the email
+   */
+  public void sendLoginNotificationEmail(String emailAddress, String ipAddress, String userAgent, 
+                                        String location, String device, LocalDateTime loginTime) throws MessagingException
+  {
+    String timestamp = loginTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    String locationInfo = (location != null && !location.isBlank()) ? location : "Unknown location";
+    String deviceInfo = (device != null && !device.isBlank()) ? device : "Unknown device";
+
+    String subject = "New Login Detected - PharmacyHub Account";
+    String body = prepareHtmlContent("${templateName}", "Login Notification", "LoginNotificationEmail.html");
+    
+    // Replace placeholders with actual values
+    body = body.replace("${ipAddress}", ipAddress != null ? ipAddress : "Unknown");
+    body = body.replace("${userAgent}", userAgent != null ? userAgent : "Unknown");
+    body = body.replace("${location}", locationInfo);
+    body = body.replace("${device}", deviceInfo);
+    body = body.replace("${timestamp}", timestamp);
+    
+    // Add security action links
+    String accountSecurityUrl = frontendUrl + "/account/security";
+    body = body.replace("${securityUrl}", accountSecurityUrl);
+    
+    emailSender(emailAddress, subject, body);
+  }
 
   private void emailSender(String emailAddress, String subject, String body) throws MessagingException
   {
@@ -144,7 +178,4 @@ public class EmailService
 
     return contentBuilder.toString();
   }
-
-
-
 }
