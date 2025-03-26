@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class EmailService
@@ -34,12 +36,69 @@ public class EmailService
   }
 
 
+  /**
+   * Sends a verification email with a verification token
+   * 
+   * @param emailAddress User's email address
+   * @param token Verification token
+   * @throws MessagingException If there's an error sending the email
+   */
   public void sendVerificationEmail(String emailAddress, String token) throws MessagingException
   {
-    String verificationUrl = "https://localhost:8080/auth/verify?token=" + token;
+    String verificationUrl = "https://pharmacyhub.pk/verify-email?token=" + token;
 
-    String subject = "Welcome to Pharmacy Hub";
+    String subject = "Welcome to Pharmacy Hub - Verify Your Email";
     String body = prepareHtmlContent("${verificationUrl}",verificationUrl,"EmailVerification.html");
+    emailSender(emailAddress, subject, body);
+  }
+  
+  /**
+   * Sends a verification email with a verification token and device information
+   * 
+   * @param emailAddress User's email address
+   * @param token Verification token
+   * @param ipAddress IP address from which the request was made
+   * @param userAgent User agent information
+   * @throws MessagingException If there's an error sending the email
+   */
+  public void sendVerificationEmail(String emailAddress, String token, String ipAddress, String userAgent) throws MessagingException
+  {
+    String verificationUrl = "https://pharmacyhub.pk/verify-email?token=" + token;
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+    String subject = "Welcome to Pharmacy Hub - Verify Your Email";
+    String body = prepareHtmlContent("${verificationUrl}", verificationUrl, "EmailVerification.html");
+    
+    // Add device information if the template supports it
+    body = body.replace("${ipAddress}", ipAddress != null ? ipAddress : "Unknown");
+    body = body.replace("${userAgent}", userAgent != null ? userAgent : "Unknown");
+    body = body.replace("${timestamp}", timestamp);
+    
+    emailSender(emailAddress, subject, body);
+  }
+
+  /**
+   * Sends a password reset email with a reset token
+   * 
+   * @param emailAddress User's email address
+   * @param token Reset token
+   * @param ipAddress IP address from which the request was made
+   * @param userAgent User agent information
+   * @throws MessagingException If there's an error sending the email
+   */
+  public void sendPasswordResetEmail(String emailAddress, String token, String ipAddress, String userAgent) throws MessagingException
+  {
+    String resetUrl = "https://pharmacyhub.pk/reset-password?token=" + token;
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+    String subject = "Password Reset Request - Pharmacy Hub";
+    String body = prepareHtmlContent("${resetUrl}", resetUrl, "PasswordResetEmail.html");
+    
+    // Replace device information placeholders
+    body = body.replace("${ipAddress}", ipAddress);
+    body = body.replace("${userAgent}", userAgent);
+    body = body.replace("${timestamp}", timestamp);
+    
     emailSender(emailAddress, subject, body);
   }
 

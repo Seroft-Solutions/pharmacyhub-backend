@@ -136,4 +136,63 @@ public class Role {
     public String toString() {
         return "Role(id=" + id + ", name=" + (name != null ? name.toString() : "null") + ", precedence=" + precedence + ", system=" + system + ")";    
     }
+    
+    /**
+     * Static builder method.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+    
+    /**
+     * Builder class for Role.
+     */
+    public static class Builder {
+        private Long id;
+        private RoleEnum name;
+        private String description;
+        private int precedence;
+        private boolean system = false;
+        private Set<Permission> permissions = new HashSet<>();
+        private Set<Role> childRoles = new HashSet<>();
+        
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+        
+        public Builder name(RoleEnum name) {
+            this.name = name;
+            return this;
+        }
+        
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+        
+        public Builder precedence(int precedence) {
+            this.precedence = precedence;
+            return this;
+        }
+        
+        public Builder system(boolean system) {
+            this.system = system;
+            return this;
+        }
+        
+        public Builder permissions(Set<Permission> permissions) {
+            this.permissions = permissions;
+            return this;
+        }
+        
+        public Builder childRoles(Set<Role> childRoles) {
+            this.childRoles = childRoles;
+            return this;
+        }
+        
+        public Role build() {
+            return new Role(id, name, description, precedence, system, permissions, childRoles);
+        }
+    }
 }

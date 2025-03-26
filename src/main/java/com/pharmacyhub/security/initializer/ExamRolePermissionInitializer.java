@@ -16,6 +16,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,11 +26,11 @@ import java.util.stream.Collectors;
  * Initializes exam-specific roles and permissions
  * Runs after the main role initializer to ensure all base roles are already created
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 @Order(Ordered.LOWEST_PRECEDENCE - 10) // Ensure this runs after the main role initializer
 public class ExamRolePermissionInitializer implements ApplicationListener<ContextRefreshedEvent> {
+    private static final Logger log = LoggerFactory.getLogger(ExamRolePermissionInitializer.class);
     private final RolesRepository rolesRepository;
     private final PermissionRepository permissionRepository;
     private final PermissionDataLoaderService permissionDataLoaderService;
@@ -148,12 +150,11 @@ public class ExamRolePermissionInitializer implements ApplicationListener<Contex
         if (!rolesRepository.findByName(RoleEnum.EXAM_CREATOR).isPresent()) {
             log.info("Creating EXAM_CREATOR role");
             
-            Role examCreatorRole = Role.builder()
-                    .name(RoleEnum.EXAM_CREATOR)
-                    .description("Role for creating and managing exams")
-                    .precedence(70) // Between INSTRUCTOR and PHARMACIST
-                    .system(true)
-                    .build();
+            Role examCreatorRole = new Role();
+            examCreatorRole.setName(RoleEnum.EXAM_CREATOR);
+            examCreatorRole.setDescription("Role for creating and managing exams");
+            examCreatorRole.setPrecedence(70); // Between INSTRUCTOR and PHARMACIST
+            examCreatorRole.setSystem(true);
             
             // Save the role first to get an ID
             examCreatorRole = rolesRepository.save(examCreatorRole);

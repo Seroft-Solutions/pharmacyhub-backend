@@ -29,6 +29,9 @@ public class LoginRequestDTO implements BaseDTO {
     @JsonProperty("deviceId")
     private String deviceId;
     
+    @JsonProperty("ipAddress")
+    private String ipAddress;
+    
     @JsonProperty("userAgent")
     private String userAgent;
     

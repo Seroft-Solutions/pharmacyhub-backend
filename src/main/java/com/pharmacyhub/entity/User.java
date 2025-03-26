@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class User implements UserDetails {
+    private String profilePictureUrl;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -207,6 +208,10 @@ public class User implements UserDetails {
     public String getUsername() {
         return emailAddress;
     }
+    
+    public void setUsername(String username) {
+        this.emailAddress = username;
+    }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -229,6 +234,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return active;
+    }
+    
+    public void setEnabled(boolean enabled) {
+        this.active = enabled;
     }
 
     @Override
@@ -271,5 +280,13 @@ public class User implements UserDetails {
     
     public boolean isVerified() {
         return verified;
+    }
+    
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+    
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
     }
 }

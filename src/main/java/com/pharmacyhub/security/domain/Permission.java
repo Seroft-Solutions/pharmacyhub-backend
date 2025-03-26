@@ -111,4 +111,57 @@ public class Permission {
         }
         return name != null ? name.hashCode() : 0;
     }
+    
+    /**
+     * Static builder method.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+    
+    /**
+     * Builder class for Permission.
+     */
+    public static class Builder {
+        private Long id;
+        private String name;
+        private String description;
+        private ResourceType resourceType;
+        private OperationType operationType;
+        private boolean requiresApproval = false;
+        
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+        
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+        
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+        
+        public Builder resourceType(ResourceType resourceType) {
+            this.resourceType = resourceType;
+            return this;
+        }
+        
+        public Builder operationType(OperationType operationType) {
+            this.operationType = operationType;
+            return this;
+        }
+        
+        public Builder requiresApproval(boolean requiresApproval) {
+            this.requiresApproval = requiresApproval;
+            return this;
+        }
+        
+        public Permission build() {
+            return new Permission(id, name, description, resourceType, operationType, requiresApproval);
+        }
+    }
 }

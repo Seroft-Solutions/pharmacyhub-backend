@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Propagation;
 
 /**
  * Service for validating login sessions and preventing account sharing
@@ -34,7 +35,7 @@ public class SessionValidationService {
     private final UserRepository userRepository;
     private final GeoIpService geoIpService;
     
-    @Value("${pharmacyhub.security.session.max-active-sessions:3}")
+    @Value("${pharmacyhub.security.session.max-active-sessions:1}")
     private int maxActiveSessions;
     
     @Value("${pharmacyhub.security.session.require-otp-for-new-device:true}")
@@ -93,14 +94,37 @@ public class SessionValidationService {
                 .sessionId(session.getId())
                 .build();
         } else if (tooManySessions) {
-            result = LoginValidationResultDTO.builder()
-                .status(LoginStatus.TOO_MANY_DEVICES)
-                .message("Too many active devices. Please log out from another device first.")
-                .requiresOtp(false)
-                .build();
+            // Check if there's an existing active session from a different device
+            List<LoginSession> activeSessions = loginSessionRepository.findActiveSessionsByUserId(user.getId());
+            boolean hasOtherDevice = activeSessions.stream()
+                    .anyMatch(s -> !s.getDeviceId().equals(request.getDeviceId()));
+            
+            if (hasOtherDevice) {
+                // Return too many devices error
+                result = LoginValidationResultDTO.builder()
+                    .status(LoginStatus.TOO_MANY_DEVICES)
+                    .message("You are already logged in from another device. Please log out from that device first.")
+                    .requiresOtp(false)
+                    .build();
+            } else {
+                // Same device - reactivate session
+                LoginSession session = createOrUpdateSession(user, request, country, false);
+                result = LoginValidationResultDTO.builder()
+                    .status(LoginStatus.OK)
+                    .requiresOtp(false)
+                    .sessionId(session.getId())
+                    .build();
+            }
         } else {
-            // Create or update session with no OTP required
+            // No active sessions found - create a new one and invalidate others for safety
             LoginSession session = createOrUpdateSession(user, request, country, false);
+            
+            // If this is a new login on a new device, invalidate any other sessions
+            if (maxActiveSessions == 1) {
+                // Safety first - invalidate all other sessions
+                invalidateOtherSessions(user.getId(), session.getId());
+            }
+            
             result = LoginValidationResultDTO.builder()
                 .status(LoginStatus.OK)
                 .requiresOtp(false)
@@ -150,6 +174,89 @@ public class SessionValidationService {
         }
         
         // No matching country or IP found, consider it suspicious
+        return true;
+    }
+    
+    /**
+     * Invalidate all active sessions for a user
+     * 
+     * @param userId User ID
+     * @return Number of sessions invalidated
+     */
+    @Transactional
+    public int invalidateAllSessions(Long userId) {
+        logger.debug("Invalidating all sessions for user ID: {}", userId);
+        List<LoginSession> activeSessions = loginSessionRepository.findActiveSessionsByUserId(userId);
+        
+        if (activeSessions.isEmpty()) {
+            return 0;
+        }
+        
+        int count = 0;
+        for (LoginSession session : activeSessions) {
+            session.setActive(false);
+            loginSessionRepository.save(session);
+            count++;
+        }
+        
+        logger.debug("Invalidated {} sessions for user ID: {}", count, userId);
+        return count;
+    }
+    
+    /**
+     * Invalidate all active sessions for a user except the current one
+     * 
+     * @param userId User ID
+     * @param currentSessionId Current session ID to keep active
+     * @return Number of sessions invalidated
+     */
+    @Transactional
+    public int invalidateOtherSessions(Long userId, UUID currentSessionId) {
+        logger.debug("Invalidating other sessions for user ID: {} except session ID: {}", userId, currentSessionId);
+        List<LoginSession> activeSessions = loginSessionRepository.findActiveSessionsByUserId(userId);
+        
+        if (activeSessions.isEmpty()) {
+            return 0;
+        }
+        
+        int count = 0;
+        for (LoginSession session : activeSessions) {
+            if (!session.getId().equals(currentSessionId)) {
+                session.setActive(false);
+                loginSessionRepository.save(session);
+                count++;
+            }
+        }
+        
+        logger.debug("Invalidated {} other sessions for user ID: {}", count, userId);
+        return count;
+    }
+    
+    /**
+     * Invalidate a specific session by ID
+     * 
+     * @param sessionId Session ID to invalidate
+     * @return true if successful, false if session not found or already inactive
+     */
+    @Transactional
+    public boolean invalidateSession(UUID sessionId) {
+        logger.debug("Invalidating session: {}", sessionId);
+        
+        Optional<LoginSession> sessionOpt = loginSessionRepository.findById(sessionId);
+        if (sessionOpt.isEmpty()) {
+            logger.warn("Session not found: {}", sessionId);
+            return false;
+        }
+        
+        LoginSession session = sessionOpt.get();
+        if (!session.isActive()) {
+            logger.warn("Session already inactive: {}", sessionId);
+            return false;
+        }
+        
+        session.setActive(false);
+        loginSessionRepository.save(session);
+        logger.debug("Session invalidated: {}", sessionId);
         return true;
     }
     

@@ -243,13 +243,12 @@ public class PermissionDataLoaderService {
             
             if (permission == null) {
                 // Create new permission
-                permission = Permission.builder()
-                        .name(definition.getName())
-                        .description(definition.getDescription())
-                        .resourceType(definition.getResourceType())
-                        .operationType(definition.getOperationType())
-                        .requiresApproval(definition.isRequiresApproval())
-                        .build();
+                permission = new Permission();
+                permission.setName(definition.getName());
+                permission.setDescription(definition.getDescription());
+                permission.setResourceType(definition.getResourceType());
+                permission.setOperationType(definition.getOperationType());
+                permission.setRequiresApproval(definition.isRequiresApproval());
                 permissionRepository.save(permission);
                 created++;
             } else {

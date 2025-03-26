@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.pharmacyhub.dto.ChangePasswordDTO;
 import com.pharmacyhub.constants.RoleEnum;
+import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.mail.MessagingException;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +51,16 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Save a User entity directly
+     * 
+     * @param user User entity to save
+     * @return Saved user entity
+     */
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
     public PHUserDTO saveUser(UserDTO userDTO) {
         // Check if user already exists
         Optional<User> existingUser = userRepository.findByEmailAddress(userDTO.getEmailAddress());
@@ -71,6 +83,64 @@ public class UserService {
 
         // Save user
         user = userRepository.save(user);
+
+        // Convert to DTO and return
+        return UserDTO.builder()
+            .id(user.getId())
+            .emailAddress(user.getEmailAddress())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .contactNumber(user.getContactNumber())
+            .openToConnect(user.isOpenToConnect())
+            .registered(user.isRegistered())
+            .build();
+    }
+    
+    /**
+     * Save a new user and send verification email
+     * 
+     * @param userDTO User data to save
+     * @return Saved user DTO or null if user already exists
+     * @throws MessagingException If there's an error sending the email
+     */
+    @Autowired
+    private EmailService emailService;
+    
+    @Autowired
+    private TokenService tokenService;
+    
+    public PHUserDTO saveUserAndSendVerification(UserDTO userDTO) throws MessagingException {
+        // Check if user already exists
+        Optional<User> existingUser = userRepository.findByEmailAddress(userDTO.getEmailAddress());
+        if (existingUser.isPresent()) {
+            return null;
+        }
+
+        // Create new user
+        User user = new User();
+        user.setEmailAddress(userDTO.getEmailAddress());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        
+        // Generate verification token
+        String verificationToken = tokenService.generateToken(null, "email-verification");
+        user.setVerificationToken(verificationToken);
+        user.setVerified(false);
+        user.setActive(true);
+        user.setRegistered(true);
+        user.setAccountNonLocked(true);
+        user.setOpenToConnect(true);
+
+        // Save user first to get ID
+        user = userRepository.save(user);
+        
+        // Update the token with the user ID
+        tokenService.updateTokenUserId(verificationToken, user.getId());
+        
+        // Send verification email
+        emailService.sendVerificationEmail(user.getEmailAddress(), verificationToken, 
+                                          userDTO.getIpAddress(), userDTO.getUserAgent());
 
         // Convert to DTO and return
         return UserDTO.builder()
@@ -110,6 +180,16 @@ public class UserService {
     public User getUserByEmailAddress(UserDTO userDTO) {
         Optional<User> userOptional = userRepository.findByEmailAddress(userDTO.getEmailAddress());
         return userOptional.orElse(null);
+    }
+    
+    /**
+     * Find a user by their email address
+     * 
+     * @param email Email address to search for
+     * @return User if found, null otherwise
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmailAddress(email).orElse(null);
     }
 
     public boolean forgotPassword(UserDTO userDTO) {

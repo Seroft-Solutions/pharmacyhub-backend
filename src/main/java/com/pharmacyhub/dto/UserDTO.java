@@ -31,6 +31,12 @@ public class UserDTO implements PHUserDTO
   private SalesmanDTO salesman;
   private PharmacyManagerDTO pharmacyManager;
   
+  // Device information for emails
+  @JsonIgnore
+  private String ipAddress;
+  @JsonIgnore
+  private String userAgent;
+  
   @Override
   public UserType getUserType() {
     return userType;
