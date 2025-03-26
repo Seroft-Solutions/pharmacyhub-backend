@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -435,6 +436,7 @@ public class AuthService {
      * @return True if password was reset successfully
      * @throws Exception if password reset fails
      */
+    @Transactional
     public boolean completePasswordReset(String token, String newPassword, String confirmPassword) throws Exception {
         // Add detailed logging
         logger.info("Processing password reset for token: {}", token);
@@ -467,6 +469,10 @@ public class AuthService {
         
         // Invalidate token - do this AFTER successful password update
         tokenService.invalidateToken(token);
+        
+        // Invalidate all existing tokens for this user with purpose "reset-password"
+        // This prevents multiple reset attempts with different tokens
+        tokenService.invalidateUserTokensByPurpose(userId, "reset-password");
         
         // Invalidate all existing sessions for security
         sessionValidationService.invalidateAllSessions(userId);

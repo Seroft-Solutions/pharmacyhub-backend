@@ -101,6 +101,9 @@ pharmacyhub:
     jwt:
       secret: pharmacyhub_jwt_secret_key_for_token_generation_and_validation_2025
       token-validity-in-seconds: 18000  # 5 hours
+    token:
+      expiration: 1440  # 24 hours in minutes
+      cleanup-interval: 3600000  # 1 hour in milliseconds
   error-handling:
     include-debug-info: false  # Set to true in development environment
     log-request-details: true
