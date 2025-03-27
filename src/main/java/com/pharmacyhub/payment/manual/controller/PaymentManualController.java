@@ -3,6 +3,7 @@ package com.pharmacyhub.payment.manual.controller;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentProcessDTO;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentResponseDTO;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentSubmitDTO;
+import com.pharmacyhub.payment.manual.dto.PaymentStatisticsDTO;
 import com.pharmacyhub.payment.manual.entity.PaymentManualRequest;
 import com.pharmacyhub.payment.manual.service.PaymentManualService;
 import jakarta.validation.Valid;
@@ -151,5 +152,25 @@ public class PaymentManualController {
         
         ManualPaymentResponseDTO response = paymentManualService.rejectRequest(requestId, processDTO);
         return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Get payment statistics (admin)
+     */
+    @GetMapping("/admin/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PaymentStatisticsDTO> getPaymentStatistics() {
+        PaymentStatisticsDTO statistics = paymentManualService.getPaymentStatistics();
+        return ResponseEntity.ok(statistics);
+    }
+    
+    /**
+     * Get payment history summary (admin)
+     */
+    @GetMapping("/admin/history/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> getPaymentHistorySummary() {
+        Map<String, Object> summary = paymentManualService.getPaymentHistorySummary();
+        return ResponseEntity.ok(summary);
     }
 }

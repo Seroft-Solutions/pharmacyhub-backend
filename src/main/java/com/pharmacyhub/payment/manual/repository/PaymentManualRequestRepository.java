@@ -45,4 +45,9 @@ public interface PaymentManualRequestRepository extends JpaRepository<PaymentMan
      * Find all requests with a specific status
      */
     List<PaymentManualRequest> findByStatus(PaymentManualRequest.PaymentStatus status);
+    
+    /**
+     * Find all requests with any of the given statuses
+     */
+    List<PaymentManualRequest> findByStatusIn(List<PaymentManualRequest.PaymentStatus> statuses);
 }

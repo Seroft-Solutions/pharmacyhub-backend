@@ -17,8 +17,15 @@ public class ManualPaymentResponseDTO {
     private String userId;
     private Long examId;
     private String examTitle;
+    
+    // User details
+    private String userEmail;
+    private String userFirstName;
+    private String userLastName;
+    private String userPhoneNumber;
     private String senderNumber;
     private String transactionId;
+    private Double amount; // Ensure this is included
     private String notes;
     private String attachmentUrl;
     private String screenshotData;

@@ -3,9 +3,11 @@ package com.pharmacyhub.payment.manual.service;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentProcessDTO;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentResponseDTO;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentSubmitDTO;
+import com.pharmacyhub.payment.manual.dto.PaymentStatisticsDTO;
 import com.pharmacyhub.payment.manual.entity.PaymentManualRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service interface for manual payment operations
@@ -87,4 +89,16 @@ public interface PaymentManualService {
      * @return true if user has any pending request, false otherwise
      */
     boolean hasUserAnyPendingRequest(String userId);
+    
+    /**
+     * Get payment statistics for admin dashboard
+     * @return Payment statistics DTO
+     */
+    PaymentStatisticsDTO getPaymentStatistics();
+    
+    /**
+     * Get payment history summary
+     * @return Map containing summary information
+     */
+    Map<String, Object> getPaymentHistorySummary();
 }

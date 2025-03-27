@@ -4,9 +4,12 @@ import com.pharmacyhub.domain.entity.Exam;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentProcessDTO;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentResponseDTO;
 import com.pharmacyhub.payment.manual.dto.ManualPaymentSubmitDTO;
+import com.pharmacyhub.payment.manual.dto.PaymentStatisticsDTO;
 import com.pharmacyhub.payment.manual.entity.PaymentManualRequest;
 import com.pharmacyhub.payment.manual.repository.PaymentManualRequestRepository;
+import com.pharmacyhub.entity.User;
 import com.pharmacyhub.service.ExamService;
+import com.pharmacyhub.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +33,7 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     private final PaymentManualRequestRepository repository;
     private final ExamService examService;
+    private final UserService userService;
     
     @Override
     @Transactional
@@ -44,6 +48,7 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         paymentRequest.setExamId(request.getExamId());
         paymentRequest.setSenderNumber(request.getSenderNumber());
         paymentRequest.setTransactionId(request.getTransactionId());
+        paymentRequest.setAmount(request.getAmount());
         paymentRequest.setNotes(request.getNotes());
         paymentRequest.setScreenshotData(request.getScreenshotData());
         paymentRequest.setStatus(PaymentManualRequest.PaymentStatus.PENDING);
@@ -216,6 +221,75 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
+    public PaymentStatisticsDTO getPaymentStatistics() {
+        // Get counts of total users, paid users, etc.
+        long totalUsers = userService.findAll().size();
+        
+        // Count unique users with approved payments
+        List<PaymentManualRequest> approvedRequests = repository.findByStatus(PaymentManualRequest.PaymentStatus.APPROVED);
+        long paidUsers = approvedRequests.stream()
+            .map(PaymentManualRequest::getUserId)
+            .distinct()
+            .count();
+        
+        // Calculate total amount collected (stubbed for now)
+        long totalAmountCollected = approvedRequests.size() * 500; // Assuming each payment is 500 PKR
+        
+        // Count recent payments (last 7 days)
+        LocalDateTime weekAgo = LocalDateTime.now().minusDays(7);
+        long recentPayments = approvedRequests.stream()
+            .filter(req -> req.getProcessedAt() != null && req.getProcessedAt().isAfter(weekAgo))
+            .count();
+        
+        // Calculate approval rate
+        long totalProcessed = repository.findByStatusIn(List.of(
+            PaymentManualRequest.PaymentStatus.APPROVED,
+            PaymentManualRequest.PaymentStatus.REJECTED
+        )).size();
+        
+        double approvalRate = totalProcessed > 0 ?
+            (double) approvedRequests.size() / totalProcessed * 100 : 0;
+        
+        // Get counts for summary
+        long approved = approvedRequests.size();
+        long rejected = repository.findByStatus(PaymentManualRequest.PaymentStatus.REJECTED).size();
+        long pending = repository.findByStatus(PaymentManualRequest.PaymentStatus.PENDING).size();
+        
+        PaymentStatisticsDTO stats = new PaymentStatisticsDTO();
+        stats.setTotalUsers(totalUsers);
+        stats.setPaidUsers(paidUsers);
+        stats.setTotalAmountCollected(totalAmountCollected);
+        stats.setRecentPayments(recentPayments);
+        stats.setApprovalRate(approvalRate);
+        stats.setApproved(approved);
+        stats.setRejected(rejected);
+        stats.setPending(pending);
+        
+        return stats;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getPaymentHistorySummary() {
+        // Get counts for different statuses
+        long approved = repository.findByStatus(PaymentManualRequest.PaymentStatus.APPROVED).size();
+        long rejected = repository.findByStatus(PaymentManualRequest.PaymentStatus.REJECTED).size();
+        long pending = repository.findByStatus(PaymentManualRequest.PaymentStatus.PENDING).size();
+        
+        // Calculate total amount (stubbed for now)
+        long totalAmount = approved * 500; // Assuming each payment is 500 PKR
+        
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("approved", approved);
+        summary.put("rejected", rejected);
+        summary.put("pending", pending);
+        summary.put("totalAmount", totalAmount);
+        
+        return summary;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
     public boolean hasUserApprovedRequest(String userId, Long examId) {
         // If examId is null, check if the user has any approved manual payment request
         if (examId == null) {
@@ -254,6 +328,20 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         dto.setExamId(request.getExamId());
         dto.setSenderNumber(request.getSenderNumber());
         dto.setTransactionId(request.getTransactionId());
+        dto.setAmount(request.getAmount());
+        
+        // Add user information
+        try {
+            User user = userService.findByEmail(request.getUserId());
+            if (user != null) {
+                dto.setUserEmail(user.getEmailAddress());
+                dto.setUserFirstName(user.getFirstName());
+                dto.setUserLastName(user.getLastName());
+                dto.setUserPhoneNumber(user.getContactNumber());
+            }
+        } catch (Exception e) {
+            log.warn("Could not retrieve user details for ID: {}", request.getUserId(), e);
+        }
         dto.setNotes(request.getNotes());
         dto.setAttachmentUrl(request.getAttachmentUrl());
         

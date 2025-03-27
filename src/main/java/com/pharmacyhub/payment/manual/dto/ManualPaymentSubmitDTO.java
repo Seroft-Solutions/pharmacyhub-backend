@@ -22,6 +22,8 @@ public class ManualPaymentSubmitDTO {
     @NotBlank(message = "Transaction ID is required")
     private String transactionId;
     
+    private Double amount;
+    
     private String notes;
     
     private String screenshotData;

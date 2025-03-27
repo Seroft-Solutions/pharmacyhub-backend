@@ -35,6 +35,9 @@ public class PaymentManualRequest {
     @Column(nullable = false)
     private String transactionId;
     
+    @Column(nullable = true)
+    private Double amount;
+    
     @Column(nullable = true, length = 2000)
     private String notes;
     
