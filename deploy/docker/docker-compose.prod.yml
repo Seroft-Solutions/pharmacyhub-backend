@@ -59,6 +59,42 @@ services:
 
   # Keycloak service removed as it's not needed for PharmacyHub
 
+  pgadmin-prod:
+    image: dpage/pgadmin4:latest
+    container_name: pharmacyhub-pgadmin-prod
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PROD_PGADMIN_EMAIL:-admin@pharmacyhub.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PROD_PGADMIN_PASSWORD:-admin}
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="Authorized users only. All activity may be monitored and reported."
+      - PGADMIN_SERVER_JSON=[{"name":"PharmacyHub Production DB","host":"postgres-prod","port":5432,"db":"pharmacyhub_prod","username":"postgres","password":"${PROD_DB_PASSWORD}","maintenance_db":"postgres","group":"Servers"}]
+    volumes:
+      - pgadmin_data_prod:/var/lib/pgadmin
+    ports:
+      - "5052:80"
+    networks:
+      - prod-network
+      - proxy-network
+    depends_on:
+      postgres-prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   pharmacyhub-backend-prod:
     image: ${PROD_BACKEND_DOCKER_IMAGE}
     container_name: pharmacyhub-backend-prod
@@ -122,4 +158,11 @@ volumes:
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/prod/data/redis
+      o: bind
+  pgadmin_data_prod:
+    name: pharmacyhub-pgadmin-data-prod
+    driver: local
+    driver_opts:
+      type: none
+      device: ${CRM_BASE_PATH}/prod/data/pgadmin
       o: bind

@@ -83,6 +83,37 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  pgadmin-qa:
+    image: dpage/pgadmin4:latest
+    container_name: pharmacyhub-pgadmin-qa
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${QA_PGADMIN_EMAIL:-admin@pharmacyhub.com}
+      - PGADMIN_DEFAULT_PASSWORD=${QA_PGADMIN_PASSWORD:-admin}
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="Authorized users only. All activity may be monitored and reported."
+      - PGADMIN_SERVER_JSON=[{"name":"PharmacyHub QA DB","host":"postgres-qa","port":5432,"db":"pharmacyhub_qa","username":"postgres","password":"${QA_DB_PASSWORD}","maintenance_db":"postgres","group":"Servers"}]
+    volumes:
+      - pgadmin_data_qa:/var/lib/pgadmin
+    ports:
+      - "5051:80"
+    networks:
+      - qa-network
+      - proxy-network
+    depends_on:
+      postgres-qa:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   pharmacyhub-backend-qa:
     image: ${QA_BACKEND_DOCKER_IMAGE}
     container_name: pharmacyhub-backend-qa
@@ -151,4 +182,11 @@ volumes:
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/qa/data/redis
+      o: bind
+  pgadmin_data_qa:
+    name: pharmacyhub-pgadmin-data-qa
+    driver: local
+    driver_opts:
+      type: none
+      device: ${CRM_BASE_PATH}/qa/data/pgadmin
       o: bind

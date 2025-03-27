@@ -28,6 +28,25 @@ services:
       - local-network
     restart: always
 
+  pgadmin-local:
+    image: dpage/pgadmin4:latest
+    container_name: pharmacyhub-pgadmin-local
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@pharmacyhub.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
+      - PGADMIN_CONFIG_LOGIN_BANNER="Authorized users only. All activity may be monitored and reported."
+      - PGADMIN_SERVER_JSON=[{"name":"PharmacyHub Local DB","host":"postgres-local","port":5432,"db":"pharmacyhub_local","username":"postgres","password":"postgres","maintenance_db":"postgres","group":"Servers"}]
+    volumes:
+      - pgadmin_data_local:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - local-network
+    depends_on:
+      - postgres-local
+    restart: always
+
   keycloak-local:
     image: quay.io/keycloak/keycloak:25.0.2
     container_name: pharmacyhub-keycloak-local
@@ -62,3 +81,4 @@ networks:
 volumes:
   postgres_data_local:
   redis_data_local:
+  pgadmin_data_local:

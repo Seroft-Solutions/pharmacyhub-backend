@@ -77,6 +77,19 @@ After infrastructure setup, deploy the application components:
 
 ## Infrastructure Components
 
+### pgAdmin 4
+
+Provides database management and administration capabilities:
+- Web UI: Various ports per environment (default: 5050 for dev, 5051 for QA, 5052 for prod)
+- Pre-configured connections to each database instance
+- Environment variables required:
+  - `DEV_PGADMIN_EMAIL`: Admin email for pgAdmin in dev environment (default: admin@pharmacyhub.com)
+  - `DEV_PGADMIN_PASSWORD`: Admin password for pgAdmin in dev environment (default: admin)
+  - `QA_PGADMIN_EMAIL`: Admin email for pgAdmin in QA environment
+  - `QA_PGADMIN_PASSWORD`: Admin password for pgAdmin in QA environment
+  - `PROD_PGADMIN_EMAIL`: Admin email for pgAdmin in production environment
+  - `PROD_PGADMIN_PASSWORD`: Admin password for pgAdmin in production environment
+
 ### Nginx Proxy Manager
 
 Provides reverse proxy capabilities with SSL support. Configuration:
@@ -104,6 +117,7 @@ The VPS directory structure follows this pattern:
 │   └── data/
 │       ├── postgres/       # PostgreSQL data
 │       ├── redis/          # Redis data
+│       ├── pgadmin/        # pgAdmin data
 │       └── backups/        # Database backups
 ├── qa/                     # QA environment (same structure)
 ├── prod/                   # Production environment (same structure)
