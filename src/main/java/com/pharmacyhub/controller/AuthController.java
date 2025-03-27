@@ -266,10 +266,6 @@ public class AuthController extends BaseController {
             // Use the auth service to handle social login
             AuthResponseDTO response = authService.socialLogin(request, httpRequest);
             return successResponse(response);
-        } catch (SecurityException ex) {
-            // Special case for anti-sharing policy violations
-            logger.warn("Login denied due to anti-sharing policy for social login");
-            return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
         } catch (Exception e) {
             logger.error("Social login error", e);
             return errorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to process social login: " + e.getMessage());
