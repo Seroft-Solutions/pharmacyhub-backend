@@ -5,6 +5,7 @@ import com.pharmacyhub.dto.session.LoginValidationResultDTO;
 import com.pharmacyhub.dto.session.LoginValidationResultDTO.LoginStatus;
 import com.pharmacyhub.entity.User;
 import com.pharmacyhub.entity.session.LoginSession;
+import com.pharmacyhub.exception.SessionValidationException;
 import com.pharmacyhub.repository.LoginSessionRepository;
 import com.pharmacyhub.repository.UserRepository;
 import com.pharmacyhub.service.geo.GeoIpService;
@@ -38,6 +39,9 @@ public class SessionValidationService {
     @Value("${pharmacyhub.security.session.max-active-sessions:1}")
     private int maxActiveSessions;
     
+    @Value("${pharmacyhub.security.session.max-device-changes:3}")
+    private int maxDeviceChanges;
+    
     @Value("${pharmacyhub.security.session.require-otp-for-new-device:true}")
     private boolean requireOtpForNewDevice;
     
@@ -68,6 +72,11 @@ public class SessionValidationService {
         boolean tooManySessions = activeSessionsCount >= maxActiveSessions;
         logger.debug("Active sessions count: {}, Too many sessions: {}", activeSessionsCount, tooManySessions);
         
+        // Check for excessive device or IP changes
+        int recentDeviceChanges = loginSessionRepository.countRecentDeviceChanges(user.getId(), 7); // Last 7 days
+        boolean tooManyDeviceChanges = recentDeviceChanges >= maxDeviceChanges;
+        logger.debug("Recent device changes: {}, Too many changes: {}", recentDeviceChanges, tooManyDeviceChanges);
+        
         // Check for suspicious location
         boolean isSuspiciousLocation = checkForSuspiciousLocation(user.getId(), country, request.getIpAddress());
         logger.debug("Is suspicious location: {}", isSuspiciousLocation);
@@ -75,55 +84,59 @@ public class SessionValidationService {
         // Determine validation result
         LoginValidationResultDTO result;
         
+        // First, check if there are already active sessions
+        if (tooManySessions) {
+            // ALWAYS enforce single session policy - return too many devices error
+            // Log active sessions for debugging
+            List<LoginSession> activeSessions = loginSessionRepository.findActiveSessionsByUserId(user.getId());
+            logger.warn("User {} has {} active sessions: {}", user.getId(), activeSessionsCount, 
+                activeSessions.stream().map(s -> s.getId().toString()).toArray());
+                
+            // Instead of just returning a DTO, throw a structured exception
+            throw new SessionValidationException(
+                LoginStatus.TOO_MANY_DEVICES,
+                "You are already logged in from another device. Please log out from that device first."
+            );
+        }
         if (isNewDevice && requireOtpForNewDevice) {
             // Create a new session requiring OTP
             LoginSession session = createOrUpdateSession(user, request, country, true);
-            result = LoginValidationResultDTO.builder()
-                .status(LoginStatus.NEW_DEVICE)
-                .message("Login from a new device detected. Please verify your identity.")
-                .requiresOtp(true)
-                .sessionId(session.getId())
-                .build();
+            
+            // Throw structured exception with session ID
+            throw new SessionValidationException(
+                LoginStatus.NEW_DEVICE,
+                "Login from a new device detected. Please verify your identity.",
+                session.getId(),
+                true
+            );
         } else if (isSuspiciousLocation) {
             // Create a session requiring OTP
             LoginSession session = createOrUpdateSession(user, request, country, true);
-            result = LoginValidationResultDTO.builder()
-                .status(LoginStatus.SUSPICIOUS_LOCATION)
-                .message("Login from an unusual location detected. Please verify your identity.")
-                .requiresOtp(true)
-                .sessionId(session.getId())
-                .build();
-        } else if (tooManySessions) {
-            // Check if there's an existing active session from a different device
-            List<LoginSession> activeSessions = loginSessionRepository.findActiveSessionsByUserId(user.getId());
-            boolean hasOtherDevice = activeSessions.stream()
-                    .anyMatch(s -> !s.getDeviceId().equals(request.getDeviceId()));
             
-            if (hasOtherDevice) {
-                // Return too many devices error
-                result = LoginValidationResultDTO.builder()
-                    .status(LoginStatus.TOO_MANY_DEVICES)
-                    .message("You are already logged in from another device. Please log out from that device first.")
-                    .requiresOtp(false)
-                    .build();
-            } else {
-                // Same device - reactivate session
-                LoginSession session = createOrUpdateSession(user, request, country, false);
-                result = LoginValidationResultDTO.builder()
-                    .status(LoginStatus.OK)
-                    .requiresOtp(false)
-                    .sessionId(session.getId())
-                    .build();
-            }
+            // Throw structured exception with session ID
+            throw new SessionValidationException(
+                LoginStatus.SUSPICIOUS_LOCATION,
+                "Login from an unusual location detected. Please verify your identity.",
+                session.getId(),
+                true
+            );
+        } else if (tooManyDeviceChanges) {
+            // Account is blocked due to too many device/IP changes
+            // Flag the user account as requiring special verification
+            user.setRequiresAdminVerification(true);
+            userRepository.save(user);
+            
+            // Throw structured exception
+            throw new SessionValidationException(
+                LoginStatus.ACCOUNT_BLOCKED,
+                "This account has been temporarily blocked due to suspicious activity. Please contact support."
+            );
         } else {
             // No active sessions found - create a new one and invalidate others for safety
             LoginSession session = createOrUpdateSession(user, request, country, false);
             
-            // If this is a new login on a new device, invalidate any other sessions
-            if (maxActiveSessions == 1) {
-                // Safety first - invalidate all other sessions
-                invalidateOtherSessions(user.getId(), session.getId());
-            }
+            // Always invalidate all other sessions to ensure single-session policy
+            invalidateOtherSessions(user.getId(), session.getId());
             
             result = LoginValidationResultDTO.builder()
                 .status(LoginStatus.OK)

@@ -3,6 +3,8 @@ package com.pharmacyhub.controller.session;
 import com.pharmacyhub.controller.base.BaseController;
 import com.pharmacyhub.dto.response.ApiResponse;
 import com.pharmacyhub.dto.session.*;
+import com.pharmacyhub.exception.SessionNotFoundException;
+import com.pharmacyhub.exception.SessionValidationException;
 import com.pharmacyhub.service.session.SessionManagementService;
 import com.pharmacyhub.service.session.SessionOtpService;
 import com.pharmacyhub.service.session.SessionValidationService;
@@ -57,9 +59,19 @@ public class SessionController extends BaseController {
             logger.debug("Setting client IP: {}", ipAddress);
         }
         
-        LoginValidationResultDTO result = sessionValidationService.validateLogin(request);
-        return successResponse(result);
-    }
+        try {
+            // Call validation service - may throw SessionValidationException
+            LoginValidationResultDTO result = sessionValidationService.validateLogin(request);
+            return successResponse(result);
+        } catch (SessionValidationException ex) {
+            // If it's an actual error like TOO_MANY_DEVICES, it will be handled by the
+            // exception handler and this code won't be reached
+            throw ex;
+        } catch (Exception ex) {
+            // Handle other exceptions
+            logger.error("Error validating login: {}", ex.getMessage(), ex);
+            throw ex;
+        }
     
     /**
      * Get all sessions for current user
@@ -144,8 +156,16 @@ public class SessionController extends BaseController {
             @PathVariable Long userId,
             @Valid @RequestBody TerminateOtherSessionsRequestDTO request) {
         
-        sessionManagementService.terminateOtherSessions(userId, request.getCurrentSessionId());
-        return successResponse("Other sessions terminated successfully");
+        try {
+            sessionManagementService.terminateOtherSessions(userId, request.getCurrentSessionId());
+            return successResponse("Other sessions terminated successfully");
+        } catch (SessionNotFoundException ex) {
+            // Let the exception handler take care of it
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Error terminating other sessions: {}", ex.getMessage(), ex);
+            throw ex;
+        }
     }
     
     /**
