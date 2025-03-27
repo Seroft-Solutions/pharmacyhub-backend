@@ -40,7 +40,6 @@ for ENV in "${ENVIRONMENTS[@]}"; do
   mkdir -p $ENV_DIR/data/postgres
   mkdir -p $ENV_DIR/data/redis
   mkdir -p $ENV_DIR/data/keycloak
-  mkdir -p $ENV_DIR/data/pgadmin
   mkdir -p $ENV_DIR/data/backups/postgres
   
   # Set permissions directly without using sudoers
@@ -52,13 +51,8 @@ for ENV in "${ENVIRONMENTS[@]}"; do
     chown -R 999:999 $ENV_DIR/data/postgres
     chmod 750 $ENV_DIR/data/postgres
     echo -e "${GREEN}Set Postgres directory permissions${NC}"
-    
-    # Set pgAdmin directory permissions (pgAdmin runs as 5050:5050)
-    chown -R 5050:5050 $ENV_DIR/data/pgadmin
-    chmod 750 $ENV_DIR/data/pgadmin
-    echo -e "${GREEN}Set pgAdmin directory permissions${NC}"
   else
-    echo -e "${YELLOW}Skipping PostgreSQL and pgAdmin permissions (CI mode)${NC}"
+    echo -e "${YELLOW}Skipping PostgreSQL permissions (CI mode)${NC}"
   fi
   
   # Other directories - regular user
