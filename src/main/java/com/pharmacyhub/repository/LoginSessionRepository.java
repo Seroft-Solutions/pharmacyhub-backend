@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,22 +45,6 @@ public interface LoginSessionRepository extends JpaRepository<LoginSession, UUID
      */
     @Query("SELECT COUNT(ls) FROM LoginSession ls WHERE ls.user.id = :userId AND ls.active = true")
     long countActiveSessionsByUserId(Long userId);
-    
-    /**
-     * Count recent device changes for a user within days
-     *
-     * Using native query with PostgreSQL interval to avoid JPQL/HQL date arithmetic issues
-     */
-    @Query(value = "SELECT COUNT(DISTINCT device_id) FROM login_sessions WHERE user_id = ?1 AND login_time > (NOW() - (?2 * INTERVAL '1 day'))", nativeQuery = true)
-    int countRecentDeviceChanges(Long userId, int days);
-    
-    /**
-     * Count recent IP changes for a user within days
-     *
-     * Using native query with PostgreSQL interval to avoid JPQL/HQL date arithmetic issues
-     */
-    @Query(value = "SELECT COUNT(DISTINCT ip_address) FROM login_sessions WHERE user_id = ?1 AND login_time > (NOW() - (?2 * INTERVAL '1 day'))", nativeQuery = true)
-    int countRecentIpChanges(Long userId, int days);
     
     /**
      * Find suspicious sessions (multiple logins from different IPs/countries)

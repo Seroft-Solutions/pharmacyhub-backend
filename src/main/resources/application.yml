@@ -88,8 +88,8 @@ clientApp:
 
 google:
   oauth:
-    client-id: ${GOOGLE_CLIENT_ID:1}
-    client-secret: ${GOOGLE_CLIENT_SECRET:1}
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
     default-user-role: ROLE_USER
 
 pharmacyhub:
