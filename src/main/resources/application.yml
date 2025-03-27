@@ -88,8 +88,9 @@ clientApp:
 
 google:
   oauth:
-    client-id: ${GOOGLE_CLIENT_ID}
-    client-secret: ${GOOGLE_CLIENT_SECRET}
+    client-id: ${GOOGLE_CLIENT_ID:919555990168-5ncdcjifms0qoepfs0pnuo66d3d0ad1u.apps.googleusercontent.com}
+    client-secret: ${GOOGLE_CLIENT_SECRET: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}
+    redirect-uri: ${GOOGLE_REDIRECT_URI:https://pharmacyhub.pk/auth/callback}
     default-user-role: ROLE_USER
 
 pharmacyhub:

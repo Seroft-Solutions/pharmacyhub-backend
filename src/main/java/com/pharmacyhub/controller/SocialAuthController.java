@@ -54,8 +54,16 @@ public class SocialAuthController extends BaseController {
             HttpServletRequest httpRequest) {
         
         try {
-            logger.info("Received Google login callback with code: {}", 
-                request.getCode() != null ? "[PRESENT]" : "[MISSING]");
+            logger.info("Received Google login callback with code: {}, callback URL: {}", 
+                request.getCode() != null ? "[PRESENT]" : "[MISSING]",
+                request.getCallbackUrl() != null ? request.getCallbackUrl() : "[NOT PROVIDED]");
+                
+            // If callbackUrl is not provided, use the default redirect URI from google credentials
+            String callbackUrl = request.getCallbackUrl();
+            if (callbackUrl == null || callbackUrl.isEmpty()) {
+                callbackUrl = "http://localhost:3000/auth/callback";
+                logger.info("No callback URL provided, using default: {}", callbackUrl);
+            }
                 
             // Get device information
             String ipAddress = request.getIpAddress();
@@ -71,7 +79,7 @@ public class SocialAuthController extends BaseController {
             // Process the Google login
             User authenticatedUser = authenticationService.processSocialLogin(
                 request.getCode(), 
-                "google"
+                callbackUrl
             );
             
             // Generate JWT token
@@ -111,6 +119,15 @@ public class SocialAuthController extends BaseController {
                     .tokenType("Bearer")
                     .expiresIn(tokenValidityInSeconds)
                     .build();
+
+            // Ensure the user has at least one role - add USER role if none exists
+            if (userRoles.isEmpty()) {
+                logger.warn("User {} has no roles, adding default USER role", authenticatedUser.getEmailAddress());
+                userRoleService.assignRoleToUser(authenticatedUser.getId(), "USER");
+                // Update role names for response
+                roleNames.add("USER");
+                userResponse.setRoles(roleNames);
+            }
 
             // Create response DTO
             AuthResponseDTO response = AuthResponseDTO.builder()

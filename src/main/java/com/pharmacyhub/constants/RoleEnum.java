@@ -11,6 +11,7 @@ public enum RoleEnum {
     INVENTORY_MANAGER("INVENTORY_MANAGER"),
     INSTRUCTOR("INSTRUCTOR"),
     STUDENT("STUDENT"),
+    ROLE_USER("ROLE_USER"),
     EXAM_CREATOR("EXAM_CREATOR");
     
     private final String value;

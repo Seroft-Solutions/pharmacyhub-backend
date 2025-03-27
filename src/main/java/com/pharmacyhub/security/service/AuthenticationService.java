@@ -10,8 +10,12 @@ import com.pharmacyhub.security.service.UserRoleService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.auth.oauth2.TokenResponseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +64,9 @@ public class AuthenticationService {
     
     @Value("${google.oauth.client-secret:1}")
     private String googleClientSecret;
+    
+    @Value("${google.oauth.redirect-uri:http://localhost:3000/auth/callback}")
+    private String googleRedirectUri;
     
     @Value("${google.oauth.default-user-role:ROLE_USER}")
     private String defaultUserRole;
@@ -135,8 +142,8 @@ public class AuthenticationService {
         logger.info("Processing social login with code: [PRESENT] and callback URL: {}", callbackUrl);
         
         // Determine which provider based on callback URL
-        if (callbackUrl.toLowerCase().contains("google")) {
-            return processGoogleLogin(code);
+        if (callbackUrl.toLowerCase().contains("google") || callbackUrl.toLowerCase().contains("auth/callback")) {
+            return processGoogleLogin(code, callbackUrl);
         } else if (callbackUrl.toLowerCase().contains("facebook")) {
             // For future implementation
             throw new UnsupportedOperationException("Facebook login not implemented yet");
@@ -149,15 +156,22 @@ public class AuthenticationService {
      * Process Google login using the authorization code
      * 
      * @param code The authorization code from Google
+     * @param redirectUri The redirect URI used in the Google OAuth flow
      * @return The authenticated user
      * @throws IOException If there is a problem with the HTTP transport
      * @throws GeneralSecurityException If there is a security issue with the token verification
      */
-    private User processGoogleLogin(String code) throws IOException, GeneralSecurityException {
-        logger.debug("Processing Google login with code: [PRESENT]");
+    private User processGoogleLogin(String code, String redirectUri) throws IOException, GeneralSecurityException {
+        logger.debug("Processing Google login with code: [PRESENT] and redirect URI: {}", redirectUri);
         
-        // Exchange the authorization code for an ID token
-        GoogleIdToken idToken = verifyGoogleIdToken(code);
+        // First, exchange the authorization code for an ID token
+        String idTokenString = exchangeGoogleAuthCode(code, redirectUri);
+        if (idTokenString == null) {
+            throw new SecurityException("Failed to exchange Google authorization code for tokens");
+        }
+        
+        // Verify the ID token
+        GoogleIdToken idToken = verifyGoogleIdToken(idTokenString);
         if (idToken == null) {
             throw new SecurityException("Invalid Google ID token");
         }
@@ -243,6 +257,61 @@ public class AuthenticationService {
     }
     
     /**
+     * Google OAuth 2.0 Flow:
+     * 1. User clicks "Login with Google" on frontend
+     * 2. Frontend redirects to Google OAuth consent screen
+     * 3. User grants permissions and Google redirects back with an authorization code
+     * 4. Frontend sends this authorization code to our backend
+     * 5. Backend exchanges the code for tokens (ID token, access token, refresh token)
+     * 6. Backend verifies the ID token and extracts user information
+     * 7. Backend creates/updates the user account and generates a JWT for authentication
+     */
+
+    /**
+     * Exchange Google authorization code for tokens
+     *
+     * @param code The authorization code received from Google
+     * @param redirectUri The redirect URI used in the OAuth flow
+     * @return The ID token string or null if exchange fails
+     */
+    private String exchangeGoogleAuthCode(String code, String redirectUri) {
+        try {
+            logger.debug("Exchanging Google auth code for tokens with redirect URI: {}", redirectUri);
+            
+            // Create HTTP transport and JSON factory
+            NetHttpTransport httpTransport = new NetHttpTransport();
+            GsonFactory jsonFactory = new GsonFactory();
+            
+            // Set up the Google OAuth 2.0 endpoint
+            logger.info("Google OAuth token exchange - Client ID: {}, Redirect URI: {}", 
+                googleClientId.substring(0, 8) + "...", redirectUri);
+                
+            GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                httpTransport,
+                jsonFactory,
+                googleClientId,
+                googleClientSecret,
+                code,
+                redirectUri)  // Use the actual redirect URI from the request
+                .execute();
+                
+            logger.debug("Successfully exchanged authorization code for tokens");
+            
+            // Return the ID token
+            return tokenResponse.getIdToken();
+        } catch (Exception e) {
+            logger.error("Error exchanging Google auth code for tokens: {}", e.getMessage(), e);
+            // Log more details if available
+            if (e instanceof TokenResponseException) {
+                TokenResponseException tre = (TokenResponseException) e;
+                logger.error("Token response error - Status code: {}, Details: {}", 
+                    tre.getStatusCode(), tre.getDetails());
+            }
+            return null;
+        }
+    }
+
+    /**
      * Verify Google ID token
      *
      * @param idTokenString The ID token string from Google
@@ -256,7 +325,7 @@ public class AuthenticationService {
             
             return verifier.verify(idTokenString);
         } catch (Exception e) {
-            logger.error("Error verifying Google ID token", e);
+            logger.error("Error verifying Google ID token: {}", e.getMessage(), e);
             return null;
         }
     }

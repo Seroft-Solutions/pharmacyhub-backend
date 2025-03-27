@@ -74,6 +74,12 @@ public class UserService {
         // Create new user
         User user = new User();
         user.setEmailAddress(userDTO.getEmailAddress());
+
+        if(userDTO.getPassword() == null)
+        {
+            userDTO.setPassword("##GOOGLE##PharmacyHub##09812###");
+        }
+
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setFirstName(userDTO.getFirstName());
         user.setLastName(userDTO.getLastName());
