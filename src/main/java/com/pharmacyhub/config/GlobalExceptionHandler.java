@@ -1,6 +1,6 @@
 package com.pharmacyhub.config;
 
-import com.pharmacyhub.exception.ExceptionConstants;
+import com.pharmacyhub.constants.ErrorConstants;
 import com.pharmacyhub.dto.response.ApiErrorResponse;
 import com.pharmacyhub.exception.BadRequestException;
 import com.pharmacyhub.exception.BaseException;
@@ -8,7 +8,6 @@ import com.pharmacyhub.exception.ConflictException;
 import com.pharmacyhub.exception.ForbiddenException;
 import com.pharmacyhub.exception.ResourceNotFoundException;
 import com.pharmacyhub.exception.UnauthorizedException;
-import com.pharmacyhub.service.ExceptionHandlerService;
 import com.pharmacyhub.utils.LogUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,12 +56,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
     
-    private final ExceptionHandlerService exceptionHandlerService;
-    
-    public GlobalExceptionHandler(ExceptionHandlerService exceptionHandlerService) {
-        this.exceptionHandlerService = exceptionHandlerService;
-    }
-    
     /**
      * Extract the request path from the web request
      */
@@ -80,7 +73,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleBaseException(
             BaseException ex, HttpServletRequest request) {
         
-        ApiErrorResponse errorResponse = exceptionHandlerService.handleBaseException(ex, request, log);
+        LogUtils.logException(log, request, ex);
+        
+        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
+                .status(ex.getStatus().value())
+                .errorCode(ex.getErrorCode())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
     }
     
@@ -129,7 +130,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleUnauthorizedException(
             UnauthorizedException ex, HttpServletRequest request) {
         
-        ApiErrorResponse errorResponse = exceptionHandlerService.handleUnauthorizedException(ex, request, log);
+        LogUtils.logException(log, request, ex);
+        
+        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .errorCode(ex.getErrorCode())
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
     
@@ -434,7 +443,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(
             AccessDeniedException ex, HttpServletRequest request) {
         
-        ApiErrorResponse errorResponse = exceptionHandlerService.handleAccessDeniedException(ex, request, log);
+        // Log detailed information about the 403 error
+        LogUtils.logAccessDenied(log, request, ex.getMessage());
+        
+        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .errorCode(ErrorConstants.CODE_ACCESS_DENIED)
+                .message(ErrorConstants.ACCESS_DENIED)
+                .path(request.getRequestURI())
+                .build();
+        
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
     
@@ -445,7 +463,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAuthenticationException(
             AuthenticationException ex, HttpServletRequest request) {
         
-        ApiErrorResponse errorResponse = exceptionHandlerService.handleAuthenticationException(ex, request, log);
+        String errorCode = ErrorConstants.CODE_AUTHENTICATION;
+        String message = ErrorConstants.AUTHENTICATION_FAILED;
+        
+        // Handle specific authentication exceptions
+        if (ex instanceof BadCredentialsException || ex instanceof UsernameNotFoundException) {
+            message = "Invalid username or password";
+        } else if (ex instanceof DisabledException) {
+            errorCode = ErrorConstants.CODE_ACCOUNT_DISABLED;
+            message = ErrorConstants.ACCOUNT_DISABLED;
+        } else if (ex instanceof LockedException) {
+            errorCode = ErrorConstants.CODE_ACCOUNT_LOCKED;
+            message = ErrorConstants.ACCOUNT_LOCKED;
+        } else if (ex instanceof AccountExpiredException) {
+            errorCode = ErrorConstants.CODE_ACCOUNT_EXPIRED;
+            message = ErrorConstants.ACCOUNT_EXPIRED;
+        }
+        
+        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .errorCode(errorCode)
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+        
+        LogUtils.logException(log, request, ex);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
     
@@ -476,7 +518,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleAllExceptions(
             Exception ex, HttpServletRequest request) {
         
-        ApiErrorResponse errorResponse = exceptionHandlerService.handleInternalServerError(ex, request, log);
+        // Log the full exception details for server-side debugging
+        LogUtils.logException(log, request, ex);
+        
+        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .errorCode(ErrorConstants.CODE_INTERNAL_ERROR)
+                .message(ErrorConstants.INTERNAL_SERVER_ERROR)
+                .path(request.getRequestURI())
+                .build();
+        
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

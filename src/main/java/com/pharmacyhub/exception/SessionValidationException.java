@@ -2,7 +2,6 @@ package com.pharmacyhub.exception;
 
 import com.pharmacyhub.dto.session.LoginValidationResultDTO.LoginStatus;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
 
@@ -10,7 +9,7 @@ import java.util.UUID;
  * Exception for session validation failures
  */
 @Getter
-public class SessionValidationException extends BaseException {
+public class SessionValidationException extends RuntimeException {
     
     private final LoginStatus status;
     private final UUID sessionId;
@@ -25,12 +24,7 @@ public class SessionValidationException extends BaseException {
      * @param requiresOtp Whether OTP is required
      */
     public SessionValidationException(LoginStatus status, String message, UUID sessionId, boolean requiresOtp) {
-        super(
-            ExceptionConstants.SESSION_VALIDATION_ERROR.getCode(),
-            message,
-            ExceptionConstants.SESSION_VALIDATION_ERROR.getResolution(),
-            HttpStatus.BAD_REQUEST
-        );
+        super(message);
         this.status = status;
         this.sessionId = sessionId;
         this.requiresOtp = requiresOtp;
@@ -44,14 +38,5 @@ public class SessionValidationException extends BaseException {
      */
     public SessionValidationException(LoginStatus status, String message) {
         this(status, message, null, false);
-    }
-    
-    /**
-     * Constructs a new session validation exception with default values
-     * 
-     * @param status Login status
-     */
-    public SessionValidationException(LoginStatus status) {
-        this(status, ExceptionConstants.SESSION_VALIDATION_ERROR.getMessage(), null, false);
     }
 }

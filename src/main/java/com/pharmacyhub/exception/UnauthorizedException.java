@@ -1,5 +1,6 @@
 package com.pharmacyhub.exception;
 
+import com.pharmacyhub.constants.ErrorConstants;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -8,41 +9,34 @@ import org.springframework.http.HttpStatus;
 public class UnauthorizedException extends BaseException {
     
     /**
-     * Constructs a new exception with the default message from ExceptionConstants
+     * Constructs a new exception with the default message
      */
     public UnauthorizedException() {
-        super(ExceptionConstants.AUTHENTICATION_FAILED);
+        super(
+            ErrorConstants.CODE_AUTHENTICATION,
+            ErrorConstants.AUTHENTICATION_FAILED,
+            HttpStatus.UNAUTHORIZED
+        );
     }
     
     /**
-     * Constructs a new exception with a custom message but using the constant's code and resolution
+     * Constructs a new exception with the specified message
      */
     public UnauthorizedException(String message) {
-        super(ExceptionConstants.AUTHENTICATION_FAILED, message);
+        super(
+            ErrorConstants.CODE_AUTHENTICATION,
+            message,
+            HttpStatus.UNAUTHORIZED
+        );
     }
     
     /**
-     * Constructs a new exception with the specified constant
-     */
-    public UnauthorizedException(ExceptionConstants exceptionConstant) {
-        super(exceptionConstant);
-    }
-    
-    /**
-     * Constructs a new exception with a custom message but using the specified constant's code and resolution
-     */
-    public UnauthorizedException(ExceptionConstants exceptionConstant, String message) {
-        super(exceptionConstant, message);
-    }
-    
-    /**
-     * Constructs a new exception with the default constant and a cause
+     * Constructs a new exception with the specified message and cause
      */
     public UnauthorizedException(String message, Throwable cause) {
         super(
-            ExceptionConstants.AUTHENTICATION_FAILED.getCode(),
+            ErrorConstants.CODE_AUTHENTICATION,
             message,
-            ExceptionConstants.AUTHENTICATION_FAILED.getResolution(),
             HttpStatus.UNAUTHORIZED,
             cause
         );
