@@ -60,10 +60,8 @@ public class SessionExceptionHandler extends ResponseEntityExceptionHandler {
             .errorCode(errorCode != null ? errorCode : "SESSION_ERROR")
             .message(errorMessage != null ? errorMessage : ex.getMessage())
             .path(request.getRequestURI())
+            .details(sessionError)
             .build();
-            
-        // Add session error details to the response
-        response.addDetail("sessionError", sessionError);
         
         logger.warn("Session validation exception: {} - {}", ex.getStatus(), ex.getMessage());
         return new ResponseEntity<>(response, httpStatus);
@@ -109,10 +107,8 @@ public class SessionExceptionHandler extends ResponseEntityExceptionHandler {
             .errorCode("SESSION_EXPIRED")
             .message(SessionErrorConstants.SESSION_EXPIRED)
             .path(request.getRequestURI())
+            .details(sessionError)
             .build();
-            
-        // Add session error details to the response
-        response.addDetail("sessionError", sessionError);
         
         logger.warn("Session expired: {}", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
