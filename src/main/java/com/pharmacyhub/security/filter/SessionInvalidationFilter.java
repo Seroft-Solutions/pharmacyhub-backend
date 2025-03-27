@@ -74,8 +74,10 @@ public class SessionInvalidationFilter extends OncePerRequestFilter {
         } else {
             // If token is present but no session ID, that's suspicious (except for API validation endpoints)
             if (token != null && !requestUri.contains("/validate")) {
-                logger.warn("Request has token but no session ID: {}", requestUri);
-                // We could potentially block these requests as well, but for now just log it
+                logger.warn("Rejecting request with token but no session ID: {}", requestUri);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"error\":\"Missing session ID\",\"code\":\"SESSION_ID_REQUIRED\"}");
+                return;
             }
         }
         

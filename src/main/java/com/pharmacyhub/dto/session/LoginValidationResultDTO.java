@@ -37,6 +37,7 @@ public class LoginValidationResultDTO {
         NEW_DEVICE,
         SUSPICIOUS_LOCATION,
         TOO_MANY_DEVICES,
-        OTP_REQUIRED
+        OTP_REQUIRED,
+        ACCOUNT_BLOCKED
     }
 }

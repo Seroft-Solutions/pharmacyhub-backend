@@ -40,6 +40,9 @@ public class User implements UserDetails {
     private boolean registered;
     private boolean openToConnect;
     
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean requiresAdminVerification = false;
+    
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private SystemRole systemRole;

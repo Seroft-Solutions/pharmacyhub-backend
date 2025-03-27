@@ -289,6 +289,10 @@ public class AuthController extends BaseController {
         } catch (UnverifiedAccountException ex) {
             logger.warn("Login attempt to unverified account: {}", request.getEmailAddress());
             return errorResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+        } catch (SecurityException ex) {
+            // For anti-sharing policy violations, return specific error with 401 status
+            logger.warn("Login denied due to anti-sharing policy: {}", ex.getMessage());
+            return errorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
         } catch (Exception ex) {
             logger.error("Login failed for user: {}", request.getEmailAddress(), ex);
             return errorResponse(HttpStatus.UNAUTHORIZED, "Invalid credentials");
