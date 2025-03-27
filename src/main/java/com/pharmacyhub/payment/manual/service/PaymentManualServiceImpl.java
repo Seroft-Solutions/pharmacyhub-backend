@@ -116,7 +116,6 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "userPaymentRequests", key = "#userId + '-' + #includeScreenshots")
     public List<ManualPaymentResponseDTO> getUserRequests(String userId, boolean includeScreenshots) {
         List<PaymentManualRequest> userRequests = repository.findByUserId(userId);
         
@@ -201,7 +200,6 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "pendingRequestCheck", key = "#userId + '-' + #examId")
     public boolean hasUserPendingRequest(String userId, Long examId) {
         return !repository.findByUserIdAndExamIdAndStatus(
             userId, examId, PaymentManualRequest.PaymentStatus.PENDING
@@ -210,7 +208,6 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "anyPendingRequestCheck", key = "#userId")
     public boolean hasUserAnyPendingRequest(String userId) {
         return !repository.findByUserIdAndStatus(
             userId, PaymentManualRequest.PaymentStatus.PENDING
