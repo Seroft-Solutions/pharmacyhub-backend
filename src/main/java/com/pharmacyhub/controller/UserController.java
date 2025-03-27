@@ -80,51 +80,79 @@ public class UserController
     profileDTO.setActive(user.isActive());
     profileDTO.setRegistered(user.isRegistered());
     
-    // Add roles based on userType
+    // Add roles based on userType and explicit roles
     List<String> roles = new ArrayList<>();
     
-    // Map UserType to roles
-    UserType userType = user.getUserType();
-    switch (userType) {
-        case ADMIN:
-            roles.add("ADMIN");
-            break;
-        case SUPER_ADMIN:
-            roles.add("SUPER_ADMIN");
-            roles.add("ADMIN"); // Super admin also has admin privileges
-            break;
-        case PHARMACIST:
-            roles.add("PHARMACIST");
-            break;
-        // Add other role mappings as needed
-        default:
-            roles.add("USER"); // Everyone gets basic user role
-            break;
+    // First check if user has explicitly assigned roles
+    if (user.getRoles() != null && !user.getRoles().isEmpty()) {
+        // Extract role names from the user's roles
+        user.getRoles().forEach(role -> {
+            roles.add(role.getName());
+        });
+    } else {
+        // Fallback to mapping from userType if no explicit roles
+        UserType userType = user.getUserType();
+        
+        // Handle null userType gracefully
+        if (userType != null) {
+            switch (userType) {
+                case ADMIN:
+                    roles.add("ADMIN");
+                    break;
+                case SUPER_ADMIN:
+                    roles.add("SUPER_ADMIN");
+                    roles.add("ADMIN"); // Super admin also has admin privileges
+                    break;
+                case PHARMACIST:
+                    roles.add("PHARMACIST");
+                    break;
+                // Add other role mappings as needed
+                default:
+                    roles.add("USER"); // Everyone gets basic user role
+                    break;
+            }
+        } else {
+            // Default role if userType is null
+            roles.add("USER");
+        }
     }
     
     // Set the roles directly in the response
     profileDTO.setRoles(roles);
     
-    // Set permissions based on user type
+    // Set permissions based on roles and user type
     List<String> permissions = new ArrayList<>();
     
+    // Add standard permissions for all authenticated users
+    permissions.add("view_profile");
+    
     // Admin permissions
-    if (userType == UserType.ADMIN || userType == UserType.SUPER_ADMIN) {
+    if (roles.contains("ADMIN") || roles.contains("SUPER_ADMIN")) {
         permissions.add("manage_users");
         permissions.add("manage_exams");
         permissions.add("view_reports");
         permissions.add("manage_notifications");
+    }
+    
+    // Student permissions (from social login)
+    if (roles.contains("STUDENT")) {
         permissions.add("view_past_papers");
         permissions.add("view_model_papers");
         permissions.add("view_subject_papers");
         permissions.add("view_practice_exams");
     }
+    
+    // Basic user permissions
+    if (roles.contains("USER")) {
+        permissions.add("view_dashboard");
+    }
+    
     // Set permissions in the response
     profileDTO.setPermissions(permissions);
     
     // Include userType in the metadata for backward compatibility
     Map<String, Object> metadata = new HashMap<>();
-    metadata.put("userType", userType);
+    metadata.put("userType", user.getUserType() != null ? user.getUserType() : UserType.USER);
     
     return ResponseEntity.ok(
         ApiResponse.success(profileDTO, HttpStatus.OK.value(), metadata)

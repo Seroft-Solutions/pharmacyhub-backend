@@ -1,6 +1,7 @@
 package com.pharmacyhub.security.service;
 
 import com.pharmacyhub.entity.User;
+import com.pharmacyhub.entity.enums.UserType;
 import com.pharmacyhub.security.JwtHelper;
 import com.pharmacyhub.security.infrastructure.exception.UnverifiedAccountException;
 import com.pharmacyhub.service.UserService;
@@ -206,6 +207,9 @@ public class AuthenticationService {
             String randomPassword = UUID.randomUUID().toString();
             user.setPassword(passwordEncoder.encode(randomPassword));
             
+            // Set default userType for social login users
+            user.setUserType(UserType.USER);
+            
             // Mark as verified since Google verifies emails
             user.setVerified(emailVerified);
             user.setEnabled(true);
@@ -385,6 +389,6 @@ public class AuthenticationService {
      */
     public User reloadUserWithRoles(Long userId) {
         logger.debug("Reloading user {} with updated roles", userId);
-        return userService.getUserById(userId);
+        return userService.findById(userId);
     }
 }
