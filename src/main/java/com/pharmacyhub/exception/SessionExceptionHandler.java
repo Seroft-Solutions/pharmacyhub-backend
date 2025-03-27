@@ -34,7 +34,7 @@ public class SessionExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleSessionValidationException(
             SessionValidationException ex, HttpServletRequest request) {
         
-        LoginValidationResultDTO.LoginStatus status = ex.getStatus();
+        LoginValidationResultDTO.LoginStatus status = ex.getLoginStatus();
         String errorCode = SessionErrorConstants.getErrorCode(status.toString());
         String errorMessage = SessionErrorConstants.getErrorMessage(status.toString());
         String action = SessionErrorConstants.getErrorAction(status.toString());
