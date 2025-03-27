@@ -27,12 +27,19 @@ spring:
     password: rnza drud iutg vzfr
     host: smtp.gmail.com
     port: 587
+    sender:
+      name: PharmacyHub
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+          ssl:
+            trust: smtp.gmail.com
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
   # Auto-create log directory
   application:
     name: pharmacyhub

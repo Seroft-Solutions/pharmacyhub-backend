@@ -2,6 +2,7 @@ package com.pharmacyhub.service;
 
 import com.pharmacyhub.entity.Otp;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.scheduling.annotation.Async;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class EmailService
@@ -28,6 +30,7 @@ public class EmailService
   
   @Autowired
   private JavaMailSender mailSender;
+  
   @Autowired
   private ResourceLoader resourceLoader;
 
@@ -36,6 +39,9 @@ public class EmailService
   
   @Value("${pharmacyhub.frontend.url}")
   private String frontendUrl;
+  
+  @Value("${spring.mail.sender.name:PharmacyHub}")
+  private String senderName;
 
   public void sendHtmlMail(Otp otp) throws MessagingException
   {
@@ -43,7 +49,6 @@ public class EmailService
     String body = prepareHtmlContent("${otp}",otp.getCode(),"OtpEmail.html");
     emailSender(otp.getUser().getEmailAddress(), subject, body);
   }
-
 
   /**
    * Sends a verification email with a verification token
@@ -143,25 +148,52 @@ public class EmailService
     logger.info("Password reset email sent successfully to: {}", emailAddress);
   }
 
-
-  private void emailSender(String emailAddress, String subject, String body) throws MessagingException
+  private void emailSender(String toEmailAddress, String subject, String body) throws MessagingException
   {
-    logger.debug("Preparing to send email to: {}, subject: {}", emailAddress, subject);
+    logger.debug("Preparing to send email to: {}, subject: {}", toEmailAddress, subject);
     
     try {
       MimeMessage message = mailSender.createMimeMessage();
-
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
-      helper.setTo(emailAddress);
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
+      
+      // Set proper From address with display name
+      helper.setFrom(new InternetAddress(emailAddress, senderName));
+      helper.setTo(toEmailAddress);
       helper.setSubject(subject);
-      helper.setText(body, true);
-
+      
+      // Always add both plain text and HTML versions
+      String plainText = extractPlainTextFromHtml(body);
+      helper.setText(plainText, body);
+      
+      // Set Reply-To header (same as from address)
+      helper.setReplyTo(emailAddress);
+      
+      // Set important headers to improve deliverability
+      message.addHeader("X-Priority", "1");
+      message.addHeader("X-MSMail-Priority", "High");
+      message.addHeader("Importance", "High");
+      message.addHeader("X-Auto-Response-Suppress", "OOF, AutoReply");
+      
       mailSender.send(message);
-      logger.debug("Email sent successfully to: {}", emailAddress);
+      logger.debug("Email sent successfully to: {}", toEmailAddress);
     } catch (Exception e) {
-      logger.error("Failed to send email to: {}, error: {}", emailAddress, e.getMessage(), e);
-      throw e; // Re-throw the exception to be handled by the caller
+      logger.error("Failed to send email to: {}, error: {}", toEmailAddress, e.getMessage(), e);
+      throw new MessagingException("Failed to send email: " + e.getMessage(), e);
     }
+  }
+
+  private String extractPlainTextFromHtml(String html) {
+    // Simple HTML to plain text conversion
+    String plainText = html
+        .replaceAll("<br\\s*/?>|<p>|</p>|<div>|</div>", "\n")
+        .replaceAll("<.*?>", "")
+        .replaceAll("&nbsp;", " ")
+        .replaceAll("&lt;", "<")
+        .replaceAll("&gt;", ">")
+        .replaceAll("&amp;", "&")
+        .replaceAll("&quot;", "\"")
+        .replaceAll("&apos;", "'");
+    return plainText.trim();
   }
 
   public String prepareHtmlContent(String key, String value, String template)
@@ -175,7 +207,7 @@ public class EmailService
     Resource resource = resourceLoader.getResource("classpath:templates/"+htmlTemplate);
     StringBuilder contentBuilder = new StringBuilder();
 
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), "UTF-8")))
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
     {
       String line;
       while ((line = reader.readLine()) != null)
@@ -185,12 +217,9 @@ public class EmailService
     }
     catch (IOException e)
     {
-      e.printStackTrace();
+      logger.error("Failed to load HTML template: {}", htmlTemplate, e);
     }
 
     return contentBuilder.toString();
   }
-
-
-
 }
