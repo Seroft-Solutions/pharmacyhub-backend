@@ -87,8 +87,8 @@ public class SecurityConfig {
             "http://www.pharmacyhub.pk"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Cache-Control", "Pragma"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Cache-Control", "Pragma", "X-Session-ID"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Session-ID"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // 1 hour cache for preflight requests
 
