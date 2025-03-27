@@ -9,7 +9,8 @@ import com.pharmacyhub.security.domain.ResourceType;
 import com.pharmacyhub.security.infrastructure.PermissionRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +23,9 @@ import java.util.stream.Collectors;
  * Ensures all required permissions are available in the system
  */
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class PermissionDataLoaderService {
+    private static final Logger log = LoggerFactory.getLogger(PermissionDataLoaderService.class);
     private final PermissionRepository permissionRepository;
     
     // Cache of permission definitions to avoid re-creation during initialization
