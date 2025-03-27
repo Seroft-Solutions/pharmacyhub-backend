@@ -72,7 +72,7 @@ public class SessionController extends BaseController {
             logger.error("Error validating login: {}", ex.getMessage(), ex);
             throw ex;
         }
-    }
+    
     /**
      * Get all sessions for current user
      */
