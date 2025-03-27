@@ -1,7 +1,6 @@
 package com.pharmacyhub.config;
 
 import com.pharmacyhub.exception.ExceptionConstants;
-import com.pharmacyhub.constants.ErrorConstants;
 import com.pharmacyhub.dto.response.ApiErrorResponse;
 import com.pharmacyhub.exception.BadRequestException;
 import com.pharmacyhub.exception.BaseException;

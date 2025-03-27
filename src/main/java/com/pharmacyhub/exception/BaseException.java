@@ -63,26 +63,4 @@ public abstract class BaseException extends RuntimeException {
         this.resolution = exceptionConstant.getResolution();
         this.status = exceptionConstant.getStatus();
     }
-    
-    /**
-     * Backward-compatible constructor for existing code
-     * Sets resolution to a default value
-     */
-    public BaseException(String errorCode, String message, HttpStatus status) {
-        super(message);
-        this.errorCode = errorCode;
-        this.resolution = "Please contact support if the issue persists.";
-        this.status = status;
-    }
-    
-    /**
-     * Backward-compatible constructor for existing code with cause
-     * Sets resolution to a default value
-     */
-    public BaseException(String errorCode, String message, HttpStatus status, Throwable cause) {
-        super(message, cause);
-        this.errorCode = errorCode;
-        this.resolution = "Please contact support if the issue persists.";
-        this.status = status;
-    }
 }

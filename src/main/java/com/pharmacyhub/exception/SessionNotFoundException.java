@@ -32,6 +32,6 @@ public class SessionNotFoundException extends BaseException {
      * @param cause The cause of the exception
      */
     public SessionNotFoundException(String message, Throwable cause) {
-        super(ExceptionConstants.SESSION_NOT_FOUND.getCode(), message, ExceptionConstants.SESSION_NOT_FOUND.getStatus(), cause);
+        super(ExceptionConstants.SESSION_NOT_FOUND, message, cause);
     }
 }

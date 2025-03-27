@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 public class SessionValidationException extends BaseException {
     
-    private final LoginStatus loginStatus;
+    private final LoginStatus status;
     private final UUID sessionId;
     private final boolean requiresOtp;
     
@@ -31,7 +31,7 @@ public class SessionValidationException extends BaseException {
             ExceptionConstants.SESSION_VALIDATION_ERROR.getResolution(),
             HttpStatus.BAD_REQUEST
         );
-        this.loginStatus = status;
+        this.status = status;
         this.sessionId = sessionId;
         this.requiresOtp = requiresOtp;
     }
