@@ -56,6 +56,7 @@ services:
       options:
         max-size: "10m"
         max-file: "5"
+    user: "5050"
 
   # Keycloak service removed as it's not needed for PharmacyHub
 
@@ -63,11 +64,12 @@ services:
     image: dpage/pgadmin4:latest
     container_name: pharmacyhub-pgadmin-prod
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PROD_PGADMIN_EMAIL:-admin@pharmacyhub.com}
-      - PGADMIN_DEFAULT_PASSWORD=${PROD_PGADMIN_PASSWORD:-admin}
+      - PGADMIN_DEFAULT_EMAIL=${PROD_PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PROD_PGADMIN_PASSWORD}
       - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
       - PGADMIN_CONFIG_LOGIN_BANNER="Authorized users only. All activity may be monitored and reported."
       - PGADMIN_SERVER_JSON=[{"name":"PharmacyHub Production DB","host":"postgres-prod","port":5432,"db":"pharmacyhub_prod","username":"postgres","password":"${PROD_DB_PASSWORD}","maintenance_db":"postgres","group":"Servers"}]
+      - PGADMIN_CONFIG_CONSOLE_LOG_LEVEL=10
     volumes:
       - pgadmin_data_prod:/var/lib/pgadmin
     ports:
@@ -161,8 +163,3 @@ volumes:
       o: bind
   pgadmin_data_prod:
     name: pharmacyhub-pgadmin-data-prod
-    driver: local
-    driver_opts:
-      type: none
-      device: ${CRM_BASE_PATH}/prod/data/pgadmin
-      o: bind
