@@ -23,8 +23,8 @@ spring:
     resources:
       static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
   mail:
-    username: syedus06@gmail.com
-    password: lyce duoh tkeh uqtr
+    username: official.pharmacyhub1@gmail.com
+    password: rnza drud iutg vzfr
     host: smtp.gmail.com
     port: 587
     properties:
@@ -90,7 +90,7 @@ pharmacyhub:
   seeder:
     engine: false
   frontend:
-    url: http://localhost:3000  # Frontend URL configuration
+    url: https://pharmacyhub.pk  # Frontend URL configuration
   test:
     data:
       pharmacist: 1-10
