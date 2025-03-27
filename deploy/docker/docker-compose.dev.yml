@@ -83,37 +83,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  pgadmin-dev:
-    image: dpage/pgadmin4:latest
-    container_name: pharmacyhub-pgadmin-dev
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${DEV_PGADMIN_EMAIL:-admin@pharmacyhub.com}
-      - PGADMIN_DEFAULT_PASSWORD=${DEV_PGADMIN_PASSWORD:-admin}
-      - PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION=True
-      - PGADMIN_CONFIG_LOGIN_BANNER="Authorized users only. All activity may be monitored and reported."
-      - PGADMIN_SERVER_JSON=[{"name":"PharmacyHub Dev DB","host":"postgres-dev","port":5432,"db":"pharmacyhub_dev","username":"postgres","password":"${DEV_DB_PASSWORD}","maintenance_db":"postgres","group":"Servers"}]
-    volumes:
-      - pgadmin_data_dev:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    networks:
-      - dev-network
-      - proxy-network
-    depends_on:
-      postgres-dev:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-O", "-", "http://localhost:80/misc/ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   pharmacyhub-backend-dev:
     image: ${DEV_BACKEND_DOCKER_IMAGE}
     container_name: pharmacyhub-backend-dev
@@ -182,11 +151,4 @@ volumes:
     driver_opts:
       type: none
       device: ${CRM_BASE_PATH}/dev/data/redis
-      o: bind
-  pgadmin_data_dev:
-    name: pharmacyhub-pgadmin-data-dev
-    driver: local
-    driver_opts:
-      type: none
-      device: ${CRM_BASE_PATH}/dev/data/pgadmin
       o: bind
