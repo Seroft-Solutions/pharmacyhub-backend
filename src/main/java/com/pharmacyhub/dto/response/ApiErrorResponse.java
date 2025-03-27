@@ -2,6 +2,7 @@ package com.pharmacyhub.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.pharmacyhub.exception.ExceptionConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class ApiErrorResponse {
     private int status;
     private String errorCode;
     private String message;
+    private String resolution;
     
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
@@ -57,6 +59,7 @@ public class ApiErrorResponse {
         private int status;
         private String errorCode;
         private String message;
+        private String resolution;
         private LocalDateTime timestamp = LocalDateTime.now();
         private String path;
         private Map<String, Object> details = new HashMap<>();
@@ -76,6 +79,11 @@ public class ApiErrorResponse {
             return this;
         }
         
+        public Builder resolution(String resolution) {
+            this.resolution = resolution;
+            return this;
+        }
+        
         public Builder timestamp(LocalDateTime timestamp) {
             this.timestamp = timestamp;
             return this;
@@ -92,7 +100,7 @@ public class ApiErrorResponse {
         }
         
         public ApiErrorResponse build() {
-            return new ApiErrorResponse(status, errorCode, message, timestamp, path, details);
+            return new ApiErrorResponse(status, errorCode, message, resolution, timestamp, path, details);
         }
     }
     
@@ -115,6 +123,44 @@ public class ApiErrorResponse {
                 .status(status)
                 .errorCode(errorCode)
                 .message(message)
+                .path(path)
+                .build();
+    }
+    
+    /**
+     * Create a simple error response with status, error code, message, and resolution
+     */
+    public static ApiErrorResponse of(int status, String errorCode, String message, String resolution) {
+        return ApiErrorResponse.builder()
+                .status(status)
+                .errorCode(errorCode)
+                .message(message)
+                .resolution(resolution)
+                .build();
+    }
+    
+    /**
+     * Create a simple error response with status, error code, message, resolution, and path
+     */
+    public static ApiErrorResponse of(int status, String errorCode, String message, String resolution, String path) {
+        return ApiErrorResponse.builder()
+                .status(status)
+                .errorCode(errorCode)
+                .message(message)
+                .resolution(resolution)
+                .path(path)
+                .build();
+    }
+    
+    /**
+     * Create an error response from an ExceptionConstants enum value
+     */
+    public static ApiErrorResponse fromExceptionConstant(ExceptionConstants exceptionConstant, String path) {
+        return ApiErrorResponse.builder()
+                .status(exceptionConstant.getStatus().value())
+                .errorCode(exceptionConstant.getCode())
+                .message(exceptionConstant.getMessage())
+                .resolution(exceptionConstant.getResolution())
                 .path(path)
                 .build();
     }
