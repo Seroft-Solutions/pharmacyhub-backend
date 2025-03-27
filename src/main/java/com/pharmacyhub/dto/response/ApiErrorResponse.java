@@ -130,7 +130,7 @@ public class ApiErrorResponse {
     /**
      * Create a simple error response with status, error code, message, and resolution
      */
-    public static ApiErrorResponse ofResolution(int status, String errorCode, String message, String resolution) {
+    public static ApiErrorResponse of(int status, String errorCode, String message, String resolution) {
         return ApiErrorResponse.builder()
                 .status(status)
                 .errorCode(errorCode)
@@ -142,7 +142,7 @@ public class ApiErrorResponse {
     /**
      * Create a simple error response with status, error code, message, resolution, and path
      */
-    public static ApiErrorResponse withResolution(int status, String errorCode, String message, String resolution, String path) {
+    public static ApiErrorResponse of(int status, String errorCode, String message, String resolution, String path) {
         return ApiErrorResponse.builder()
                 .status(status)
                 .errorCode(errorCode)
