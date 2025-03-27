@@ -32,6 +32,6 @@ public class SessionExpiredException extends BaseException {
      * @param cause The cause of the exception
      */
     public SessionExpiredException(String message, Throwable cause) {
-        super(ExceptionConstants.SESSION_EXPIRED, message, cause);
+        super(ExceptionConstants.SESSION_EXPIRED.getCode(), message, ExceptionConstants.SESSION_EXPIRED.getStatus(), cause);
     }
 }
