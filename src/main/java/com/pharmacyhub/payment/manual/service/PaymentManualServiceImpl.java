@@ -219,7 +219,6 @@ public class PaymentManualServiceImpl implements PaymentManualService {
     
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "approvedRequestCheck", key = "#userId + '-' + #examId")
     public boolean hasUserApprovedRequest(String userId, Long examId) {
         // If examId is null, check if the user has any approved manual payment request
         if (examId == null) {
