@@ -376,4 +376,15 @@ public class AuthenticationService {
     public String encodePassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }
+    
+    /**
+     * Reload user with updated roles and permissions
+     * 
+     * @param userId The user ID
+     * @return The user with updated roles and permissions
+     */
+    public User reloadUserWithRoles(Long userId) {
+        logger.debug("Reloading user {} with updated roles", userId);
+        return userService.getUserById(userId);
+    }
 }

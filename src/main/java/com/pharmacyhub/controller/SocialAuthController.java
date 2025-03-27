@@ -12,6 +12,7 @@ import com.pharmacyhub.entity.User;
 import com.pharmacyhub.security.domain.Permission;
 import com.pharmacyhub.security.domain.Role;
 import com.pharmacyhub.security.service.AuthenticationService;
+import com.pharmacyhub.security.service.UserRoleService;
 import com.pharmacyhub.service.session.SessionValidationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,6 +42,9 @@ public class SocialAuthController extends BaseController {
     
     @Autowired
     private SessionValidationService sessionValidationService;
+    
+    @Autowired
+    private UserRoleService userRoleService;
     
     @Value("${pharmacyhub.security.jwt.token-validity-in-seconds:18000}")
     private long tokenValidityInSeconds;
@@ -120,20 +124,28 @@ public class SocialAuthController extends BaseController {
                     .expiresIn(tokenValidityInSeconds)
                     .build();
 
-            // Ensure the user has at least one role - add USER role if none exists
+            // Ensure the user has at least one role for proper authorization
             if (userRoles.isEmpty()) {
-                logger.warn("User {} has no roles, adding default USER role", authenticatedUser.getEmailAddress());
+                logger.warn("User {} has no roles, adding default USER and STUDENT roles", authenticatedUser.getEmailAddress());
+                
+                // Add USER role
                 userRoleService.assignRoleToUser(authenticatedUser.getId(), "USER");
-                // Update role names for response
                 roleNames.add("USER");
+                
+                // Add STUDENT role for exam access
+                userRoleService.assignRoleToUser(authenticatedUser.getId(), "STUDENT");
+                roleNames.add("STUDENT");
+                
+                // Update user response with new roles
                 userResponse.setRoles(roleNames);
+                
+                // Reload user with new roles
+                authenticatedUser = authenticationService.reloadUserWithRoles(authenticatedUser.getId());
+                userRoles = authenticatedUser.getRoles();
             }
 
-            // Create response DTO
-            AuthResponseDTO response = AuthResponseDTO.builder()
-                    .user(userResponse)
-                    .tokens(tokens)
-                    .build();
+            // Create response DTO with session ID
+            AuthResponseDTO response;
             
             // Validate session if device information is provided
             if (request.getDeviceId() != null) {
@@ -148,17 +160,28 @@ public class SocialAuthController extends BaseController {
                     .metadata(buildMetadataJson(request))
                     .build();
                 
+                // Validate the session
                 LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
                 
-                // Add session ID to response if available
-                if (validationResult.getSessionId() != null) {
-                    response = AuthResponseDTO.builder()
-                        .user(userResponse)
-                        .tokens(tokens)
-                        .sessionId(validationResult.getSessionId())
-                        .validationStatus(validationResult.getStatus().toString())
-                        .build();
-                }
+                // Create response with session details
+                response = AuthResponseDTO.builder()
+                    .user(userResponse)
+                    .tokens(tokens)
+                    .sessionId(validationResult.getSessionId())
+                    .validationStatus(validationResult.getStatus().toString())
+                    .build();
+                
+                logger.debug("Generated session ID for user {}: {}", 
+                    authenticatedUser.getEmailAddress(), validationResult.getSessionId());
+            } else {
+                // Create basic response without session ID
+                logger.warn("No device ID provided for user {}, session tracking will be limited", 
+                    authenticatedUser.getEmailAddress());
+                    
+                response = AuthResponseDTO.builder()
+                    .user(userResponse)
+                    .tokens(tokens)
+                    .build();
             }
 
             logger.info("Google login successful for user: {}", authenticatedUser.getEmailAddress());

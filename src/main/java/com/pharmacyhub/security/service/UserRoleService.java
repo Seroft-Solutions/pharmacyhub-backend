@@ -58,7 +58,13 @@ public class UserRoleService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
-        user.setRole(role);
+        // Add the role to the user's roles
+        if (user.getRoles() == null) {
+            user.setRoles(new java.util.HashSet<>());
+        }
+        user.getRoles().add(role);
+        
+        // Save the user with the new role
         userRepository.save(user);
     }
 }
