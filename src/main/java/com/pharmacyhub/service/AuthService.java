@@ -118,48 +118,33 @@ public class AuthService {
                 .tokens(tokens)
                 .build();
         
-        // Validate session even if device information is not provided
-        // Get client IP from request
-        String ipAddress = getClientIpAddress(httpRequest);
-        String userAgent = httpRequest.getHeader("User-Agent");
-        
-        // Create a device ID if not provided
-        String deviceId = request.getDeviceId();
-        if (deviceId == null || deviceId.isEmpty()) {
-            // Use a hash of IP + User Agent if device ID is not provided
-            deviceId = "auto-" + (ipAddress + userAgent).hashCode();
-            logger.debug("Created auto device ID: {}", deviceId);
-        }
-        
-        // Validate login session
-        LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
-            .userId(authenticatedUser.getId())
-            .deviceId(deviceId)
-            .ipAddress(ipAddress)
-            .userAgent(userAgent)
-            .platform(request.getPlatform())
-            .language(request.getLanguage())
-            .metadata(buildMetadataJson(request))
-            .build();
-        
-        LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
-        
-        // Check if login should be denied due to anti-sharing rules
-        if (validationResult.getStatus() == LoginValidationResultDTO.LoginStatus.TOO_MANY_DEVICES ||
-            validationResult.getStatus() == LoginValidationResultDTO.LoginStatus.ACCOUNT_BLOCKED) {
-            logger.warn("Login denied due to anti-sharing policy: {}", validationResult.getStatus());
-            throw new SecurityException(validationResult.getMessage() != null ? 
-                validationResult.getMessage() : "Login denied due to anti-sharing policy.");
-        }
-        
-        // Add session ID to response if available
-        if (validationResult.getSessionId() != null) {
-            response = AuthResponseDTO.builder()
-                .user(userResponse)
-                .tokens(tokens)
-                .sessionId(validationResult.getSessionId())
-                .validationStatus(validationResult.getStatus().toString())
+        // Validate session if device information is provided
+        if (request.getDeviceId() != null) {
+            // Get client IP from request
+            String ipAddress = getClientIpAddress(httpRequest);
+            
+            // Validate login session
+            LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
+                .userId(authenticatedUser.getId())
+                .deviceId(request.getDeviceId())
+                .ipAddress(ipAddress)
+                .userAgent(request.getUserAgent())
+                .platform(request.getPlatform())
+                .language(request.getLanguage())
+                .metadata(buildMetadataJson(request))
                 .build();
+            
+            LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
+            
+            // Add session ID to response if available
+            if (validationResult.getSessionId() != null) {
+                response = AuthResponseDTO.builder()
+                    .user(userResponse)
+                    .tokens(tokens)
+                    .sessionId(validationResult.getSessionId())
+                    .validationStatus(validationResult.getStatus().toString())
+                    .build();
+            }
         }
         
         logger.info("Login successful for user: {}", authenticatedUser.getUsername());
@@ -245,44 +230,30 @@ public class AuthService {
                 .tokens(tokens)
                 .build();
         
-        // Validate session even if device information is not provided
-        // Create a device ID if not provided
-        String deviceId = request.getDeviceId();
-        if (deviceId == null || deviceId.isEmpty()) {
-            // Use a hash of IP + User Agent if device ID is not provided
-            deviceId = "auto-" + (ipAddress + userAgent).hashCode();
-            logger.debug("Created auto device ID for social login: {}", deviceId);
-        }
-        
-        // Create validation request
-        LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
-            .userId(authenticatedUser.getId())
-            .deviceId(deviceId)
-            .ipAddress(ipAddress)
-            .userAgent(userAgent)
-            .platform(request.getPlatform())
-            .language(request.getLanguage())
-            .metadata(buildMetadataJson(request))
-            .build();
-        
-        LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
-        
-        // Check if login should be denied due to anti-sharing rules
-        if (validationResult.getStatus() == LoginValidationResultDTO.LoginStatus.TOO_MANY_DEVICES ||
-            validationResult.getStatus() == LoginValidationResultDTO.LoginStatus.ACCOUNT_BLOCKED) {
-            logger.warn("Social login denied due to anti-sharing policy: {}", validationResult.getStatus());
-            throw new SecurityException(validationResult.getMessage() != null ? 
-                validationResult.getMessage() : "Login denied due to anti-sharing policy.");
-        }
-        
-        // Add session ID to response if available
-        if (validationResult.getSessionId() != null) {
-            response = AuthResponseDTO.builder()
-                .user(userResponse)
-                .tokens(tokens)
-                .sessionId(validationResult.getSessionId())
-                .validationStatus(validationResult.getStatus().toString())
+        // Validate session if device information is provided
+        if (request.getDeviceId() != null) {
+            // Create validation request
+            LoginValidationRequestDTO validationRequest = LoginValidationRequestDTO.builder()
+                .userId(authenticatedUser.getId())
+                .deviceId(request.getDeviceId())
+                .ipAddress(ipAddress)
+                .userAgent(userAgent)
+                .platform(request.getPlatform())
+                .language(request.getLanguage())
+                .metadata(buildMetadataJson(request))
                 .build();
+            
+            LoginValidationResultDTO validationResult = sessionValidationService.validateLogin(validationRequest);
+            
+            // Add session ID to response if available
+            if (validationResult.getSessionId() != null) {
+                response = AuthResponseDTO.builder()
+                    .user(userResponse)
+                    .tokens(tokens)
+                    .sessionId(validationResult.getSessionId())
+                    .validationStatus(validationResult.getStatus().toString())
+                    .build();
+            }
         }
         
         logger.info("Social login successful for user: {}", authenticatedUser.getEmailAddress());

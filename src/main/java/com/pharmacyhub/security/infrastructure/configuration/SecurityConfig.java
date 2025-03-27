@@ -1,7 +1,6 @@
 package com.pharmacyhub.security.infrastructure.configuration;
 
 import com.pharmacyhub.security.JwtAuthenticationFilter;
-import com.pharmacyhub.security.filter.SessionInvalidationFilter;
 import com.pharmacyhub.security.handler.CustomAccessDeniedHandler;
 import com.pharmacyhub.security.handler.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,6 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
-    
-    @Autowired
-    private SessionInvalidationFilter sessionInvalidationFilter;
     
     @Autowired
     private CustomAuthenticationEntryPoint authenticationEntryPoint;
@@ -65,8 +61,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
             )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(sessionInvalidationFilter, JwtAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -92,8 +87,8 @@ public class SecurityConfig {
             "http://www.pharmacyhub.pk"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Cache-Control", "Pragma", "X-Session-ID"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "X-Session-ID"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Cache-Control", "Pragma"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // 1 hour cache for preflight requests
 
