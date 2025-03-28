@@ -193,6 +193,15 @@ public class RoleInitializer implements ApplicationListener<ContextRefreshedEven
                 .system(true)
                 .build();
         roleMap.put(RoleEnum.USER, rolesRepository.save(userRole));
+
+        Role userRole2 = Role.builder()
+                            .name(RoleEnum.ROLE_USER)
+                            .description("Base user role with minimal permissions")
+                            .precedence(100)
+                            .permissions(userPermissions)
+                            .system(true)
+                            .build();
+        roleMap.put(RoleEnum.ROLE_USER, rolesRepository.save(userRole2));
         
         // Create STUDENT role (precedence - 90)
         Set<Permission> studentPermissions = new HashSet<>(userPermissions);
