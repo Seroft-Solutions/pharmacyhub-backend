@@ -47,6 +47,7 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/social-auth/**").permitAll()
+                .requestMatchers("/api/diagnostic/**").permitAll() // Added diagnostic endpoints
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/health").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
