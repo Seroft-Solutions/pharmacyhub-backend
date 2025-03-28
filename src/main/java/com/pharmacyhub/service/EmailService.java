@@ -22,6 +22,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.scheduling.annotation.Async;
 import java.nio.charset.StandardCharsets;
+import jakarta.annotation.PostConstruct;
+import org.springframework.core.env.Environment;
 
 @Service
 public class EmailService
@@ -33,6 +35,9 @@ public class EmailService
   
   @Autowired
   private ResourceLoader resourceLoader;
+  
+  @Autowired
+  private Environment environment;
 
   @Value("${spring.mail.username}")
   private String emailAddress;
@@ -43,11 +48,31 @@ public class EmailService
   @Value("${spring.mail.sender.name:PharmacyHub}")
   private String senderName;
 
+  /**
+   * Log email configuration details at startup
+   */
+  @PostConstruct
+  public void logEmailConfiguration() {
+    logger.info("EmailService initialized with configuration:");
+    logger.info("Mail Server: {} (Port: {})", getEnvironmentInfo("Mail Host"), getEnvironmentInfo("Mail Port"));
+    logger.info("Mail Username: {}", getEnvironmentInfo("Mail Username"));
+    logger.info("Mail Sender Name: {}", senderName);
+    logger.info("Frontend URL: {}", frontendUrl);
+    logger.info("SMTP Auth: {}", getEnvironmentInfo("Mail Auth"));
+    logger.info("SMTP StartTLS: {}", getEnvironmentInfo("Mail StartTLS"));
+    
+    // Don't log actual password but check if it's present
+    String mailPassword = environment.getProperty("spring.mail.password");
+    logger.info("Mail Password configured: {}", (mailPassword != null && !mailPassword.isEmpty()) ? "YES" : "NO");
+  }
+
   public void sendHtmlMail(Otp otp) throws MessagingException
   {
+    logger.info("Preparing OTP email for user: {}", otp.getUser().getEmailAddress());
     String subject = "Your OTP for Pharmacy Hub";
-    String body = prepareHtmlContent("${otp}",otp.getCode(),"OtpEmail.html");
+    String body = prepareHtmlContent("${otp}", otp.getCode(), "OtpEmail.html");
     emailSender(otp.getUser().getEmailAddress(), subject, body);
+    logger.info("OTP email sent successfully to: {}", otp.getUser().getEmailAddress());
   }
 
   /**
@@ -59,11 +84,14 @@ public class EmailService
    */
   public void sendVerificationEmail(String emailAddress, String token) throws MessagingException
   {
+    logger.info("Preparing basic verification email for: {}", emailAddress);
     String verificationUrl = frontendUrl + "/verify-email?token=" + token;
+    logger.debug("Verification URL: {}", verificationUrl);
 
     String subject = "Welcome to Pharmacy Hub - Verify Your Email";
-    String body = prepareHtmlContent("${verificationUrl}",verificationUrl,"EmailVerification.html");
+    String body = prepareHtmlContent("${verificationUrl}", verificationUrl, "EmailVerification.html");
     emailSender(emailAddress, subject, body);
+    logger.info("Basic verification email sent successfully to: {}", emailAddress);
   }
   
   /**
@@ -77,6 +105,12 @@ public class EmailService
    */
   public void sendVerificationEmail(String emailAddress, String token, String ipAddress, String userAgent) throws MessagingException
   {
+    logger.info("Preparing verification email for: {}", emailAddress);
+    logger.debug("Verification details - IP: {}, UserAgent: {}, Token: {}", 
+               ipAddress != null ? ipAddress : "Unknown", 
+               userAgent != null ? userAgent : "Unknown", 
+               token.substring(0, Math.min(token.length(), 8)) + "...");
+    
     String verificationUrl = frontendUrl + "/verify-email?token=" + token;
     String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -88,7 +122,9 @@ public class EmailService
     body = body.replace("${userAgent}", userAgent != null ? userAgent : "Unknown");
     body = body.replace("${timestamp}", timestamp);
     
+    logger.debug("Verification email prepared successfully with verification URL: {}", verificationUrl);
     emailSender(emailAddress, subject, body);
+    logger.info("Verification email sent successfully to: {}", emailAddress);
   }
   
   /**
@@ -102,14 +138,18 @@ public class EmailService
    */
   @Async
   public CompletableFuture<Boolean> sendVerificationEmailAsync(String emailAddress, String token, String ipAddress, String userAgent) {
+      logger.info("Asynchronous verification email requested for: {}", emailAddress);
       return CompletableFuture.supplyAsync(() -> {
           try {
+              logger.debug("Starting async email process for: {} from thread: {}", 
+                         emailAddress, Thread.currentThread().getName());
               // Send verification email with device tracking information
               sendVerificationEmail(emailAddress, token, ipAddress, userAgent);
               logger.info("Verification email sent asynchronously to: {}", emailAddress);
               return true;
           } catch (Exception e) {
-              logger.error("Failed to send verification email asynchronously to: {}", emailAddress, e);
+              logger.error("Failed to send verification email asynchronously to: {} - Error: {}", 
+                          emailAddress, e.getMessage(), e);
               return false;
           }
       });
@@ -148,11 +188,48 @@ public class EmailService
     logger.info("Password reset email sent successfully to: {}", emailAddress);
   }
 
+  /**
+   * Send a test email to verify email configuration
+   * 
+   * @param testEmailAddress Address to send test email to
+   * @return Success message or error message
+   */
+  public String sendTestEmail(String testEmailAddress) {
+    try {
+      logger.info("Sending test email to: {}", testEmailAddress);
+      
+      String subject = "PharmacyHub Test Email - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+      StringBuilder htmlBody = new StringBuilder();
+      htmlBody.append("<html><body>");
+      htmlBody.append("<h1>PharmacyHub Test Email</h1>");
+      htmlBody.append("<p>This is a test email to verify the email configuration.</p>");
+      htmlBody.append("<p>Server time: ").append(LocalDateTime.now()).append("</p>");
+      htmlBody.append("<p>Configuration:</p>");
+      htmlBody.append("<ul>");
+      htmlBody.append("<li>SMTP Server: ").append(getEnvironmentInfo("Mail Host")).append("</li>");
+      htmlBody.append("<li>SMTP Port: ").append(getEnvironmentInfo("Mail Port")).append("</li>");
+      htmlBody.append("<li>Auth: ").append(getEnvironmentInfo("Mail Auth")).append("</li>");
+      htmlBody.append("<li>StartTLS: ").append(getEnvironmentInfo("Mail StartTLS")).append("</li>");
+      htmlBody.append("</ul>");
+      htmlBody.append("</body></html>");
+      
+      emailSender(testEmailAddress, subject, htmlBody.toString());
+      logger.info("Test email sent successfully to: {}", testEmailAddress);
+      return "Test email sent successfully to: " + testEmailAddress;
+    } catch (Exception e) {
+      logger.error("Failed to send test email to: {}, Error: {}", testEmailAddress, e.getMessage(), e);
+      return "Failed to send test email: " + e.getMessage();
+    }
+  }
+
   private void emailSender(String toEmailAddress, String subject, String body) throws MessagingException
   {
-    logger.debug("Preparing to send email to: {}, subject: {}", toEmailAddress, subject);
+    logger.info("Preparing to send email to: {}, subject: {}", toEmailAddress, subject);
+    logger.debug("Email configuration - Host: {}, Port: {}, Username: {}", 
+               getEnvironmentInfo("Mail Host"), getEnvironmentInfo("Mail Port"), getEnvironmentInfo("Mail Username"));
     
     try {
+      logger.debug("Creating MIME message with encoding: {}", StandardCharsets.UTF_8.name());
       MimeMessage message = mailSender.createMimeMessage();
       MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
       
@@ -173,11 +250,28 @@ public class EmailService
       message.addHeader("X-MSMail-Priority", "High");
       message.addHeader("Importance", "High");
       message.addHeader("X-Auto-Response-Suppress", "OOF, AutoReply");
+      message.addHeader("X-Mailer", "PharmacyHub Mailer");
       
+      logger.debug("Email prepared successfully with headers: Priority=High, From={}, To={}", emailAddress, toEmailAddress);
+      logger.info("Attempting to connect to mail server and send email to: {}", toEmailAddress);
+      
+      long startTime = System.currentTimeMillis();
       mailSender.send(message);
-      logger.debug("Email sent successfully to: {}", toEmailAddress);
+      long endTime = System.currentTimeMillis();
+      
+      logger.info("Email sent successfully to: {} in {} ms", toEmailAddress, (endTime - startTime));
+      logger.debug("SMTP transaction completed successfully for recipient: {}", toEmailAddress);
+    } catch (jakarta.mail.AuthenticationFailedException e) {
+      logger.error("SMTP Authentication failed. Check username and password. Error: {}", e.getMessage(), e);
+      throw new MessagingException("Failed to authenticate with mail server: " + e.getMessage(), e);
+    } catch (jakarta.mail.SendFailedException e) {
+      logger.error("Failed to send email to: {}. Invalid recipient or sending rejected: {}", toEmailAddress, e.getMessage(), e);
+      throw new MessagingException("Mail server rejected the recipient or sender: " + e.getMessage(), e);
+    } catch (jakarta.mail.MessagingException e) {
+      logger.error("Messaging error when sending to: {}. SMTP Error: {}", toEmailAddress, e.getMessage(), e);
+      throw new MessagingException("Mail server communication error: " + e.getMessage(), e);
     } catch (Exception e) {
-      logger.error("Failed to send email to: {}, error: {}", toEmailAddress, e.getMessage(), e);
+      logger.error("Failed to send email to: {}, Unexpected error: {}", toEmailAddress, e.getMessage(), e);
       throw new MessagingException("Failed to send email: " + e.getMessage(), e);
     }
   }
@@ -198,28 +292,55 @@ public class EmailService
 
   public String prepareHtmlContent(String key, String value, String template)
   {
+    logger.debug("Preparing HTML content using template: {}", template);
     String htmlTemplate = loadHtmlTemplate(template);
-    return htmlTemplate.replace(key, value);
+    String result = htmlTemplate.replace(key, value);
+    logger.debug("HTML content prepared successfully using template: {}", template);
+    return result;
   }
 
   public String loadHtmlTemplate(String htmlTemplate)
   {
+    logger.debug("Loading HTML template: {}", htmlTemplate);
     Resource resource = resourceLoader.getResource("classpath:templates/"+htmlTemplate);
     StringBuilder contentBuilder = new StringBuilder();
 
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)))
     {
       String line;
+      int lineCount = 0;
       while ((line = reader.readLine()) != null)
       {
         contentBuilder.append(line).append(System.lineSeparator());
+        lineCount++;
       }
+      logger.debug("Successfully loaded template: {} ({} lines)", htmlTemplate, lineCount);
     }
     catch (IOException e)
     {
-      logger.error("Failed to load HTML template: {}", htmlTemplate, e);
+      logger.error("Failed to load HTML template: {} - Error: {}", htmlTemplate, e.getMessage(), e);
     }
 
     return contentBuilder.toString();
+  }
+  
+  /**
+   * Get a mail environment property with a safe default
+   */
+  private String getEnvironmentInfo(String propertyType) {
+    switch (propertyType) {
+      case "Mail Host":
+        return environment.getProperty("spring.mail.host", "<not set>");
+      case "Mail Port":
+        return environment.getProperty("spring.mail.port", "<not set>");
+      case "Mail Username":
+        return environment.getProperty("spring.mail.username", "<not set>");
+      case "Mail Auth":
+        return environment.getProperty("spring.mail.properties.mail.smtp.auth", "<not set>");
+      case "Mail StartTLS":
+        return environment.getProperty("spring.mail.properties.mail.smtp.starttls.enable", "<not set>");
+      default:
+        return "<unknown property>";
+    }
   }
 }
