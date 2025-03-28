@@ -67,7 +67,8 @@ public class JwtHelper
   private Boolean isTokenExpired(String token)
   {
     final Date expiration = getExpirationDateFromToken(token);
-    return expiration.before(new Date());
+    // Add clock skew tolerance of 5 minutes to allow for minor time differences between systems
+    return expiration.before(new Date(System.currentTimeMillis() - (5 * 60 * 1000)));
   }
 
   //generate token for user
