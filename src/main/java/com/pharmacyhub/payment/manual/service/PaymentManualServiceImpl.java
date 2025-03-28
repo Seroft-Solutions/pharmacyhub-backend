@@ -346,10 +346,8 @@ public class PaymentManualServiceImpl implements PaymentManualService {
         dto.setAttachmentUrl(request.getAttachmentUrl());
         
         // Only include screenshot data if specifically requested
-        if (includeScreenshots) {
             dto.setScreenshotData(request.getScreenshotData());
-        }
-        
+
         dto.setStatus(request.getStatus().toString());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setProcessedAt(request.getProcessedAt());
