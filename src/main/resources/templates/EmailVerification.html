@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light">
     <meta name="supported-color-schemes" content="light">
-    <title>Verify Your Email</title>
+    <title>Welcome to PharmacyHub</title>
     <style>
         :root {
             --primary: #4361ee;
@@ -17,7 +17,7 @@
             --background-alt: #f8f9fa;
             --border: #e9ecef;
         }
-        
+
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
@@ -26,7 +26,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         .email-container {
             max-width: 600px;
             margin: 40px auto;
@@ -35,43 +35,43 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        
+
         .email-header {
             padding: 32px 48px;
             text-align: center;
             background-color: var(--background);
             border-bottom: 1px solid var(--border);
         }
-        
+
         .title {
             font-size: 24px;
             font-weight: 600;
             color: var(--accent);
             margin: 0;
         }
-        
+
         .subtitle {
             font-size: 16px;
             color: var(--text-light);
             margin: 8px 0 0;
             font-weight: 400;
         }
-        
+
         .email-body {
             padding: 32px 48px;
             background-color: var(--background);
         }
-        
+
         .greeting {
             font-size: 18px;
             margin-bottom: 24px;
         }
-        
+
         .button-container {
             text-align: center;
             margin: 32px 0;
         }
-        
+
         .button {
             display: inline-block;
             background-color: var(--primary);
@@ -84,21 +84,11 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: background-color 0.2s;
         }
-        
+
         .button:hover {
             background-color: var(--primary-dark);
         }
-        
-        .link-fallback {
-            margin-top: 24px;
-            padding: 16px;
-            background-color: var(--background-alt);
-            border-radius: 6px;
-            font-size: 14px;
-            word-break: break-all;
-            color: var(--text-light);
-        }
-        
+
         .security-info {
             margin-top: 32px;
             padding: 20px;
@@ -106,37 +96,29 @@
             border-radius: 6px;
             border-left: 4px solid var(--primary);
         }
-        
+
         .security-info h3 {
             margin-top: 0;
             font-size: 16px;
             color: var(--accent);
         }
-        
+
         .info-item {
             display: flex;
             margin-bottom: 8px;
             font-size: 14px;
         }
-        
+
         .info-label {
             width: 120px;
             color: var(--text-light);
             flex-shrink: 0;
         }
-        
+
         .info-value {
             font-weight: 500;
         }
-        
-        .expiry-notice {
-            margin-top: 24px;
-            padding: 12px 16px;
-            background-color: rgba(67, 97, 238, 0.08);
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        
+
         .email-footer {
             padding: 24px 48px;
             text-align: center;
@@ -145,28 +127,18 @@
             font-size: 14px;
             border-top: 1px solid var(--border);
         }
-        
-        .footer-links {
-            margin: 16px 0;
-        }
-        
-        .footer-links a {
-            color: var(--primary);
-            text-decoration: none;
-            margin: 0 8px;
-        }
-        
+
         .company-info {
             font-size: 12px;
             margin-top: 16px;
         }
-        
+
         @media only screen and (max-width: 640px) {
             .email-container {
                 margin: 0;
                 border-radius: 0;
             }
-            
+
             .email-header, .email-body, .email-footer {
                 padding-left: 24px;
                 padding-right: 24px;
@@ -175,67 +147,52 @@
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="email-header">
-            <h1 class="title">Verify Your Email</h1>
-            <p class="subtitle">One last step to complete your registration</p>
+<div class="email-container">
+    <div class="email-header">
+        <h1 class="title">Welcome to PharmacyHub</h1>
+        <p class="subtitle">Please confirm your email to complete registration</p>
+    </div>
+
+    <div class="email-body">
+        <p class="greeting">Hello,</p>
+
+        <p>Thank you for registering with PharmacyHub. Please confirm your email address to complete your account setup by clicking the button below:</p>
+
+        <div class="button-container">
+            <a href="${verificationUrl}" class="button">Confirm Email</a>
         </div>
-        
-        <div class="email-body">
-            <p class="greeting">Hello,</p>
-            
-            <p>Thank you for joining PharmacyHub. To ensure the security of your account and gain full access to our platform, please verify your email address by clicking the button below:</p>
-            
-            <div class="button-container">
-                <a href="${verificationUrl}" class="button">Verify Email Address</a>
+
+        <div class="security-info">
+            <h3>Request Details</h3>
+            <p>This request was made from:</p>
+
+            <div class="info-item">
+                <div class="info-label">IP Address:</div>
+                <div class="info-value">${ipAddress}</div>
             </div>
-            
-            <div class="link-fallback">
-                <p>If the button doesn't work, please copy and paste this link into your browser:</p>
-                <p>${verificationUrl}</p>
+
+            <div class="info-item">
+                <div class="info-label">Device:</div>
+                <div class="info-value">${userAgent}</div>
             </div>
-            
-            <div class="expiry-notice">
-                <strong>Note:</strong> This verification link will expire in 30 minutes for security reasons.
+
+            <div class="info-item">
+                <div class="info-label">Date & Time:</div>
+                <div class="info-value">${timestamp}</div>
             </div>
-            
-            <div class="security-info">
-                <h3>For Your Security</h3>
-                <p>This verification request was initiated from:</p>
-                
-                <div class="info-item">
-                    <div class="info-label">IP Address:</div>
-                    <div class="info-value">${ipAddress}</div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-label">Device:</div>
-                    <div class="info-value">${userAgent}</div>
-                </div>
-                
-                <div class="info-item">
-                    <div class="info-label">Date & Time:</div>
-                    <div class="info-value">${timestamp}</div>
-                </div>
-                
-                <p>If you didn't request this verification, please ignore this email or contact our support team if you have concerns.</p>
-            </div>
-        </div>
-        
-        <div class="email-footer">
-            <p>Thank you for choosing PharmacyHub</p>
-            
-            <div class="footer-links">
-                <a href="#">Help Center</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-            </div>
-            
-            <div class="company-info">
-                <p>&copy; 2025 PharmacyHub. All rights reserved.</p>
-                <p>This is an automated message. Please do not reply.</p>
-            </div>
+
+            <p>If you didn’t request this, please contact our support team.</p>
         </div>
     </div>
+
+    <div class="email-footer">
+        <p>Thank you for choosing PharmacyHub</p>
+
+        <div class="company-info">
+            <p>&copy; 2025 PharmacyHub. All rights reserved.</p>
+            <p>This is an automated message. Please do not reply.</p>
+        </div>
+    </div>
+</div>
 </body>
 </html>
