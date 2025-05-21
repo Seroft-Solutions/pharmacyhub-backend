@@ -24,7 +24,7 @@ on:
 
 env:
   DOCKER_IMAGE: syedus06/pharmacyhub-backend
-  VPS_HOST: '103.135.45.76'
+  VPS_HOST: '103.135.45.44'
   VPS_USER: 'root'
   VPS_PORT: '22'
   CI: 'true'
