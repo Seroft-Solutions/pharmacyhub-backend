@@ -29,7 +29,7 @@ on:
         default: true
 
 env:
-  VPS_HOST: '103.135.45.76'
+  VPS_HOST: '31.58.144.117'
   VPS_USER: 'root'
   VPS_PORT: '22'
   CI: 'true'

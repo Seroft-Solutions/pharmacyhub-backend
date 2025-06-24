@@ -24,8 +24,8 @@ usage() {
   echo "  CI        - Set to 'true' when running in CI environment"
   echo
   echo "Example:"
-  echo "  $0 103.135.45.76 ubuntu ~/.ssh/id_rsa"
-  echo "  $0 103.135.45.76"
+  echo "  $0 31.58.144.117 ubuntu ~/.ssh/id_rsa"
+  echo "  $0 31.58.144.117"
   exit 1
 }
 
