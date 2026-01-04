@@ -1,5 +1,5 @@
 # Use the official OpenJDK image for Java 17 as the base image
-FROM openjdk:17-jdk
+FROM eclipse-temurin:17-jdk
 
 # Add Maintainer Info
 LABEL maintainer="syedus06@gmail.com"
